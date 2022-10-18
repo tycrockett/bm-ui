@@ -1,0 +1,7 @@
+{
+  "base": "/Users/crockettty",
+  "pwd": "~/projects/personal/bm-ui/src",
+  "cmds": {
+    "codeEditorCmd": "open -n -b \"com.microsoft.VSCode\" --args \"$PWD\""
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "bm-ui",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/css": "^11.10.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^0.27.2",
+    "chokidar": "^3.5.3",
+    "cors": "^2.8.5",
+    "date-fns": "^2.29.3",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "parse-gitignore": "^2.0.0",
+    "phosphor-react": "^1.4.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-toastify": "^9.0.8",
+    "web-vitals": "^2.1.4"
+  },
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "rescripts start",
+    "build": "rescripts build",
+    "test": "rescripts test",
+    "eject": "rescripts eject",
+    "dev": "concurrently -k \"BROWSER=none PORT=3030 npm start\" \"npm:electron\"",
+    "electron": "wait-on tcp:3030 && electron ."
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@rescripts/cli": "^0.0.16",
+    "concurrently": "^7.4.0",
+    "electron": "^20.2.0",
+    "electron-is-dev": "^2.0.0",
+    "wait-on": "^6.0.1"
+  }
+}
