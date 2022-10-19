@@ -22,7 +22,6 @@ const checkGit = async (settings) => {
   try {
     const path = settings?.pwd?.replace('~', settings.base);
     const list = getFilesInDirectory(path, true);
-    console.log(list);
     return list?.findIndex(({ name }) => name === '.git') > -1;
   } catch (err) {
     return false;
