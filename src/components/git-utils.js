@@ -22,12 +22,19 @@ export const hasRemoteBranch = async (currentBranch = '') => {
 export const createBranch = async (name) => {
   if (name) {
     try {
+      const hasStatus = !!(await cmd(`git status --porcelain`));
+      if (hasStatus) {
+        await cmd(`git stash`);
+      }
       const currentBranch = await getCurrentBranch();
       const hasRemote = await hasRemoteBranch(currentBranch);
       if (hasRemote) {
         await cmd(`git pull origin ${currentBranch}`);
       }
       await cmd(`git checkout -b ${name}`);
+      if (hasStatus) {
+        await cmd(`git stash apply`);
+      }
       return true;
     } catch (err) {
       console.log(err);
@@ -109,7 +116,7 @@ export const push = async (flags = []) => {
     const hasRemote = await hasRemoteBranch(currentBranch);
     if (hasRemote) {
       await cmd(`git push`);
-    } else if (flags.includes('-su') || flags.includes('--set-upstream')) {
+    } else if (!flags.includes('--disable-set-upstream')) {
       await cmd(`git push --set-upstream origin ${currentBranch}`);
       await cmd(`git push`);
     }
@@ -190,7 +197,7 @@ export const fetch = async () =>
         const description = des.replace(/"'/g, '');
         await cmd(`git add .`);
         await cmd(`git commit -m "${description}"`);
-        await push();
+        await push(['--disable-set-upstream']);
         return true;
       } else {
         toast.error(`You need to add a description`);

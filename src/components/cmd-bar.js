@@ -74,8 +74,8 @@ const cmdList = [
       name: 'push',
       key: 'push',
       args: '',
-      flags: '-su --set-upstream',
-      description: 'git push or with the -su flag sets an upstream for the current branch}',
+      flags: '',
+      description: 'git push or if no remote branch exists it will automatically set the upstream branch',
     },
     {
       name: 'fetch',

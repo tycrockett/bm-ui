@@ -159,7 +159,6 @@ function App() {
   useShortcuts({
     focusCmdBar: () => focusCmd?.current?.focus(),
     codeEditorCmd: handleOpenCode,
-    // openTerminalEditor
   }, display);
 
   const updatePage = () => {

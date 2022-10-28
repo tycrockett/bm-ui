@@ -1,14 +1,29 @@
 import { useEffect, useMemo } from "react";
+import { openRemote } from '../components/git-utils';
+const { exec } = window.require('child_process');
 
 const defaults = {
   'meta+l': 'focus-cmd-bar',
   'meta+o': 'code-editor-cmd',
-  'meta+shift+d': 'open-dev-tools', 
+  'meta+t': 'open-terminal',
+  'meta+e': 'open-remote'
+  // 'meta+shift+d': 'open-dev-tools', 
+}
+
+const cmds = {
+  'open-terminal': {
+    type: 'exec',
+    value: 'open -a terminal .',
+  },
+  'open-remote': {
+    type: 'fn',
+    value: () => openRemote('-a')
+  }
 }
 
 export const useShortcuts = ({
   focusCmdBar,
-  codeEditorCmd
+  codeEditorCmd,
 }, disabled = false) => {
 
   const shortcuts = useMemo(() => {
@@ -29,6 +44,13 @@ export const useShortcuts = ({
         } else if (shortcut === 'open-dev-tools') {
           // w.close()
           console.log('OPEN');
+        } else if (shortcut in cmds) {
+          const cmd = cmds[shortcut];
+          if (cmd.type === 'exec') {
+            exec(cmd.value);
+          } else if (cmd.type === 'fn') {
+            cmd.value();
+          }
         }
       } else if (!metaKey && !altKey && !ctrlKey && !shiftKey) {
         focusCmdBar();
