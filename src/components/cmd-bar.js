@@ -15,11 +15,11 @@ import { useTerminal } from "../hooks/use-terminal";
 
 const cmdArgs = {
   'open': ['terminal', 'editor', 'finder'],
-  'mode': ['terminal', 'bm']
+  'mode': ['terminal', 'bm'],
 }
 
 const cmdList = [
-  ['cd', 'bm', 'clear', 'open', 'exit', 'mode', 'kill'],
+  ['cd', '..', 'bm', 'clear', 'open', 'exit', 'mode', 'kill'],
   [
     {
       name: '.',
@@ -149,6 +149,13 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
           const path = settings?.pwd?.replace('~', settings.base);
           filterFn = ({ name }) => name;
           list = getFilesInDirectory(path)?.filter((match) => filterFn(match).startsWith(split[cmdIndex])) ?? []
+        } else if (split[0] === '..') {
+          const backSplit = settings?.pwd.split('/').slice(0, -1).join('/');
+          const path = backSplit?.replace('~', settings?.base);
+          console.log(path);
+          filterFn = ({ name }) => name;
+          list = getFilesInDirectory(path)?.filter((match) => filterFn(match).startsWith(split[cmdIndex])) ?? []
+          console.log("BACK", list);
         } else if (split[0] === 'bm') {
           cmdIndex = 1;
           list = cmdList[1]?.filter(({ name }) => (
@@ -194,7 +201,9 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
   
   const command = async (e) => {
     e.preventDefault();
-    if (cmd.includes('-h') || cmd.includes('--help')) {
+    const command = cmd;
+    const args = command?.split(' ');
+    if (args.includes('-h') || args.includes('--help')) {
       setCmd('');
       toast.warn(`command was discarded because --help flag was detected`);
       return;
@@ -204,15 +213,11 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
       
       setLoading(true);
       const timestamp = `${new Date().toISOString()}-${list?.[0]?.key}`;
-      
-      const command = cmd;
       setCmd('');
       
       let data = { ...settings };
       let hasChanges = false;
       let success = false;
-      
-      const args = command?.split(' ');
       
       if (command === '..') {
         const split = settings?.pwd?.split('/');
@@ -221,6 +226,11 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
           data.pwd = path;
           hasChanges = true;
         }
+      } else if (args?.[0] === '..') {
+        hasChanges = true;
+        const backSplit = settings?.pwd.split('/').slice(0, -1).join('/');
+        const path = backSplit + '/' + list[0].name;
+        data.pwd = path;
       } else if (args?.[0] === 'mode') {
         if (!args?.[1]) {
           setMode((m) => m === 'bm' ? 'terminal' : 'bm');
@@ -392,7 +402,7 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
                 <Div styles="hover pointer radius-30px m-xs pad-xs" onClick={() => clickCmd(item)}>
                   <Text styles="bold no-word-wrap">{item}</Text>
                 </Div>
-              ) : cmd.startsWith('cd ') ? (
+              ) : cmd.startsWith('cd ') || cmd.startsWith('.. ') ? (
                 <Div
                   styles={`hover pointer radius-30px m-xs pad-xs ${idx === 0 ? 'selected' : ''}`}
                   onClick={() => clickCmd(item.name)}
