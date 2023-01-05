@@ -106,7 +106,7 @@ export const openRemote = async (flags = '') => {
     }
     if (flags.includes('-c') || flags.includes('--copy')) {
       navigator.clipboard.writeText(url);
-      toast.success(`Copied url to branch`);
+      toast.success(`Copied branch URL`);
     } else {
       await cmd(`open "${url}"`);
     }
