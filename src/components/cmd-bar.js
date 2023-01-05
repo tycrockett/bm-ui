@@ -67,8 +67,8 @@ const cmdList = [
       name: 'remote',
       key: 'remote',
       args: '',
-      flags: '-a --all',
-      description: 'Open the remote branch or with -a opens the current repos branch list.',
+      flags: '-a --all -c --copy',
+      description: 'Open the remote branch or with -a opens the current repos branch list. -c will copy the url rather than open it.',
     },
     {
       name: 'push',
@@ -152,10 +152,8 @@ export const CmdBar = forwardRef(({ settings, setSettings, setMode }, ref) => {
         } else if (split[0] === '..') {
           const backSplit = settings?.pwd.split('/').slice(0, -1).join('/');
           const path = backSplit?.replace('~', settings?.base);
-          console.log(path);
           filterFn = ({ name }) => name;
           list = getFilesInDirectory(path)?.filter((match) => filterFn(match).startsWith(split[cmdIndex])) ?? []
-          console.log("BACK", list);
         } else if (split[0] === 'bm') {
           cmdIndex = 1;
           list = cmdList[1]?.filter(({ name }) => (

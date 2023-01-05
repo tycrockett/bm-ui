@@ -95,6 +95,7 @@ export const GitBm = ({ pwd }) => {
     let watcher = null;
     if (pwd) {
       try {
+        setWatcher(new Date().toISOString());
         const ignore = parse(fs.readFileSync('.gitignore')) || [];
         watcher = chokidar.watch('.', { ignored: [...ignore.patterns, /(^|[\/\\])\../], ignoreInitial: true, }).on('all', (event, path) => {
           setWatcher(new Date().toISOString());

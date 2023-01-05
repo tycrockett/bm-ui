@@ -17,7 +17,7 @@ const cmds = {
   },
   'open-remote': {
     type: 'fn',
-    value: () => openRemote('-a')
+    value: () => openRemote()
   }
 }
 

@@ -98,10 +98,16 @@ export const openRemote = async (flags = '') => {
   try {
     const currentBranch = await getCurrentBranch();
     const base = (await cmd(`git config remote.origin.url | cut -f2 -d. | tr ':' /`)).trim();
+    let url = '';
     if (flags.includes('--all') || flags.includes('-a')) {
-      await cmd(`open https://github.${base}/branches`);
+      url = `https://github.${base}/branches`;
     } else {
-      await cmd(`open "https://github.${base}/branches/all?query=${currentBranch}"`);
+      url = `https://github.${base}/branches/all?query=${currentBranch}`;
+    }
+    if (flags.includes('-c') || flags.includes('--copy')) {
+      navigator.clipboard.writeText(url);
+    } else {
+      await cmd(`open "${url}"`);
     }
     return true;
   } catch (err) {
