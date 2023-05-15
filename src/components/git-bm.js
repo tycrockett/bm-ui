@@ -12,7 +12,7 @@ import { Input } from "../shared-styles/input";
 import { Select } from "../shared-styles/Select";
 import { colors } from "../shared-styles/styles";
 import { Text } from "../shared-styles/text";
-import { checkoutBranch, deleteBranch, getBranches, hasRemoteBranch, logCommits, openRemote, push, update } from "./git-utils";
+import { checkoutBranch, deleteBranch, fetch, getBranches, hasRemoteBranch, logCommits, openRemote, push, update } from "./git-utils";
 const fs = window.require('fs');
 const chokidar = window.require('chokidar');
 const parse = require('parse-gitignore');
@@ -137,6 +137,29 @@ export const GitBm = ({ pwd }) => {
     }
   }, [lastCommand]);
 
+  const [lastFetch, setLastFetch] = useState(null);
+
+  const updateFetch = async () => {
+    try {
+      const success = await fetch();
+      if (success) {
+        setLastFetch(`Last Auto-Fetch ${format(new Date(), 'h:mm a')}`);
+        const timestamp = `${new Date().toISOString()}-fetch`;
+        setStore('lastCommand', timestamp);
+      }
+    } catch (err) {
+      console.warn(err);
+      setLastFetch('ERROR');
+    }
+  }
+
+  useEffect(() => {
+    updateFetch();
+    setInterval(() => {
+      updateFetch();
+    }, 1000 * 60);
+  }, []);
+
   const handleCheckout = async (event) => {
     const current = event.target.value;
     const success = await checkoutBranch(current, defaultBranch);
@@ -236,33 +259,36 @@ export const GitBm = ({ pwd }) => {
 
   return (
     <Div styles="relative">
-      <Div styles="ai:c">
-        <Select
-          styles="dark"
-          value={branches?.current || ''}
-          onChange={handleCheckout}
-          disabled={!branches?.list?.length}
-          ref={ref}
-        >
-          {branches?.list?.map((branch) => (
-            <option key={branch} value={branch}>
-              {branch}
-            </option>
-          ))}
-        </Select>
-        <Button styles="icon-dark ml-sm" onClick={handleRemote}>
-          {!!loading ? <div className={loaderStyle} />
-            : hasRemote
-              ? <CloudCheck color={colors.green} size={24} />
-              : <CloudSlash color={colors.red} size={24} />
-          }
-        </Button>
-        <Button styles="icon-dark" onClick={handleDelete} disabled={!!loading}>
-          <Trash color="white" size={24} />
-        </Button>
-        <Button styles="icon-dark" onClick={handleUpdate} disabled={!!loading}>
-          <Download color="white" size={24} />
-        </Button>
+      <Div styles="jc:sb ai:c">
+        <Div styles="ai:c">
+          <Select
+            styles="dark"
+            value={branches?.current || ''}
+            onChange={handleCheckout}
+            disabled={!branches?.list?.length}
+            ref={ref}
+          >
+            {branches?.list?.map((branch) => (
+              <option key={branch} value={branch}>
+                {branch}
+              </option>
+            ))}
+          </Select>
+          <Button styles="icon-dark ml-sm" onClick={handleRemote}>
+            {!!loading ? <div className={loaderStyle} />
+              : hasRemote
+                ? <CloudCheck color={colors.green} size={24} />
+                : <CloudSlash color={colors.red} size={24} />
+            }
+          </Button>
+          <Button styles="icon-dark" onClick={handleDelete} disabled={!!loading}>
+            <Trash color="white" size={24} />
+          </Button>
+          <Button styles="icon-dark" onClick={handleUpdate} disabled={!!loading}>
+            <Download color="white" size={24} />
+          </Button>
+        </Div>
+        <Text>{lastFetch}</Text>
       </Div>
 
       {display && (

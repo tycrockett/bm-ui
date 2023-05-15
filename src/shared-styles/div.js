@@ -1,12 +1,12 @@
 import { forwardRef } from 'react';
 import { css } from '@emotion/css';
-import { theme } from './styles';
+import { colors, theme } from './styles';
 
 const tags = {
   ...theme,
   modal: `
     border-radius: 8px;
-    background-color: white;
+    background-image: linear-gradient(120deg, #6500B0, #6500B0, ${colors.indigo});
   `
 }
 
@@ -21,7 +21,7 @@ const buildStyles = (object, styles) => {
 }
 
 
-export const Div = forwardRef(({ children, styles = '', className = '', bgColor = '', ...rest }, ref) => {
+export const Div = forwardRef(({ children, styles = '', className = '', bgColor = '', onClose = () => {}, ...rest }, ref) => {
   const props = {
     className: css`
       ${buildStyles(tags, styles)}
@@ -44,8 +44,9 @@ export const Div = forwardRef(({ children, styles = '', className = '', bgColor 
         left: 0;
         right: 0;
         background: rgba(0, 0, 0, .2);
-      `}>
-        <div {...props}>
+        z-index: 1000;
+      `} onMouseDown={onClose}>
+        <div {...props} onMouseDown={(event) => event.stopPropagation()}>
           {children}
         </div>
       </div>

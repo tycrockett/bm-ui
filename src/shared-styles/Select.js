@@ -19,7 +19,7 @@ const tags = {
     min-width: 200px;
     padding: 8px;
     outline: none;
-    background: ${colors.black};
+    background-color: #4B0082;
     border: 1px solid #666;
     border-radius: 4px;
     appearance: none;
@@ -29,12 +29,12 @@ const tags = {
     :hover {
       border: 1px solid white;
       cursor: pointer;
-      background-color: rgba(255, 255, 255, .1);
+      background-color: #6500B0;
     }
     [disabled] {
       border: 1px solid #666;
       cursor: default;
-      background: ${colors.black};
+      background: #4B0082;
     }
   `,
 }
@@ -56,11 +56,11 @@ const buildStyles = (object, styles) => {
 const child = (reverse, children) => `
   cursor: pointer;
   position: absolute;
-  top: 0;
+  top: 100%;
   ${reverse ? `top: -${20 * children.length - 20}px;` : ''}
   right: 0;
   left: 0;
-  background-color: ${colors.black};
+  background-color: #4B0082;
   border: 1px solid white; border-radius: 4px;
   padding: 4px;
 `;

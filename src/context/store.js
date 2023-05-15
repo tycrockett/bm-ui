@@ -3,6 +3,7 @@ import React, { useReducer } from 'react';
 const initialState = {
   settings: {},
   sessions: [],
+  localBuildDomain: 'http://localhost:3000'
 };
 
 const reducer = (state, action) => {

@@ -2,16 +2,20 @@
 export const colors = {
   black: `#282d2d`,
   light: `#BBB`,
-  lightGreen: `#ACD1AF`,
-  green: `#00D100`,
-  darkGreen: `#285D34`,
-  red: `#D10000`,
-  lightRed: `#F47174`,
+
+  lightGreen: `#04B16F`,
+  green: `#117660`,
+  darkGreen: `#09323B`,
+
+  lightRed: `#F7BEC0`,
+  red: `#E7625F`,
+  darkRed: `#C85250`,
+
   lightBlue: `#93CAED`,
   blue: `#0000D1`,
   darkBlue: `#0B0B60`,
+  
   indigo: `#310062`,
-
 }
 
 export const theme = {
@@ -89,7 +93,7 @@ export const theme = {
   'full-height': `height: 100%;`,
   hover: `
     :hover {
-      background: rgba(255, 255, 255, .2);
+      background: #6500B0;
     }
   `,
   pointer: `cursor: pointer;`,

@@ -6,7 +6,12 @@ const defaults = {
   'meta+l': 'focus-cmd-bar',
   'meta+o': 'code-editor-cmd',
   'meta+t': 'open-terminal',
-  'meta+e': 'open-remote'
+  'meta+w': 'open-toolbox',
+  'meta+e': 'open-remote',
+  
+  'alt+Dead': 'toolbox-link-builder',
+  
+  'meta+x': 'escape',
   // 'meta+shift+d': 'open-dev-tools', 
 }
 
@@ -24,6 +29,9 @@ const cmds = {
 export const useShortcuts = ({
   focusCmdBar,
   codeEditorCmd,
+  closeAll,
+  handleToolbox,
+  openLocalLink
 }, disabled = false) => {
 
   const shortcuts = useMemo(() => {
@@ -51,6 +59,12 @@ export const useShortcuts = ({
           } else if (cmd.type === 'fn') {
             cmd.value();
           }
+        } else if (shortcut === 'open-toolbox') {
+          handleToolbox();
+        } else if (shortcut === 'toolbox-link-builder') {
+          openLocalLink();
+        } else if (shortcut === 'escape') {
+          closeAll();
         }
       } else if (!metaKey && !altKey && !ctrlKey && !shiftKey) {
         focusCmdBar();

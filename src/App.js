@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import { css } from '@emotion/css';
 import { Div } from './shared-styles/div';
 import { Text } from './shared-styles/text';
-import { FolderSimple, File, ArrowSquareOut, Gear, Tree, Monitor } from 'phosphor-react';
+import { FolderSimple, File, ArrowSquareOut, Gear, Tree, Monitor, Wrench } from 'phosphor-react';
 import { getFilesInDirectory, read, write } from './node/fs-utils';
 import { Input } from './shared-styles/input';
 import { Button } from './shared-styles/button';
@@ -15,6 +15,7 @@ import { useStore } from './context/use-store';
 import { useAsyncValue } from './hooks/use-async-value';
 import { fetch as fetchAll } from './components/git-utils';
 import { Terminal } from './components/terminal';
+import { linkOutLocalBuild, Toolbox } from './components/toolbox';
 
 const cacheKeyRelative = `bm-cache`;
 
@@ -30,7 +31,7 @@ const checkGit = async (settings) => {
 
 function App() {
 
-  const { store: { settings = {}, cacheKey }, setStore } = useStore();
+  const { store: { settings = {}, cacheKey, localBuildDomain }, setStore } = useStore();
 
   const focusCmd = useRef();
   const [pwd, setPwd] = useState('');
@@ -39,8 +40,9 @@ function App() {
   const [display, setDisplay] = useState(false);
   const [text, setText] = useState('');
   const refFieldFocus = useRef();
-  const [mode, setMode]  = useState('bm');
-
+  const [mode, setMode] = useState('bm');
+  const [modal, setModal] = useState('');
+  
   const setSettings = (data) => {
     if (cacheKey) {
       write(`${cacheKey}/settings.json`, data);
@@ -159,6 +161,12 @@ function App() {
   useShortcuts({
     focusCmdBar: () => focusCmd?.current?.focus(),
     codeEditorCmd: handleOpenCode,
+    closeAll: () => {
+      setModal('');
+      setMode(mode === 'bm' ? 'terminal' : 'bm');
+    },
+    handleToolbox: () => setModal(modal === 'toolbox' ? '' : 'toolbox'),
+    openLocalLink: () => linkOutLocalBuild(localBuildDomain)
   }, display);
 
   const updatePage = () => {
@@ -173,13 +181,20 @@ function App() {
 
   return (
     <Div styles="pad" className="width: calc(100% - 32px);">
+
+      {modal === 'toolbox' && (
+        <Toolbox
+          onClose={() => setModal('')}
+        />
+      )}
+
       <Div styles="padb">
         <Div styles="ai:c">
           <Div styles="ai:c fg">
             <Button styles="icon-dark" onClick={() => updatePage()}>
               {mode === 'bm' ? <Tree size={32} color="white" />
                 : mode === 'terminal' ? <Monitor size={32} color="white" />
-                : null
+                  : null
               }
             </Button>
             <Text styles="bold">{hasMorePath ? '.../' : ''}{currentPath}</Text>
@@ -197,6 +212,9 @@ function App() {
               ))}
             </Div>
           )}
+          <Button styles="icon-dark" onClick={() => setModal('toolbox')}>
+            <Wrench size={24} color="white" weight="bold" />
+          </Button>
           <Button styles="icon-dark" onClick={handleOpenCode}>
             <ArrowSquareOut size={24} color="white" weight="bold" />
           </Button>
@@ -254,7 +272,7 @@ function App() {
 
       <Terminal
         setMode={setMode}
-        display={mode ==='terminal'}
+        display={mode === 'terminal'}
       />
 
     </Div>
