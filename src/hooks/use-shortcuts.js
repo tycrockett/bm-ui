@@ -39,35 +39,37 @@ export const useShortcuts = ({
   }, []);
 
   const handleKeydown = (event) => {
-    if (!disabled) {
-      const { key, metaKey, altKey, ctrlKey, shiftKey } = event;
-      const code = `${metaKey ? 'meta+' : ''}${altKey ? 'alt+' : ''}${ctrlKey ? 'ctrl+' : ''}${shiftKey ? 'shift+' : ''}${key}`;
-      if (code in shortcuts) {
-        event.preventDefault();
-        const shortcut = shortcuts[code];
-        if (shortcut === 'focus-cmd-bar') {
-          focusCmdBar();
-        } else if (shortcut === 'code-editor-cmd') {
-          codeEditorCmd();
-        } else if (shortcut === 'open-dev-tools') {
-          // w.close()
-          console.log('OPEN');
-        } else if (shortcut in cmds) {
-          const cmd = cmds[shortcut];
-          if (cmd.type === 'exec') {
-            exec(cmd.value);
-          } else if (cmd.type === 'fn') {
-            cmd.value();
+    if (event?.target?.tagName !== 'INPUT') {
+      if (!disabled) {
+        const { key, metaKey, altKey, ctrlKey, shiftKey } = event;
+        const code = `${metaKey ? 'meta+' : ''}${altKey ? 'alt+' : ''}${ctrlKey ? 'ctrl+' : ''}${shiftKey ? 'shift+' : ''}${key}`;
+        if (code in shortcuts) {
+          event.preventDefault();
+          const shortcut = shortcuts[code];
+          if (shortcut === 'focus-cmd-bar') {
+            focusCmdBar();
+          } else if (shortcut === 'code-editor-cmd') {
+            codeEditorCmd();
+          } else if (shortcut === 'open-dev-tools') {
+            // w.close()
+            console.log('OPEN');
+          } else if (shortcut in cmds) {
+            const cmd = cmds[shortcut];
+            if (cmd.type === 'exec') {
+              exec(cmd.value);
+            } else if (cmd.type === 'fn') {
+              cmd.value();
+            }
+          } else if (shortcut === 'open-toolbox') {
+            handleToolbox();
+          } else if (shortcut === 'toolbox-link-builder') {
+            openLocalLink();
+          } else if (shortcut === 'escape') {
+            closeAll();
           }
-        } else if (shortcut === 'open-toolbox') {
-          handleToolbox();
-        } else if (shortcut === 'toolbox-link-builder') {
-          openLocalLink();
-        } else if (shortcut === 'escape') {
-          closeAll();
+        } else if (!metaKey && !altKey && !ctrlKey && !shiftKey) {
+          focusCmdBar();
         }
-      } else if (!metaKey && !altKey && !ctrlKey && !shiftKey) {
-        focusCmdBar();
       }
     }
   }
