@@ -21,7 +21,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
       )
   );
   const { animation: fadeIn } = useAnimation(
-    { animation: animation("fadeIn", ".2s ease"), timing: 300 },
+    { animation: animation("fadeIn", ".4s ease"), timing: 500 },
     [status?.lastUpdate]
   );
 
@@ -34,13 +34,10 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
     }
   };
 
-  if (
-    !status?.modified?.length &&
-    !status?.deleted?.length &&
-    !status?.untracked?.length
-  ) {
-    return null;
-  }
+  const hasStatus =
+    !!status?.modified?.length ||
+    !!status?.deleted?.length ||
+    !!status?.untracked?.length;
 
   return (
     <Div
@@ -49,219 +46,248 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
         margin-bottom: 32px;
       `}
     >
-      <Div
-        css={`
-          ${flex("space-between")}
-        `}
-      >
-        <Text
-          h3
-          bold
-          css={`
-            margin-bottom: 8px;
-          `}
-        >
-          Status
-        </Text>
-        <Text
-          h4
-          bold
-          css={`
-            margin-bottom: 8px;
-          `}
-        >
-          {status?.lastUpdate
-            ? format(new Date(status?.lastUpdate), "h:mm a")
-            : ""}
-        </Text>
-      </Div>
-      <Text>{shortStatus}</Text>
-      {status?.untracked?.map((item) => (
-        <Div
-          css={`
-            ${flex("space-between")}
-            padding: 0;
-          `}
-        >
+      {hasStatus ? (
+        <>
           <Div
             css={`
-              ${flex("center")}
-              p {
-                margin-left: 16px;
-              }
+              ${flex("space-between")}
             `}
           >
-            <Button
-              icon
-              small
-              onClick={() => copyItem(item)}
+            <Text
+              h3
+              bold
               css={`
-                margin: 0;
+                margin-bottom: 8px;
               `}
             >
-              <FileDotted size={24} color={colors.lightBlue} weight="bold" />
-            </Button>
-            <Text h4>{item}</Text>
+              Status
+            </Text>
+            <Text
+              h4
+              bold
+              css={`
+                margin-bottom: 8px;
+              `}
+            >
+              {status?.lastUpdate
+                ? format(new Date(status?.lastUpdate), "h:mm a")
+                : ""}
+            </Text>
           </Div>
-          <Div
+          <Text
             css={`
-              ${flex("right")}
-              p {
-                margin-right: 4px;
-              }
+              margin-bottom: 16px;
             `}
           >
+            {shortStatus}
+          </Text>
+          {status?.untracked?.map((item) => (
             <Div
               css={`
-                width: 100px;
-                ${flex("right")}
-                padding: 4px 8px;
-                border-radius: 30px;
-                ${shadows.lg}
-                margin: 0 8px;
-                font-weight: bold;
+                ${flex("space-between")}
+                padding: 0;
               `}
             >
-              <Text>{status?.fileCount?.[item]}</Text>
-              <PlusCircle size={24} color={colors.green} weight="bold" />
+              <Div
+                css={`
+                  ${flex("center")}
+                  p {
+                    margin-left: 16px;
+                  }
+                `}
+              >
+                <Button
+                  icon
+                  small
+                  onClick={() => copyItem(item)}
+                  css={`
+                    margin: 0;
+                  `}
+                >
+                  <FileDotted
+                    size={24}
+                    color={colors.lightBlue}
+                    weight="bold"
+                  />
+                </Button>
+                <Text h4>{item}</Text>
+              </Div>
+              <Div
+                css={`
+                  ${flex("right")}
+                  p {
+                    margin-right: 4px;
+                  }
+                `}
+              >
+                <Div
+                  css={`
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  <Text>{status?.fileCount?.[item]}</Text>
+                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                </Div>
+              </Div>
             </Div>
-          </Div>
-        </Div>
-      ))}
+          ))}
 
-      {status?.deleted?.map((item) => (
-        <Div
-          css={`
-            ${flex("space-between")}
-            padding: 8px 0;
-          `}
-        >
-          <Div
-            css={`
-              ${flex("center")}
-              p {
-                margin-left: 16px;
-              }
-            `}
-          >
-            <Button
-              icon
-              small
-              onClick={() => copyItem(item)}
-              css={`
-                margin: 0;
-              `}
-            >
-              <FileX size={24} color={colors.red} weight="bold" />
-            </Button>
-            <Text h4>{item}</Text>
-          </Div>
-          <Div
-            css={`
-              ${flex("right")}
-              p {
-                margin-right: 4px;
-              }
-            `}
-          >
+          {status?.deleted?.map((item) => (
             <Div
               css={`
-                width: 100px;
-                ${flex("right")}
-                padding: 4px 8px;
-                border-radius: 30px;
-                ${shadows.lg}
-                margin: 0 8px;
-                font-weight: bold;
+                ${flex("space-between")}
+                padding: 0;
               `}
             >
-              <Text>{status?.files?.[item]?.deletes}</Text>
-              <MinusCircle size={24} color={colors.red} weight="bold" />
+              <Div
+                css={`
+                  ${flex("center")}
+                  p {
+                    margin-left: 16px;
+                  }
+                `}
+              >
+                <Button
+                  icon
+                  small
+                  onClick={() => copyItem(item)}
+                  css={`
+                    margin: 0;
+                  `}
+                >
+                  <FileX size={24} color={colors.red} weight="bold" />
+                </Button>
+                <Text h4>{item}</Text>
+              </Div>
+              <Div
+                css={`
+                  ${flex("right")}
+                  p {
+                    margin-right: 4px;
+                  }
+                `}
+              >
+                <Div
+                  css={`
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  <Text>{status?.files?.[item]?.deletes}</Text>
+                  <MinusCircle size={24} color={colors.red} weight="bold" />
+                </Div>
+                <Div
+                  css={`
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  <Text>{status?.files?.[item]?.adds}</Text>
+                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                </Div>
+              </Div>
             </Div>
-            <Div
-              css={`
-                width: 100px;
-                ${flex("right")}
-                padding: 4px 8px;
-                border-radius: 30px;
-                ${shadows.lg}
-                margin: 0 8px;
-                font-weight: bold;
-              `}
-            >
-              <Text>{status?.files?.[item]?.adds}</Text>
-              <PlusCircle size={24} color={colors.green} weight="bold" />
-            </Div>
-          </Div>
-        </Div>
-      ))}
+          ))}
 
-      {status?.modified?.map((item) => (
+          {status?.modified?.map((item) => (
+            <Div
+              css={`
+                ${flex("space-between")}
+                padding: 0;
+              `}
+            >
+              <Div
+                css={`
+                  ${flex("center")}
+                  p {
+                    margin-left: 16px;
+                  }
+                `}
+              >
+                <Button
+                  icon
+                  small
+                  onClick={() => copyItem(item)}
+                  css={`
+                    margin: 0;
+                  `}
+                >
+                  <FileArrowUp size={24} color={colors.green} weight="bold" />
+                </Button>
+                <Text h4>{item}</Text>
+              </Div>
+              <Div
+                css={`
+                  ${flex("center")}
+                  p {
+                    margin-right: 4px;
+                  }
+                `}
+              >
+                <Div
+                  css={`
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  <Text>{status?.files?.[item]?.deletes}</Text>
+                  <MinusCircle size={24} color={colors.red} weight="bold" />
+                </Div>
+                <Div
+                  css={`
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  <Text>{status?.files?.[item]?.adds}</Text>
+                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                </Div>
+              </Div>
+            </Div>
+          ))}
+        </>
+      ) : (
         <Div
           css={`
             ${flex("space-between")}
-            padding: 8px 0;
           `}
         >
-          <Div
-            css={`
-              ${flex("center")}
-              p {
-                margin-left: 16px;
-              }
-            `}
-          >
-            <Button
-              icon
-              small
-              onClick={() => copyItem(item)}
-              css={`
-                margin: 0;
-              `}
-            >
-              <FileArrowUp size={24} color={colors.green} weight="bold" />
-            </Button>
-            <Text h4>{item}</Text>
-          </Div>
-          <Div
-            css={`
-              ${flex("center")}
-              p {
-                margin-right: 4px;
-              }
-            `}
-          >
-            <Div
-              css={`
-                width: 100px;
-                ${flex("right")}
-                padding: 4px 8px;
-                border-radius: 30px;
-                ${shadows.lg}
-                margin: 0 8px;
-                font-weight: bold;
-              `}
-            >
-              <Text>{status?.files?.[item]?.deletes}</Text>
-              <MinusCircle size={24} color={colors.red} weight="bold" />
-            </Div>
-            <Div
-              css={`
-                width: 100px;
-                ${flex("right")}
-                padding: 4px 8px;
-                border-radius: 30px;
-                ${shadows.lg}
-                margin: 0 8px;
-                font-weight: bold;
-              `}
-            >
-              <Text>{status?.files?.[item]?.adds}</Text>
-              <PlusCircle size={24} color={colors.green} weight="bold" />
-            </Div>
-          </Div>
+          <Text h3 bold>
+            No changes detected.
+          </Text>
+          <Text h4 bold>
+            {status?.lastUpdate
+              ? format(new Date(status?.lastUpdate), "h:mm a")
+              : ""}
+          </Text>
         </Div>
-      ))}
+      )}
     </Div>
   );
 };

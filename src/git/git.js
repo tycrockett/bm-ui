@@ -443,8 +443,11 @@ export const Git = () => {
             currentBranch={branches?.current}
             parentBranch={parentBranch}
           />
-
-          <Logs parentBranch={parentBranch} lastCommand={lastCommand} />
+          <Logs
+            parentBranch={parentBranch}
+            lastCommand={lastCommand}
+            pwd={settings?.pwd}
+          />
         </Div>
       ) : (
         <SetupBm />
