@@ -8,6 +8,7 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
         ${flex("start column")}
         border-radius: 16px;
         padding: 16px;
+        width: 100%;
       `}
     >
       <Div

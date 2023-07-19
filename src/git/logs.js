@@ -10,12 +10,21 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
     [parentBranch, pwd]
   );
   const [logs] = useAsyncValue(getLogs, [lastCommand, parentBranch, pwd]);
+  const commits = Object.entries(logs || {});
+
+  if (!commits.length) {
+    return null;
+  }
 
   return (
     <Div
       css={`
         ${animation("fadeIn", ".2s ease")}
-        margin-bottom: 32px;
+        background-color: rgba(0, 0, 0, .2);
+        padding: 16px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        width: 100%;
       `}
     >
       <Text
@@ -27,7 +36,7 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
       >
         Commits
       </Text>
-      {Object.entries(logs || {})?.map(([key, item]) => (
+      {commits?.map(([key, item]) => (
         <Div
           css={`
             ${flex("space-between")}

@@ -340,12 +340,17 @@ export const Git = () => {
       {settings?.pwd in repos ? (
         <Div
           css={`
-            height: calc(100vh - ${box?.top + 32}px);
+            height: calc(100vh - ${box?.top + 16}px);
+            ${flex("start column")}
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
           `}
         >
           <Div
             css={`
               ${flex("left")}
+              width: 100%;
               select {
                 width: 200px;
                 padding: 12px 8px;
@@ -421,6 +426,7 @@ export const Git = () => {
               )}
             </Div>
           </Div>
+
           <CmdList
             list={list}
             index={index}

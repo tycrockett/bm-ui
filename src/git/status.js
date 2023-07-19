@@ -45,6 +45,8 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
       css={`
         ${hasStatus ? fadeIn : ""}
         margin-bottom: 32px;
+        height: 100%;
+        width: 100%;
       `}
     >
       {hasStatus ? (
