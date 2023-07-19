@@ -50,6 +50,13 @@ const tags = {
     :active {
       filter: none;
     }
+    :disabled {
+      opacity: 60%;
+      cursor: default;
+      :hover {
+        background: transparent;
+      }
+    }
   `,
   'icon-dark': `
     display: flex;

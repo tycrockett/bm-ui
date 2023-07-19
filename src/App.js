@@ -1,282 +1,253 @@
-import { useMemo, useEffect, useState, useCallback, useRef } from 'react';
-import { css } from '@emotion/css';
-import { Div } from './shared-styles/div';
-import { Text } from './shared-styles/text';
-import { FolderSimple, File, ArrowSquareOut, Gear, Tree, Monitor, Wrench } from 'phosphor-react';
-import { getFilesInDirectory, read, write } from './node/fs-utils';
-import { Input } from './shared-styles/input';
-import { Button } from './shared-styles/button';
-import { colors } from './shared-styles/styles';
-import { cmd } from './node/node-exports';
-import { GitGui } from './components/git-gui';
-import { CmdBar } from './components/cmd-bar';
-import { useShortcuts } from './hooks/use-shortcuts';
-import { useStore } from './context/use-store';
-import { useAsyncValue } from './hooks/use-async-value';
-import { fetch as fetchAll } from './components/git-utils';
-import { Terminal } from './components/terminal';
-import { linkOutLocalBuild, Toolbox } from './components/toolbox';
+import { css } from "@emotion/css";
+import {
+  ArrowLeft,
+  ArrowSquareOut,
+  Gear,
+  Monitor,
+  Plus,
+  Tree,
+} from "phosphor-react";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { StoreContext } from "./context/store";
+import { Finder } from "./directory/finder";
+import { Git } from "./git/git";
+import { useAnimation } from "./hooks/use-animation";
+import { useKeyboard } from "./hooks/use-keyboard";
+import { Settings } from "./settings/settings";
+import { Div, Text, Button, colors } from "./shared";
+import { animation, flex, shadows } from "./shared/utils";
+import { cmd } from "./node/node-exports";
 
-const cacheKeyRelative = `bm-cache`;
+const header = `
+  padding: 8px 16px;
+`;
 
-const checkGit = async (settings) => {
-  try {
-    const path = settings?.pwd?.replace('~', settings.base);
-    const list = getFilesInDirectory(path, true);
-    return list?.findIndex(({ name }) => name === '.git') > -1;
-  } catch (err) {
-    return false;
-  }
-}
+const App = () => {
+  const {
+    store,
+    methods: { setSettings, directory },
+  } = useContext(StoreContext);
+  const [mode, setMode] = useState("finder");
 
-function App() {
+  const { settings } = store;
 
-  const { store: { settings = {}, cacheKey, localBuildDomain }, setStore } = useStore();
-
-  const focusCmd = useRef();
-  const [pwd, setPwd] = useState('');
-  const [focusPwd, setFocusPwd] = useState(false);
-  const [dirList, setDirList] = useState();
-  const [display, setDisplay] = useState(false);
-  const [text, setText] = useState('');
-  const refFieldFocus = useRef();
-  const [mode, setMode] = useState('bm');
-  const [modal, setModal] = useState('');
-  
-  const setSettings = (data) => {
-    if (cacheKey) {
-      write(`${cacheKey}/settings.json`, data);
-    }
-    setStore('settings', data);
-  }
-
-  const fetch = async () => {
-    try {
-      const baseRaw = await cmd(`cd ~ && pwd`);
-      const base = baseRaw.replace(/\n/g, '');
-      const cacheKey = `${base}/${cacheKeyRelative}`;
-      setStore('cacheKey', cacheKey);
-      let data = read(`${cacheKey}/settings.json`, {});
-      if (!data.base || !data.pwd) {
-        data.base = base;
-        data.pwd = '~';
-        setSettings(data);
-      }
-      const path = data.pwd.replace('~', data.base);
-      process.chdir(path);
-      setSettings(data);
-    } catch (err) {
-      console.log('YIKES');
-      console.warn(err);
-      setPwd('');
-    } finally {
-      await fetchAll();
-      setStore('lastCommand', `${new Date().toISOString()}-fetch`);
-    }
-  }
-
-  const updateDirList = async () => {
-    const path = settings?.pwd?.replace('~', settings.base);
-    const data = getFilesInDirectory(path);
-    setDirList(data);
-  }
+  const splitDir = settings?.pwd?.split("/");
+  const displayDirectory = settings?.pwd?.split("/").slice(-2)?.join("/");
 
   useEffect(() => {
-    fetch();
-  }, []);
-
-  useEffect(() => {
-    updateDirList();
-    if (settings.pwd) {
-      process.chdir(settings.pwd.replace('~', settings.base));
-    }
-  }, [settings.pwd]);
-
-
-  const filteredList = useMemo(() => {
-    if (!pwd) {
-      return dirList || [];
-    }
-    return dirList?.filter(({ name }) => {
-      return name.toLowerCase().includes(pwd.toLowerCase());
-    }) || [];
-  }, [pwd, settings?.pwd, dirList?.map(({ name }) => name).toString()]);
-
-  const updatePwd = async (dir) => {
-    let pwd = '';
-    if (dir === '..') {
-      const split = settings.pwd.split('/');
-      pwd = split.slice(0, split.length - 1).join('/');
+    const isDirectoryGit = directory.checkGit(settings?.pwd);
+    if (isDirectoryGit) {
+      setMode("git");
     } else {
-      pwd = `${settings.pwd}/${dir}`;
+      setMode("finder");
     }
-    const path = pwd.replace('~', settings.base);
-    if (pwd) {
-      process.chdir(path);
-      const data = { ...settings, pwd };
-      setSettings(data);
+  }, [settings?.pwd]);
+
+  const goBack = () => {
+    let nextPath = settings?.pwd;
+    const split = nextPath.split("/");
+    if (nextPath !== "~") {
+      nextPath = split.slice(0, -1).join("/");
     }
-    setPwd('');
-  }
+    directory.change(nextPath);
+  };
 
-  const handleOpenCode = async () => {
-    if (!settings?.cmds?.codeEditorCmd) {
-      setDisplay(true);
-    } else {
-      await cmd(settings?.cmds?.codeEditorCmd);
-    }
-  }
-
-  const addCommand = () => {
-    if (text) {
-      let data = { ...settings };
-      data.cmds = { ...(data.cmds || {}), codeEditorCmd: text }
-      setSettings(data);
-      setText('');
-      setDisplay(false);
-    } else {
-      console.log('NO WORK');
-    }
-  }
-
-  const handleTab = useCallback((event) => {
-    if (refFieldFocus.current === document.activeElement) {
-      if (event.code === 'Tab') {
-        event.preventDefault();
-        setPwd((filteredList?.[0]?.name || pwd).trim());
-      }
-    }
-  }, [filteredList?.[0]?.name]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleTab);
-    return () => document.removeEventListener('keydown', handleTab);
-  }, [handleTab]);
-
-  const currentPathSplit = settings?.pwd?.split('/');
-  const currentPath = currentPathSplit?.slice(currentPathSplit.length - 2).join('/') || '';
-  const hasMorePath = currentPathSplit?.length > 2;
-  const [isGit] = useAsyncValue(() => checkGit(settings), [settings?.pwd]);
-
-  useShortcuts({
-    focusCmdBar: () => focusCmd?.current?.focus(),
-    codeEditorCmd: handleOpenCode,
-    closeAll: () => {
-      setModal('');
-      setMode(mode === 'bm' ? 'terminal' : 'bm');
-    },
-    handleToolbox: () => setModal(modal === 'toolbox' ? '' : 'toolbox'),
-    openLocalLink: () => linkOutLocalBuild(localBuildDomain)
-  }, display);
-
-  const updatePage = () => {
-    setMode((p) => {
-      if (p === 'bm') {
-        return 'terminal';
-      } else if (p === 'terminal') {
-        return 'bm';
-      }
+  const createBookmark = () => {
+    const current = settings?.pwd?.split("/")?.at(-1);
+    setSettings({
+      ...settings,
+      bookmarks: {
+        ...settings?.bookmarks,
+        [settings?.pwd]: current,
+      },
     });
-  }
+  };
+
+  const keydown = (captured, event) => {
+    if (captured === "meta+KeyF") {
+      event.stopPropagation();
+      setMode("finder");
+    } else if (captured === "meta+KeyD") {
+      event.stopPropagation();
+      setMode("git");
+    } else if (captured === "meta+KeyS") {
+      event.stopPropagation();
+      setMode("settings");
+    } else if (captured === "meta+KeyO") {
+      event.preventDefault();
+      event.stopPropagation();
+      cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
+    } else if (captured.startsWith("meta+Digit")) {
+      event.stopPropagation();
+      const index = Number(captured.replace("meta+Digit", "")) - 1;
+      const [path = ""] = Object.entries(settings?.bookmarks || {})?.[index];
+      if (path) {
+        directory.change(path);
+      }
+    } else if (captured === "meta+Equal") {
+      event.stopPropagation();
+      event.preventDefault();
+      createBookmark();
+    }
+  };
+
+  useKeyboard({ keydown, options: { useCapture: true } });
 
   return (
-    <Div styles="pad" className="width: calc(100% - 32px);">
-
-      {modal === 'toolbox' && (
-        <Toolbox
-          onClose={() => setModal('')}
-        />
-      )}
-
-      <Div styles="padb">
-        <Div styles="ai:c">
-          <Div styles="ai:c fg">
-            <Button styles="icon-dark" onClick={() => updatePage()}>
-              {mode === 'bm' ? <Tree size={32} color="white" />
-                : mode === 'terminal' ? <Monitor size={32} color="white" />
-                  : null
-              }
+    <Div
+      css={`
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+      `}
+    >
+      <Div css={header}>
+        <Div
+          css={`
+            ${flex("space-between")}
+            margin-bottom: 16px;
+          `}
+        >
+          <Div
+            css={`
+              ${flex("left")}
+            `}
+          >
+            <Button
+              icon
+              disabled={settings?.pwd === "~"}
+              onClick={goBack}
+              css={`
+                margin-right: 16px;
+              `}
+            >
+              <ArrowLeft />
             </Button>
-            <Text styles="bold">{hasMorePath ? '.../' : ''}{currentPath}</Text>
+            <Text
+              h2
+              css={`
+                cursor: pointer;
+                :hover {
+                  text-decoration: underline;
+                }
+              `}
+              onClick={() =>
+                cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`)
+              }
+            >
+              {splitDir?.length > 2 ? "../" : ""}
+              {displayDirectory}
+            </Text>
           </Div>
-          {focusPwd && !!filteredList.length && (
-            <Div styles="flex pad absolute radius" className={css`top: 100%; left: 0; right: 0; border: 1px solid white; max-height: 80vh; overflow: auto; background-color: ${colors.black};`}>
-              {filteredList.map(({ name, isFolder }) => (
-                <Div styles="pad-sm ai:c hover pointer radius" key={name} onClick={() => updatePwd(name)}>
-                  {isFolder
-                    ? <FolderSimple color="white" size={24} weight="fill" />
-                    : <File color="white" size={24} weight="fill" />
-                  }
-                  <Text styles="ml">{name}</Text>
-                </Div>
-              ))}
+
+          <Div
+            css={`
+              ${flex("right")}
+              > div {
+                padding-bottom: 0;
+                border-radius: 7px;
+                transition: border-bottom 0.15s ease-in-out;
+              }
+            `}
+          >
+            <Div
+              css={
+                mode === "git"
+                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  : "border-bottom: 6px solid transparent;"
+              }
+            >
+              <Button icon onClick={() => setMode("git")}>
+                <Tree weight="bold" />
+              </Button>
             </Div>
-          )}
-          <Button styles="icon-dark" onClick={() => setModal('toolbox')}>
-            <Wrench size={24} color="white" weight="bold" />
-          </Button>
-          <Button styles="icon-dark" onClick={handleOpenCode}>
-            <ArrowSquareOut size={24} color="white" weight="bold" />
-          </Button>
-          <Button styles="icon-dark" onClick={handleOpenCode} disabled={true}>
-            <Gear size={24} color="white" weight="bold" />
-          </Button>
+            <Div
+              css={
+                mode === "finder"
+                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  : "border-bottom: 6px solid transparent;"
+              }
+            >
+              <Button icon onClick={() => setMode("finder")}>
+                <Monitor weight="bold" />
+              </Button>
+            </Div>
+            <Div
+              css={
+                mode === "settings"
+                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  : "border-bottom: 6px solid transparent;"
+              }
+            >
+              <Button icon onClick={() => setMode("settings")}>
+                <Gear weight="bold" />
+              </Button>
+            </Div>
+          </Div>
         </Div>
-        <CmdBar
-          settings={settings}
-          setSettings={setSettings}
-          setMode={setMode}
-          ref={focusCmd}
-        />
+
+        <Div
+          css={`
+            ${flex("space-between")}
+          `}
+        >
+          <Div
+            css={`
+              ${flex("right grow")}
+              overflow-x: auto;
+              padding: 8px 0;
+            `}
+          >
+            {Object.entries(settings?.bookmarks || {}).map(([key, value]) => (
+              <Div
+                css={`
+                  border-radius: 8px;
+                  padding: 8px;
+                  margin-right: 2px;
+                  font-weight: bold;
+                  cursor: pointer;
+                  ${key === settings?.pwd
+                    ? `
+                        background-color: ${colors.green};
+                        ${shadows.lg}
+                        ${animation("shake", ".2s ease")}
+                      `
+                    : `
+                        background-color: ${colors.darkIndigo};
+                      `}
+                `}
+                onClick={() => directory.change(key)}
+              >
+                <Text>{value}</Text>
+              </Div>
+            ))}
+          </Div>
+          <Div
+            css={`
+              padding-left: 8px;
+              margin-left: 16px;
+              border-left: 4px solid ${colors.indigo};
+            `}
+            style={{ borderRadius: 0 }}
+          >
+            <Button icon onClick={createBookmark}>
+              <Plus weight="bold" />
+            </Button>
+          </Div>
+        </Div>
       </Div>
 
-      {mode === 'bm' && (
-        <>
-          <Div styles="jc:sb ai:c">
-            <GitGui
-              isGit={isGit}
-              settings={settings}
-              setSettings={setSettings}
-            />
-          </Div>
-
-          {!isGit && (
-            <Div styles="hide-scroll" className={css`height: calc(100vh - 140px); overflow: auto; padding-bottom: 100px;`}>
-              {dirList?.map((item) => (
-                <Div styles="ai:c hover radius pointer" onClick={() => updatePwd(item.name)}>
-                  {item.isFolder
-                    ? <FolderSimple color="white" size={24} weight="fill" />
-                    : <File color="white" size={24} weight="fill" />
-                  }
-                  <Text styles="ml-sm pad-xs">{item.name}</Text>
-                </Div>
-              ))}
-            </Div>
-          )}
-
-          {display && (
-            <Div styles="modal pad" className="width: 450px;">
-              <Text styles="h3 center" color={colors.black}>Code Editor Command</Text>
-              <Div styles="jc:sa ai:c pad">
-                <Text color={colors.black}>Command</Text>
-                <Input styles="ml fg" value={text} onChange={(e) => { e.stopPropagation(); setText(e.target.value); }} />
-              </Div>
-              <Div styles="jc:r ">
-                <Button styles="text" color={colors.black} onClick={() => setDisplay(false)}>Close</Button>
-                <Button styles="ml" onClick={addCommand}>Add Command</Button>
-              </Div>
-            </Div>
-          )}
-        </>
-      )}
-
-      <Terminal
-        setMode={setMode}
-        display={mode === 'terminal'}
-      />
-
+      <Div>
+        {mode === "finder" ? (
+          <Finder />
+        ) : mode === "git" ? (
+          <Git />
+        ) : mode === "settings" ? (
+          <Settings />
+        ) : null}
+      </Div>
     </Div>
   );
-}
+};
 
 export default App;

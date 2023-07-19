@@ -1,32 +1,31 @@
-import { useContext } from "react";
-import { StoreContext } from "./store";
+import { useContext } from 'react';
+import { StoreContext } from './store';
 
 export const useStore = () => {
   const value = useContext(StoreContext);
   if (!value) {
-    throw new Error("must use useStore inside a StateProvider");
+    throw new Error('must use useStore inside a StateProvider');
   }
-  const { store, dispatchStore, setSettings } = value;
+  const { store, dispatchStore } = value;
 
   const updateStore = (key, value) => {
     dispatchStore({
-      type: "UPDATE",
+      type: 'UPDATE',
       payload: value,
       key,
     });
-  };
+  }
 
   const setStore = (key, value) => {
     dispatchStore({
-      type: "SET",
+      type: 'SET',
       payload: value,
       key,
     });
-  };
+  }
 
   return {
     store,
-    setSettings,
     updateStore,
     setStore,
   };
