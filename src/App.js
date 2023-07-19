@@ -213,7 +213,7 @@ const App = () => {
                         ${animation("shake", ".2s ease")}
                       `
                     : `
-                        background-color: ${colors.darkIndigo};
+                        background-color: rgba(0, 0, 0, .2);
                       `}
                 `}
                 onClick={() => directory.change(key)}

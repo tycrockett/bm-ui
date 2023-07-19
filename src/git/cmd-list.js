@@ -23,7 +23,7 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
             <Div
               css={`
                 min-width: max-content;
-                background-color: rgba(100, 100, 100, 0.5);
+                background-color: rgba(0, 0, 0, 0.2);
                 padding: 4px 8px;
                 border-radius: 16px;
                 margin-right: 8px;
