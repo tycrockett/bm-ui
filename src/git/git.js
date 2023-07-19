@@ -351,6 +351,7 @@ export const Git = () => {
             css={`
               ${flex("left")}
               width: 100%;
+              box-sizing: border-box;
               select {
                 width: 200px;
                 padding: 12px 8px;
