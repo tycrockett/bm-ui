@@ -199,30 +199,7 @@ export const fetch = async () =>
     });
   });
 
-///// ***************
-export const getCurrentBranch = async () => {
-  try {
-    return (await cmd(`git branch --show-current`)).trim();
-  } catch (err) {
-    return "";
-  }
-};
-
-export const getBranches = async () => {
-  const data = await cmd(
-    `git for-each-ref --format='%(refname:short)' refs/heads/`
-  );
-  const list = data.split("\n").filter((item) => !!item);
-  const current = await getCurrentBranch();
-  const hasRemote = await hasRemoteBranch(current);
-  return { current, list, hasRemote };
-};
-
-const getParentBranch = () => false;
-
-export const logCommits = async (defaultBranch) => {
-  const currentBranch = await getCurrentBranch();
-  const parentBranch = getParentBranch(currentBranch) || defaultBranch;
+export const logCommits = async (parentBranch) => {
   if (parentBranch) {
     try {
       console.log();
@@ -249,6 +226,27 @@ export const logCommits = async (defaultBranch) => {
     return [];
   }
 };
+
+///// ***************
+export const getCurrentBranch = async () => {
+  try {
+    return (await cmd(`git branch --show-current`)).trim();
+  } catch (err) {
+    return "";
+  }
+};
+
+export const getBranches = async () => {
+  const data = await cmd(
+    `git for-each-ref --format='%(refname:short)' refs/heads/`
+  );
+  const list = data.split("\n").filter((item) => !!item);
+  const current = await getCurrentBranch();
+  const hasRemote = await hasRemoteBranch(current);
+  return { current, list, hasRemote };
+};
+
+const getParentBranch = () => false;
 
 export const renameBranch = async (branchName, flags) => {
   try {

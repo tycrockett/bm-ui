@@ -19,23 +19,12 @@ import {
   push,
   update,
 } from "./utils";
-import {
-  Cloud,
-  CloudCheck,
-  CloudSlash,
-  FileArrowUp,
-  FileDotted,
-  FileX,
-  MinusCircle,
-  Plug,
-  Plugs,
-  PlugsConnected,
-  Plus,
-  PlusCircle,
-  Tree,
-} from "phosphor-react";
+import { CloudCheck, CloudSlash, Tree } from "phosphor-react";
 import { css } from "@emotion/css";
 import { useAnimation } from "../hooks/use-animation";
+import { Status } from "./status";
+import { CmdList } from "./cmd-list";
+import { Logs } from "./logs";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -135,9 +124,11 @@ export const Git = () => {
   } = useContext(StoreContext);
 
   const ref = useRef();
+  const positionRef = useRef();
 
   const [index, setIndex] = useState(0);
   const [cmd, setCmd] = useState("");
+  const [lastCmd, setLastCmd] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [branches, setBranches] = useState({});
@@ -145,11 +136,15 @@ export const Git = () => {
 
   const [showBranches, setShowBranches] = useState(false);
 
+  const parentBranch =
+    repos?.[settings?.pwd]?.branches?.[branches?.current]?.parentBranch ||
+    repos?.[settings?.pwd]?.defaultBranch;
+
   const animateShake = {
     animation: animation("shake", ".35s ease"),
     timing: 400,
   };
-  const { animation: shakeTree } = useAnimation(animateShake, [lastCommand]);
+  const { animation: shakeTree } = useAnimation(animateShake, [lastCmd]);
 
   const refreshGit = async () => {
     const branches = await getBranches();
@@ -194,18 +189,14 @@ export const Git = () => {
     const [value, ...args] = cmd.split(" ");
     setLoading(true);
 
-    const parentBranch =
-      repos?.[settings?.pwd]?.branches?.[branches?.current]?.parentBranch ||
-      repos?.[settings?.pwd]?.defaultBranch;
-
     const options = {
       flags: cmd,
       parentBranch,
       currentBranch: branches?.current,
     };
     setCmd("");
+    setLastCmd(new Date().toISOString());
     try {
-      methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
       if (command === "checkout") {
         await checkoutBranch(checkoutList?.[0], options);
       } else if (command === "delete") {
@@ -236,6 +227,7 @@ export const Git = () => {
         });
       }
       refreshGit();
+      methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
     } catch (err) {
       console.log(err);
     } finally {
@@ -330,14 +322,21 @@ export const Git = () => {
     return () =>
       document.removeEventListener("click", () => setShowBranches(false));
   }, []);
+  const box = positionRef?.current?.getBoundingClientRect();
   return (
     <Div
+      ref={positionRef}
       css={`
-        padding: 16px;
+        padding: 0 16px;
+        margin: 16px 0;
       `}
     >
       {settings?.pwd in repos ? (
-        <Div>
+        <Div
+          css={`
+            height: calc(100vh - ${box?.top + 32}px);
+          `}
+        >
           <Div
             css={`
               ${flex("left")}
@@ -433,286 +432,19 @@ export const Git = () => {
               )}
             </Div>
           </Div>
-          <Div
-            css={`
-              ${flex("start column")}
-              ${shadows.lg}
-              border-radius: 16px;
-              padding: 16px;
-            `}
-          >
-            <Div
-              css={`
-                width: 100%;
-                ${flex("left start wrap")}
-                overflow-x: auto;
-                flex-grow: 1;
-              `}
-            >
-              {list?.length > 1 ? (
-                list.map((item, idx) => (
-                  <Div
-                    css={`
-                      min-width: max-content;
-                      background-color: ${colors.indigo};
-                      padding: 4px 8px;
-                      border-radius: 16px;
-                      margin-right: 8px;
-                      margin-bottom: 8px;
-                      cursor: pointer;
-                      border: 2px solid ${colors.indigo};
-                      ${idx === index && !!cmd
-                        ? `
-                      font-weight: bold;
-                      border: 2px solid ${colors.lightBlue};
-                    `
-                        : ""}
-                    `}
-                    onClick={() => console.log()}
-                  >
-                    <Text>{item.name}</Text>
-                  </Div>
-                ))
-              ) : (
-                <Div
-                  css={`
-                    width: 100%;
-                  `}
-                >
-                  <Div
-                    css={`
-                      ${flex("space-between")}
-                    `}
-                  >
-                    <Div
-                      css={`
-                        ${flex("left")}
-                      `}
-                    >
-                      <Text
-                        h3
-                        bold
-                        css={`
-                          padding: 4px 16px;
-                          border-radius: 16px;
-                          background-color: ${colors.lightIndigo};
-                          margin-right: 16px;
-                        `}
-                      >
-                        {list[0]?.name}
-                      </Text>
-                      <Text h4 bold>
-                        {list[0]?.args}
-                      </Text>
-                      <Text
-                        h4
-                        css={`
-                          margin-left: 16px;
-                        `}
-                      >
-                        {list[0]?.flags}
-                      </Text>
-                    </Div>
-                    <Text
-                      h3
-                      bold
-                      css={`
-                        padding: 4px 16px;
-                        border-radius: 16px;
-                        ${shadows.lg}
-                        background-color: ${colors.indigo};
-                        color: white;
-                        margin-right: 16px;
-                      `}
-                    >
-                      {list[0]?.command}
-                    </Text>
-                  </Div>
-                  <Text
-                    css={`
-                      margin: 16px;
-                    `}
-                  >
-                    {list[0]?.description}
-                  </Text>
-                  {list[0]?.command === "checkout" ? (
-                    <Div
-                      css={`
-                        ${flex("left")}
-                      `}
-                    >
-                      {checkoutList?.map((item, idx) => (
-                        <Text
-                          css={`
-                            ${animation("fadeIn", ".2s ease")}
-                            padding: 8px 16px;
-                            border: 2px solid transparent;
-                            ${idx === 0
-                              ? `background-color: ${colors.lightIndigo}; border: 2px solid ${colors.lightBlue}; font-weight: bold;`
-                              : `background-color: ${colors.indigo};`}
-                            ${shadows.md}
-                            border-radius: 30px;
-                            margin-right: 8px;
-                          `}
-                        >
-                          {item}
-                        </Text>
-                      ))}
-                    </Div>
-                  ) : null}
-                </Div>
-              )}
-            </Div>
-          </Div>
+          <CmdList
+            list={list}
+            index={index}
+            cmd={cmd}
+            checkoutList={checkoutList}
+          />
+          <Status
+            status={status}
+            currentBranch={branches?.current}
+            parentBranch={parentBranch}
+          />
 
-          <Div
-            css={`
-              margin-bottom: 32px;
-            `}
-          >
-            {status?.untracked?.map((item) => (
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 0;
-                `}
-              >
-                <Div
-                  css={`
-                    ${flex("left")}
-                    p {
-                      margin-left: 16px;
-                    }
-                  `}
-                >
-                  <FileDotted
-                    size={24}
-                    color={colors.lightBlue}
-                    weight="bold"
-                  />
-                  <Text h4>{item}</Text>
-                </Div>
-              </Div>
-            ))}
-
-            {status?.deleted?.map((item) => (
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 0;
-                `}
-              >
-                <Div
-                  css={`
-                    ${flex("left")}
-                    p {
-                      margin-left: 16px;
-                    }
-                  `}
-                >
-                  <FileX size={24} color={colors.red} weight="bold" />
-                  <Text h4>{item}</Text>
-                </Div>
-                <Div
-                  css={`
-                    ${flex("left")}
-                    p {
-                      margin-left: 4px;
-                    }
-                  `}
-                >
-                  <Div
-                    css={`
-                      ${flex("left")}
-                      padding: 4px 8px;
-                      border-radius: 30px;
-                      border: 1px solid ${colors.darkIndigo};
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                    `}
-                  >
-                    <PlusCircle size={24} color={colors.green} weight="bold" />
-                    <Text>{status?.files?.[item]?.adds}</Text>
-                  </Div>
-
-                  <Div
-                    css={`
-                      ${flex("left")}
-                      padding: 4px 8px;
-                      border-radius: 30px;
-                      border: 1px solid ${colors.darkIndigo};
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                    `}
-                  >
-                    <MinusCircle size={24} color={colors.red} weight="bold" />
-                    <Text>{status?.files?.[item]?.deletes}</Text>
-                  </Div>
-                </Div>
-              </Div>
-            ))}
-
-            {status?.modified?.map((item) => (
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 0;
-                `}
-              >
-                <Div
-                  css={`
-                    ${flex("left")}
-                    p {
-                      margin-left: 16px;
-                    }
-                  `}
-                >
-                  <FileArrowUp size={24} color={colors.green} weight="bold" />
-                  <Text h4>{item}</Text>
-                </Div>
-                <Div
-                  css={`
-                    ${flex("left")}
-                    p {
-                      margin-left: 4px;
-                    }
-                  `}
-                >
-                  <Div
-                    css={`
-                      ${flex("left")}
-                      padding: 4px 8px;
-                      border-radius: 30px;
-                      border: 1px solid ${colors.darkIndigo};
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                    `}
-                  >
-                    <PlusCircle size={24} color={colors.green} weight="bold" />
-                    <Text>{status?.files?.[item]?.adds}</Text>
-                  </Div>
-
-                  <Div
-                    css={`
-                      ${flex("left")}
-                      padding: 4px 8px;
-                      border-radius: 30px;
-                      border: 1px solid ${colors.darkIndigo};
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                    `}
-                  >
-                    <MinusCircle size={24} color={colors.red} weight="bold" />
-                    <Text>{status?.files?.[item]?.deletes}</Text>
-                  </Div>
-                </Div>
-              </Div>
-            ))}
-          </Div>
+          <Logs parentBranch={parentBranch} lastCommand={lastCommand} />
         </Div>
       ) : (
         <SetupBm />
