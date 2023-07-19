@@ -49,7 +49,6 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
         height: 100%;
         width: 100%;
         box-sizing: border-box;
-        border: 1px solid;
         overflow-y: auto;
       `}
     >

@@ -25,7 +25,6 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
         border-radius: 8px;
         box-sizing: border-box;
         width: 100%;
-        height: 100%;
       `}
     >
       <Text
