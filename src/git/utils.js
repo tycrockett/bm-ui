@@ -74,10 +74,15 @@ export const deleteBranch = async (options = {}) => {
   }
 };
 
-export const clearBranch = async () => {
+export const clearBranch = async (options = {}) => {
+  const { flags = "" } = options;
   try {
-    await cmd(`git add .`);
-    await cmd(`git stash`);
+    if (flags.includes("--undo") || flags.includes("-u")) {
+      await cmd(`git stash pop`);
+    } else {
+      await cmd(`git add .`);
+      await cmd(`git stash`);
+    }
   } catch (err) {
     throw err;
   }
