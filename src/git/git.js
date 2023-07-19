@@ -26,6 +26,7 @@ import { Status } from "./status";
 import { CmdList } from "./cmd-list";
 import { Logs } from "./logs";
 import { toast } from "react-toastify";
+import { Loader } from "../shared/loader";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -373,24 +374,7 @@ export const Git = () => {
               `}
             />
             <form onSubmit={handleCmd}>
-              {loading ? (
-                <Text
-                  css={`
-                    ${flex("left")}
-                    padding: 0 16px;
-                    font-weight: bold;
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    pointer-events: none;
-                    color: ${colors.lightBlue};
-                  `}
-                >
-                  Loading...
-                </Text>
-              ) : null}
+              {loading ? <Loader /> : null}
               <Input
                 disabled={loading}
                 value={cmd}

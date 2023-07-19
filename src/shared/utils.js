@@ -84,6 +84,18 @@ const animations = {
       }
     }
   `,
+  scaleUp: `
+    @keyframes scaleUp {
+      from {
+        font-size: 1em;
+        line-height: 1em;
+      }
+      to {
+        font-size: 1.5em;
+        line-height: 1.5em;
+      }
+    }
+  `,
   shake: `
     @keyframes shake {
       0% { transform: translateY(0) }
