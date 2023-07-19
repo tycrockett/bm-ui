@@ -46,13 +46,12 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
             bold
             css={`
               ${flex("center")}
-              border-radius: 50%;
+              border-radius: 30px;
+              padding: 4px 8px;
               background-color: ${colors.lightIndigo};
-              width: 32px;
-              height: 32px;
             `}
           >
-            {item?.length}
+            {item?.length} File{item?.length !== 1 ? "s" : ""}
           </Text>
         </Div>
       ))}

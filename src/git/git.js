@@ -25,6 +25,7 @@ import { useAnimation } from "../hooks/use-animation";
 import { Status } from "./status";
 import { CmdList } from "./cmd-list";
 import { Logs } from "./logs";
+import { toast } from "react-toastify";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -306,10 +307,14 @@ export const Git = () => {
     } else if (captured === "meta+KeyR") {
       event.stopPropagation();
       event.preventDefault();
-      openRemote({
-        flags: cmd,
-        currentBranch: branches?.current,
-      });
+      if (branches.hasRemote) {
+        openRemote({
+          flags: cmd,
+          currentBranch: branches?.current,
+        });
+      } else {
+        toast.error(`No remote branch detected.`);
+      }
     } else {
       ref.current.focus();
     }

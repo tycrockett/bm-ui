@@ -13,7 +13,7 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
       <Div
         css={`
           width: 100%;
-          ${flex("left start wrap")}
+          ${flex("left wrap")}
           overflow-x: auto;
           flex-grow: 1;
         `}
@@ -23,16 +23,17 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
             <Div
               css={`
                 min-width: max-content;
-                background-color: ${colors.indigo};
+                background-color: rgba(100, 100, 100, 0.5);
                 padding: 4px 8px;
                 border-radius: 16px;
                 margin-right: 8px;
                 margin-bottom: 8px;
                 cursor: pointer;
-                border: 2px solid ${colors.indigo};
+                border: 2px solid transparent;
                 ${idx === index && !!cmd
                   ? `
                       font-weight: bold;
+                      padding: 8px 16px;
                       border: 2px solid ${colors.lightBlue};
                     `
                   : ""}
