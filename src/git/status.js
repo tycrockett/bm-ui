@@ -18,10 +18,16 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
     async () =>
       await cmd(
         `git diff ${parentBranch}...${currentBranch || ""} --stat | tail -n1 `
-      )
+      ),
+    [status?.lastUpdate]
   );
+  const hasStatus =
+    !!status?.modified?.length ||
+    !!status?.deleted?.length ||
+    !!status?.untracked?.length;
+
   const { animation: fadeIn } = useAnimation(
-    { animation: animation("fadeIn", ".4s ease"), timing: 500 },
+    { animation: animation("shake", ".4s ease"), timing: 500 },
     [status?.lastUpdate]
   );
 
@@ -34,15 +40,10 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
     }
   };
 
-  const hasStatus =
-    !!status?.modified?.length ||
-    !!status?.deleted?.length ||
-    !!status?.untracked?.length;
-
   return (
     <Div
       css={`
-        ${fadeIn}
+        ${hasStatus ? fadeIn : ""}
         margin-bottom: 32px;
       `}
     >
