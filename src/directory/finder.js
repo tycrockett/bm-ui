@@ -129,6 +129,7 @@ export const Finder = () => {
           <Div
             onClick={() => directory.change(settings?.pwd + "/" + item.name)}
             css={`
+              ${animation("fadeIn", ".3s ease")}
               width: 150px;
               background-color: ${colors.dark};
               border-radius: 8px;
