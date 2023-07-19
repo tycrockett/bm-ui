@@ -1,3 +1,4 @@
+import { GitCommit } from "phosphor-react";
 import { useCallback } from "react";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { colors, Div, Text } from "../shared";
@@ -27,15 +28,20 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
         width: 100%;
       `}
     >
-      <Text
-        h3
-        bold
+      <Div
         css={`
+          ${flex("left")}
           margin-bottom: 8px;
+          p {
+            margin-left: 16px;
+          }
         `}
       >
-        Commits
-      </Text>
+        <GitCommit size={32} color="white" weight="bold" />
+        <Text h3 bold css={``}>
+          Commits
+        </Text>
+      </Div>
       {commits?.map(([key, item]) => (
         <Div
           css={`

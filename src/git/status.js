@@ -5,6 +5,7 @@ import {
   FileDotted,
   FileX,
   MinusCircle,
+  PersonSimpleRun,
   PlusCircle,
 } from "phosphor-react";
 import { toast } from "react-toastify";
@@ -56,15 +57,20 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
               ${flex("space-between")}
             `}
           >
-            <Text
-              h3
-              bold
+            <Div
               css={`
+                ${flex("left")}
                 margin-bottom: 8px;
+                p {
+                  margin-left: 16px;
+                }
               `}
             >
-              Status
-            </Text>
+              <PersonSimpleRun size={32} color="white" weight="bold" />
+              <Text h3 bold css={``}>
+                Status
+              </Text>
+            </Div>
             <Text
               h4
               bold
