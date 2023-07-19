@@ -1,7 +1,7 @@
 import { colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 
-export const CmdList = ({ list, index, cmd, checkoutList }) => {
+export const CmdList = ({ list, index, cmd, setCmd, checkoutList }) => {
   return (
     <Div
       css={`
@@ -31,6 +31,10 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
                 margin-bottom: 8px;
                 cursor: pointer;
                 border: 2px solid transparent;
+                transition: background-color 0.2s ease;
+                :hover {
+                  background-color: ${colors.lightIndigo};
+                }
                 ${idx === index && !!cmd
                   ? `
                       font-weight: bold;
@@ -39,7 +43,7 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
                     `
                   : ""}
               `}
-              onClick={() => console.log()}
+              onClick={() => setCmd(item.command)}
             >
               <Text>{item.name}</Text>
             </Div>
@@ -118,13 +122,19 @@ export const CmdList = ({ list, index, cmd, checkoutList }) => {
                       ${animation("fadeIn", ".2s ease")}
                       padding: 8px 16px;
                       border: 2px solid transparent;
+                      transition: background-color 0.2s ease;
                       ${idx === 0
-                        ? `background-color: ${colors.lightIndigo}; border: 2px solid ${colors.lightBlue}; font-weight: bold;`
+                        ? `border: 2px solid ${colors.lightBlue}; font-weight: bold;`
                         : `background-color: ${colors.indigo};`}
                       ${shadows.md}
                             border-radius: 30px;
                       margin-right: 8px;
+                      cursor: pointer;
+                      :hover {
+                        background-color: ${colors.lightIndigo};
+                      }
                     `}
+                    onClick={() => setCmd(`checkout ${item}`)}
                   >
                     {item}
                   </Text>

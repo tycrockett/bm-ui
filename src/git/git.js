@@ -431,6 +431,10 @@ export const Git = () => {
             list={list}
             index={index}
             cmd={cmd}
+            setCmd={(value) => {
+              setCmd(`${value} `);
+              ref?.current?.focus();
+            }}
             checkoutList={checkoutList}
           />
           <Status
