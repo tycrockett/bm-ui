@@ -21,7 +21,8 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
     <Div
       css={`
         ${animation("fadeIn", ".2s ease")}
-        background-color: rgba(0, 0, 0, .2);
+        transition: height .5s ease;
+        background-color: rgba(0, 0, 0, 0.2);
         padding: 16px;
         border-radius: 8px;
         box-sizing: border-box;
@@ -46,7 +47,6 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
         <Div
           css={`
             ${animation("fadeIn", ".2s ease")}
-            ${animation("verticallyGrow", ".2s ease")}
             ${flex("space-between")}
             padding: 4px 16px;
             margin: 0 -16px;

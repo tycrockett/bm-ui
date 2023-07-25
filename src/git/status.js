@@ -6,7 +6,9 @@ import {
   FileX,
   MinusCircle,
   PersonSimpleRun,
+  Pulse,
   PlusCircle,
+  FastForward,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
@@ -66,7 +68,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                 }
               `}
             >
-              <PersonSimpleRun size={32} color="white" weight="bold" />
+              <FastForward size={32} color="white" weight="bold" />
               <Text h3 bold css={``}>
                 Status
               </Text>
