@@ -138,7 +138,6 @@ const App = () => {
               ${flex("right")}
               > div {
                 padding-bottom: 0;
-                border-radius: 7px;
                 transition: border-bottom 0.15s ease-in-out;
               }
             `}
@@ -146,7 +145,10 @@ const App = () => {
             <Div
               css={
                 mode === "git"
-                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  ? `
+                    border-bottom: 6px solid ${colors.lightBlue};
+                    border-radius: 16px;
+                    border-bottom-right-radius: 3px;`
                   : "border-bottom: 6px solid transparent;"
               }
             >
@@ -157,7 +159,7 @@ const App = () => {
             <Div
               css={
                 mode === "finder"
-                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  ? `border-bottom: 6px solid ${colors.lightBlue}; border-radius: 5px;`
                   : "border-bottom: 6px solid transparent;"
               }
             >
@@ -168,7 +170,10 @@ const App = () => {
             <Div
               css={
                 mode === "settings"
-                  ? `border-bottom: 6px solid ${colors.lightBlue};`
+                  ? `border-bottom: 6px solid ${colors.lightBlue};
+                    border-radius: 16px;
+                    border-bottom-left-radius: 3px;
+                    `
                   : "border-bottom: 6px solid transparent;"
               }
             >

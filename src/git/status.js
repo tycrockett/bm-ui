@@ -104,9 +104,14 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
               <Div
                 css={`
                   ${flex("left")}
-                  width: calc(100% - 300px);
+                  flex-grow: 1;
+                  width: 100%;
+                  overflow: hidden;
                   p {
-                    margin-left: 16px;
+                    width: 100%;
+                  }
+                  svg {
+                    margin-right: 16px;
                   }
                 `}
               >
@@ -164,9 +169,15 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
               <Div
                 css={`
                   ${flex("left")}
-                  width: calc(100% - 300px);
+                  ${flex("left")}
+                  flex-grow: 1;
+                  width: 100%;
+                  overflow: hidden;
                   p {
-                    margin-left: 16px;
+                    width: 100%;
+                  }
+                  svg {
+                    margin-right: 16px;
                   }
                 `}
               >
@@ -234,13 +245,20 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                 css={`
                   ${flex("left")}
                   flex-grow: 1;
+                  width: 100%;
+                  overflow: hidden;
+                  p {
+                    width: 100%;
+                  }
                   svg {
                     margin-right: 16px;
                   }
                 `}
               >
                 <FileArrowUp size={24} color={colors.green} weight="bold" />
-                <Text h4>{item}</Text>
+                <Text h4 left-ellipsis>
+                  {item}
+                </Text>
               </Div>
               <Div
                 css={`
@@ -255,7 +273,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                     ${flex("right")} width: 100px;
                   `}
                 >
-                  <Text left-ellipsis>{status?.files?.[item]?.deletes}</Text>
+                  <Text>{status?.files?.[item]?.deletes}</Text>
                   <MinusCircle size={24} color={colors.red} weight="bold" />
                 </Div>
                 <Div

@@ -420,15 +420,15 @@ export const Git = () => {
                 cursor: pointer;
                 transition: background-color 0.2s ease;
                 width: 150px;
-
+                max-width: max-content;
+                min-width: 150px;
+                transition: width 0.3s ease;
                 :hover {
-                  flex-grow: 2;
-                  max-width: max-content;
+                  width: 100%;
                   animation 0.3s ease grow;
                   background-color: ${colors.lightIndigo};
                   ${shadows.md}
                 }
-                transition: flex-grow 0.3s ease;
                 background-color: ${colors.indigo};
                 p {
                   margin-right: 16px;
