@@ -387,6 +387,9 @@ export const Git = () => {
                   transition: background-color 0.25s ease;
                 }
               }
+              svg {
+                min-width: 32px;
+              }
             `}
           >
             <Tree
@@ -411,19 +414,27 @@ export const Git = () => {
               css={`
                 position: relative;
                 ${flex("space-between")}
-                width: 150px;
                 border: 1px solid transparent;
                 border-radius: 16px;
                 padding: 8px 16px;
                 cursor: pointer;
                 transition: background-color 0.2s ease;
+                width: 150px;
+
                 :hover {
+                  flex-grow: 2;
+                  max-width: max-content;
+                  animation 0.3s ease grow;
                   background-color: ${colors.lightIndigo};
+                  ${shadows.md}
                 }
+                transition: flex-grow 0.3s ease;
                 background-color: ${colors.indigo};
                 p {
                   margin-right: 16px;
-                  flex-grow: 1;
+                }
+                svg {
+                  min-width: 32px;
                 }
               `}
               onClick={handleRemote}
@@ -435,9 +446,9 @@ export const Git = () => {
                 {branches?.current}
               </Text>
               {branches?.hasRemote ? (
-                <CloudCheck size={32} color={colors.lightGreen} weight="bold" />
+                <CloudCheck size={32} color={colors.lightGreen} weight="fill" />
               ) : (
-                <CloudSlash size={32} color={colors.red} weight="bold" />
+                <CloudSlash size={32} color={colors.red} weight="fill" />
               )}
             </Div>
           </Div>

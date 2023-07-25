@@ -9,6 +9,8 @@ import {
   Pulse,
   PlusCircle,
   FastForward,
+  GitDiff,
+  GitPullRequest,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
@@ -68,7 +70,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                 }
               `}
             >
-              <FastForward size={32} color="white" weight="bold" />
+              <GitPullRequest size={32} color="white" weight="bold" />
               <Text h3 bold css={``}>
                 Status
               </Text>
@@ -225,68 +227,44 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
           {status?.modified?.map((item) => (
             <Div
               css={`
-                ${flex("space-between")}
-                padding: 0;
+                ${flex("space-between")} padding: 0;
               `}
             >
               <Div
                 css={`
                   ${flex("left")}
-                  width: calc(100% - 300px);
-                  p {
-                    margin-left: 16px;
+                  flex-grow: 1;
+                  svg {
+                    margin-right: 16px;
                   }
                 `}
               >
-                <Button
-                  icon
-                  small
-                  onClick={() => copyItem(item)}
-                  css={`
-                    margin: 0;
-                  `}
-                >
-                  <FileArrowUp size={24} color={colors.green} weight="bold" />
-                </Button>
-                <Text h4 left-ellipsis>
-                  {item}
-                </Text>
+                <FileArrowUp size={24} color={colors.green} weight="bold" />
+                <Text h4>{item}</Text>
               </Div>
               <Div
                 css={`
-                  ${flex("center")}
-                  p {
-                    margin-right: 4px;
+                  ${flex("right")}
+                  svg {
+                    margin-left: 8px;
                   }
                 `}
               >
                 <Div
                   css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
+                    ${flex("right")} width: 100px;
                   `}
                 >
-                  <Text>{status?.files?.[item]?.deletes}</Text>
+                  <Text left-ellipsis>{status?.files?.[item]?.deletes}</Text>
                   <MinusCircle size={24} color={colors.red} weight="bold" />
                 </Div>
                 <Div
                   css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
+                    ${flex("right")} width: 100px;
                   `}
                 >
                   <Text>{status?.files?.[item]?.adds}</Text>
-                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                  <MinusCircle size={24} color={colors.green} weight="bold" />
                 </Div>
               </Div>
             </Div>
