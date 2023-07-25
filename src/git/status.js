@@ -99,7 +99,8 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
             >
               <Div
                 css={`
-                  ${flex("center")}
+                  ${flex("left")}
+                  width: calc(100% - 300px);
                   p {
                     margin-left: 16px;
                   }
@@ -119,7 +120,9 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                     weight="bold"
                   />
                 </Button>
-                <Text h4>{item}</Text>
+                <Text h4 left-ellipsis>
+                  {item}
+                </Text>
               </Div>
               <Div
                 css={`
@@ -156,7 +159,8 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
             >
               <Div
                 css={`
-                  ${flex("center")}
+                  ${flex("left")}
+                  width: calc(100% - 300px);
                   p {
                     margin-left: 16px;
                   }
@@ -172,7 +176,9 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                 >
                   <FileX size={24} color={colors.red} weight="bold" />
                 </Button>
-                <Text h4>{item}</Text>
+                <Text h4 left-ellipsis>
+                  {item}
+                </Text>
               </Div>
               <Div
                 css={`
@@ -223,7 +229,8 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
             >
               <Div
                 css={`
-                  ${flex("center")}
+                  ${flex("left")}
+                  width: calc(100% - 300px);
                   p {
                     margin-left: 16px;
                   }
@@ -239,7 +246,9 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
                 >
                   <FileArrowUp size={24} color={colors.green} weight="bold" />
                 </Button>
-                <Text h4>{item}</Text>
+                <Text h4 left-ellipsis>
+                  {item}
+                </Text>
               </Div>
               <Div
                 css={`

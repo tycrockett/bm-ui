@@ -290,6 +290,26 @@ export const Git = () => {
     });
   }, [cmd]);
 
+  const handleRemote = async () => {
+    if (branches.hasRemote) {
+      openRemote({
+        flags: "",
+        currentBranch: branches?.current,
+      });
+    } else {
+      try {
+        setLoading(true);
+        await push({ currentBranch: branches.current });
+        await refreshGit();
+      } catch (err) {
+        console.log(err);
+        toast.error("Error setting upstream branch.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const keydown = async (captured, event) => {
     if (captured === "+Tab") {
       event.preventDefault();
@@ -406,12 +426,7 @@ export const Git = () => {
                   flex-grow: 1;
                 }
               `}
-              onClick={() => {
-                openRemote({
-                  flags: "",
-                  currentBranch: branches?.current,
-                });
-              }}
+              onClick={handleRemote}
               onContextMenu={() => {
                 setShowBranches(true);
               }}

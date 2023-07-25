@@ -27,6 +27,13 @@ export const textStyles = {
     overflow: hidden;
     white-space: nowrap;
   `,
+  "left-ellipsis": `
+    text-align: left;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    direction: rtl;
+  `,
 };
 
 export const Text = ({ children, ...rest }) => {

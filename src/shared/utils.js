@@ -71,6 +71,7 @@ export const shadows = {
 const animations = {
   fadeIn: `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`,
   fadeOut: `@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }`,
+  verticallyGrow: `@keyframes verticallyGrow { from { height: 0; } to { height: auto; }}`,
   scaleIn: `
     @keyframes scaleIn {
       from {

@@ -1,17 +1,8 @@
-import { css } from "@emotion/css";
-import {
-  ArrowLeft,
-  ArrowSquareOut,
-  Gear,
-  Monitor,
-  Plus,
-  Tree,
-} from "phosphor-react";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Gear, Monitor, Plus, Tree } from "phosphor-react";
+import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "./context/store";
 import { Finder } from "./directory/finder";
 import { Git } from "./git/git";
-import { useAnimation } from "./hooks/use-animation";
 import { useKeyboard } from "./hooks/use-keyboard";
 import { Settings } from "./settings/settings";
 import { Div, Text, Button, colors } from "./shared";
@@ -77,6 +68,8 @@ const App = () => {
       event.preventDefault();
       event.stopPropagation();
       cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
+    } else if (captured === "meta+KeyT") {
+      cmd("open -a terminal .");
     } else if (captured.startsWith("meta+Digit")) {
       event.stopPropagation();
       const index = Number(captured.replace("meta+Digit", "")) - 1;

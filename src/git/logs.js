@@ -45,6 +45,8 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
       {commits?.map(([key, item]) => (
         <Div
           css={`
+            ${animation("fadeIn", ".2s ease")}
+            ${animation("verticallyGrow", ".2s ease")}
             ${flex("space-between")}
             padding: 4px 16px;
             margin: 0 -16px;
