@@ -212,7 +212,7 @@ export const Git = () => {
               ...repos,
               [settings?.pwd]: {
                 ...repos?.[settings?.pwd],
-                branches,
+                branches: nextBranches,
               },
             });
           } catch {}
