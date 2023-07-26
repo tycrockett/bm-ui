@@ -244,6 +244,7 @@ export const Git = () => {
       methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
     } catch (err) {
       console.log(err);
+      toast.error("There was an error.");
     } finally {
       setLoading(false);
     }
