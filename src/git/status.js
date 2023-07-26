@@ -68,8 +68,11 @@ export const Status = ({
       css={`
         ${hasStatus ? fadeIn : ""}
         margin-bottom: 32px;
+        flex-grow: 1;
         height: 100%;
         width: 100%;
+        box-sizing: border-box;
+        overflow-y: auto;
       `}
     >
       {hasStatus ? (
