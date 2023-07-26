@@ -180,6 +180,8 @@ export const Git = () => {
     item.toLowerCase().includes(cmd2.toLowerCase())
   );
 
+  console.log(repos?.[settings?.pwd]?.branches);
+
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
     if (executingCommand.includes("clear")) {
@@ -187,7 +189,6 @@ export const Git = () => {
     }
 
     const { command } = list[index];
-
     const [value, ...args] = executingCommand.split(" ");
     setLoading(true);
 
@@ -203,15 +204,18 @@ export const Git = () => {
         await checkoutBranch(checkoutList?.[0], options);
       } else if (command === "delete") {
         await deleteBranch(options);
-        if (settings?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
-          let nextBranches = settings?.[settings?.pwd]?.branches;
-          delete nextBranches[options.currentBranch];
-          methods.updateRepos({
-            [settings?.pwd]: {
-              ...repos?.[settings?.pwd],
-              branches,
-            },
-          });
+        if (repos?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
+          try {
+            let nextBranches = repos?.[settings?.pwd]?.branches;
+            delete nextBranches[options.currentBranch];
+            methods.setRepos({
+              ...repos,
+              [settings?.pwd]: {
+                ...repos?.[settings?.pwd],
+                branches,
+              },
+            });
+          } catch {}
         }
       } else if (command === "update") {
         await update(options);
@@ -226,7 +230,8 @@ export const Git = () => {
         await addCommitPush(description, options);
       } else if (command === "new") {
         await createBranch(args[0], options);
-        methods.updateRepos({
+        methods.setRepos({
+          ...repos,
           [settings?.pwd]: {
             ...repos?.[settings?.pwd],
             branches: {
@@ -269,7 +274,7 @@ export const Git = () => {
 
   useEffect(() => {
     const data = read(`${settings.base}/bm-cache/repos.json`, {});
-    methods.updateRepos(data);
+    methods.setRepos(data);
 
     refreshGit();
 

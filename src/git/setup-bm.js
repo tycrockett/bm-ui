@@ -16,7 +16,7 @@ export const SetupBm = () => {
   const initBM = () => {
     let data = { ...repos };
     data[settings.pwd] = { defaultBranch };
-    methods.updateRepos(data);
+    methods.setRepos(data);
     setModal("");
     setDefaultBranch("main");
   };

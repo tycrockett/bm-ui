@@ -58,7 +58,7 @@ export const StoreProvider = (props) => {
     setStore("settings", data);
   };
 
-  const updateRepos = (updates, options = {}) => {
+  const setRepos = (updates, options = {}) => {
     let next = { ...(data?.repos || {}), ...updates };
     // data = set;
 
@@ -66,7 +66,7 @@ export const StoreProvider = (props) => {
     if (data?.settings?.base && updateCache) {
       write(`${data?.settings?.base}/bm-cache/repos.json`, next);
     }
-    updateStore("repos", next);
+    setStore("repos", next);
   };
 
   const changeDirectory = (pwd, base = data.settings.base) => {
@@ -117,7 +117,7 @@ export const StoreProvider = (props) => {
   const methods = {
     directory,
     setSettings,
-    updateRepos,
+    setRepos,
     set: setStore,
     update: updateStore,
   };
