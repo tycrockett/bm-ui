@@ -180,8 +180,6 @@ export const Git = () => {
     item.toLowerCase().includes(cmd2.toLowerCase())
   );
 
-  console.log(repos?.[settings?.pwd]?.branches);
-
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
     if (executingCommand.includes("clear")) {
