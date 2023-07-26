@@ -138,7 +138,9 @@ const App = () => {
               ${flex("right")}
               > div {
                 padding-bottom: 0;
-                transition: border-bottom 0.15s ease-in-out;
+                transition: border-radius 0.1s ease,
+                  border-bottom-right-radius 0.1s ease,
+                  border-bottom-left-radius 0.1s ease;
               }
             `}
           >

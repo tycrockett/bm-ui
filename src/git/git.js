@@ -180,19 +180,19 @@ export const Git = () => {
     item.toLowerCase().includes(cmd2.toLowerCase())
   );
 
-  const handleCmd = async (event) => {
+  const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
-    if (cmd.includes("clear")) {
+    if (executingCommand.includes("clear")) {
       console.clear();
     }
 
     const { command } = list[index];
 
-    const [value, ...args] = cmd.split(" ");
+    const [value, ...args] = executingCommand.split(" ");
     setLoading(true);
 
     const options = {
-      flags: cmd,
+      flags: executingCommand,
       parentBranch,
       currentBranch: branches?.current,
     };
@@ -203,6 +203,16 @@ export const Git = () => {
         await checkoutBranch(checkoutList?.[0], options);
       } else if (command === "delete") {
         await deleteBranch(options);
+        if (settings?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
+          let nextBranches = settings?.[settings?.pwd]?.branches;
+          delete nextBranches[options.currentBranch];
+          methods.updateRepos({
+            [settings?.pwd]: {
+              ...repos?.[settings?.pwd],
+              branches,
+            },
+          });
+        }
       } else if (command === "update") {
         await update(options);
       } else if (command === "push") {
@@ -223,6 +233,7 @@ export const Git = () => {
               ...(repos?.[settings?.pwd]?.branches || {}),
               [args[0]]: {
                 parentBranch: options?.currentBranch,
+                createdAt: new Date().toISOString(),
               },
             },
           },
@@ -230,6 +241,20 @@ export const Git = () => {
       }
       refreshGit();
       methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const completeMerge = async () => {
+    try {
+      setLoading(true);
+      const description = `Merge branch '${parentBranch}' into '${branches.current}'`;
+      await addCommitPush(description);
+      refreshGit();
+      methods.set("lastCommand", `complete-merge-${new Date().toISOString()}`);
     } catch (err) {
       console.log(err);
     } finally {
@@ -467,6 +492,7 @@ export const Git = () => {
             status={status}
             currentBranch={branches?.current}
             parentBranch={parentBranch}
+            completeMerge={completeMerge}
           />
           <Logs
             parentBranch={parentBranch}

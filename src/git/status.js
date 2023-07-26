@@ -1,15 +1,11 @@
 import { Button, colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 import {
-  FileArrowUp,
-  FileDotted,
   FileX,
-  MinusCircle,
-  PersonSimpleRun,
-  Pulse,
   PlusCircle,
-  FastForward,
-  GitDiff,
+  FileDotted,
+  FileArrowUp,
+  MinusCircle,
   GitPullRequest,
 } from "phosphor-react";
 import { toast } from "react-toastify";
@@ -18,7 +14,12 @@ import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
 
-export const Status = ({ status, currentBranch, parentBranch }) => {
+export const Status = ({
+  status,
+  currentBranch,
+  parentBranch,
+  completeMerge,
+}) => {
   const shortStatus = useAsyncValue(
     async () =>
       await cmd(
@@ -44,6 +45,23 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
       toast.error(`Unable to copy that value`);
     }
   };
+
+  const untracked = status?.untracked?.filter(
+    (item) => Number(status?.fileCount?.[item]) > 0
+  );
+  const deleted = status?.deleted?.filter(
+    (item) =>
+      Number(status?.files?.[item]?.deletes) > 0 &&
+      Number(status?.files?.[item]?.adds) > 0
+  );
+  const modified = status?.modified?.filter(
+    (item) =>
+      Number(status?.files?.[item]?.deletes) > 0 &&
+      Number(status?.files?.[item]?.adds) > 0
+  );
+
+  const unmergedChanges =
+    hasStatus && !untracked?.length && !deleted?.length && !modified?.length;
 
   return (
     <Div
@@ -94,7 +112,24 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
           >
             {shortStatus}
           </Text>
-          {status?.untracked?.map((item) => (
+          {unmergedChanges ? (
+            <Div
+              css={`
+                ${flex("space-between")}
+                padding: 32px;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 16px;
+                button {
+                  margin-left: 8px;
+                  min-width: max-content;
+                }
+              `}
+            >
+              <Text h3>There are uncommitted changes.</Text>
+              <Button onClick={completeMerge}>Complete Merge</Button>
+            </Div>
+          ) : null}
+          {untracked?.map((item) => (
             <Div
               css={`
                 ${flex("space-between")}
@@ -159,7 +194,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
             </Div>
           ))}
 
-          {status?.deleted?.map((item) => (
+          {deleted?.map((item) => (
             <Div
               css={`
                 ${flex("space-between")}
@@ -235,7 +270,7 @@ export const Status = ({ status, currentBranch, parentBranch }) => {
             </Div>
           ))}
 
-          {status?.modified?.map((item) => (
+          {modified?.map((item) => (
             <Div
               css={`
                 ${flex("space-between")} padding: 0;
