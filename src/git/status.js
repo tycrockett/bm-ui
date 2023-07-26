@@ -51,12 +51,12 @@ export const Status = ({
   );
   const deleted = status?.deleted?.filter(
     (item) =>
-      Number(status?.files?.[item]?.deletes) > 0 &&
+      Number(status?.files?.[item]?.deletes) > 0 ||
       Number(status?.files?.[item]?.adds) > 0
   );
   const modified = status?.modified?.filter(
     (item) =>
-      Number(status?.files?.[item]?.deletes) > 0 &&
+      Number(status?.files?.[item]?.deletes) > 0 ||
       Number(status?.files?.[item]?.adds) > 0
   );
 
