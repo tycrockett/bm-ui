@@ -1,11 +1,18 @@
-import { GitCommit } from "phosphor-react";
+import { format } from "date-fns";
+import { CurrencyNgn, GitCommit } from "phosphor-react";
 import { useCallback } from "react";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { colors, Div, Text } from "../shared";
 import { animation, flex } from "../shared/utils";
 import { logCommits } from "./utils";
 
-export const Logs = ({ parentBranch, lastCommand, pwd }) => {
+export const Logs = ({
+  currentBranch,
+  parentBranch,
+  repo,
+  lastCommand,
+  pwd,
+}) => {
   const getLogs = useCallback(
     () => logCommits(parentBranch),
     [parentBranch, pwd]
@@ -13,10 +20,11 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
   const [logs] = useAsyncValue(getLogs, [lastCommand, parentBranch, pwd]);
   const commits = Object.entries(logs || {});
 
-  if (!commits.length) {
+  if (currentBranch === repo?.defaultBranch) {
     return null;
   }
-
+  const metaBranch = repo?.branches?.[currentBranch];
+  console.log(metaBranch);
   return (
     <Div
       css={`
@@ -31,17 +39,34 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
     >
       <Div
         css={`
-          ${flex("left")}
-          margin-bottom: 8px;
-          p {
-            margin-left: 16px;
-          }
+          ${flex("space-between")}
         `}
       >
-        <GitCommit size={32} color="white" weight="bold" />
-        <Text h3 bold css={``}>
-          Commits
-        </Text>
+        <Div
+          css={`
+            ${flex("left")}
+            p {
+              margin-left: 16px;
+            }
+          `}
+        >
+          <GitCommit size={32} color="white" weight="bold" />
+          <Text h3 bold>
+            Commits
+          </Text>
+        </Div>
+        <Div
+          css={`
+            text-align: right;
+          `}
+        >
+          <Text h3>{metaBranch?.parentBranch}</Text>
+          {metaBranch?.createdAt ? (
+            <Text>
+              {format(new Date(metaBranch?.createdAt), "MMM d | h:mm a")}
+            </Text>
+          ) : null}
+        </Div>
       </Div>
       {commits?.map(([key, item]) => (
         <Div
@@ -50,6 +75,7 @@ export const Logs = ({ parentBranch, lastCommand, pwd }) => {
             ${flex("space-between")}
             padding: 4px 16px;
             margin: 0 -16px;
+            margin-top: 8px;
             border-radius: 8px;
             transition: background-color 0.2s ease;
             cursor: pointer;

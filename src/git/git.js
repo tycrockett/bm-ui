@@ -225,7 +225,6 @@ export const Git = () => {
         const description = args.filter((v) => !v.startsWith("-")).join(" ");
         await addCommitPush(description, options);
       } else if (command === "new") {
-        console.log(command, args[0]);
         await createBranch(args[0], options);
         methods.updateRepos({
           [settings?.pwd]: {
@@ -498,6 +497,8 @@ export const Git = () => {
             completeMerge={completeMerge}
           />
           <Logs
+            currentBranch={branches?.current}
+            repo={repos?.[settings?.pwd]}
             parentBranch={parentBranch}
             lastCommand={lastCommand}
             pwd={settings?.pwd}
