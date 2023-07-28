@@ -15,8 +15,10 @@ import {
   fetch,
   getBranches,
   getStatus,
+  handleFile,
   openRemote,
   push,
+  renameBranch,
   update,
 } from "./utils";
 import { CloudCheck, CloudSlash, Tree } from "phosphor-react";
@@ -111,11 +113,12 @@ const commands = [
     description: "git fetch -p",
   },
   {
-    name: "Remove (file)",
-    command: "rm",
+    name: "File",
+    command: "file",
     args: "{relative filepath}",
-    flags: "",
-    description: "Remove a file by filepath.",
+    flags: "-ch --checkout",
+    description:
+      "--checkout: Checks out a file from the parent branch (thereby removing any changes to the file)",
   },
 ];
 
@@ -217,8 +220,30 @@ export const Git = () => {
         }
       } else if (command === "update") {
         await update(options);
+      } else if (command === "file") {
+        await handleFile(args[0], options);
+      } else if (command === "file") {
+        await handleFile(args[0], options);
       } else if (command === "push") {
         await push(options);
+      } else if (command === "rename") {
+        await renameBranch(args[0], options);
+        let next = { ...repos };
+        const branchMeta =
+          repos?.[settings?.pwd]?.branches?.[options.currentBranch];
+        methods.setRepos({
+          ...repos,
+          [settings?.pwd]: {
+            ...repos?.[settings?.pwd],
+            branches: {
+              ...(repos?.[settings?.pwd]?.branches || {}),
+              [args[0]]: {
+                parentBranch: options?.currentBranch,
+                createdAt: new Date().toISOString(),
+              },
+            },
+          },
+        });
       } else if (command === "clear") {
         await clearBranch(options);
       } else if (command === "fetch") {

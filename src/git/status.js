@@ -1,5 +1,5 @@
 import { Button, colors, Div, Text } from "../shared";
-import { animation, flex, shadows } from "../shared/utils";
+import { animation, flex, shadows, styles } from "../shared/utils";
 import {
   FileX,
   PlusCircle,
@@ -73,6 +73,7 @@ export const Status = ({
         width: 100%;
         box-sizing: border-box;
         overflow-y: auto;
+        ${styles.scrollbar}
       `}
     >
       {hasStatus ? (
@@ -136,7 +137,7 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
-                padding: 0;
+                padding: 4px 0;
               `}
             >
               <Div
@@ -201,7 +202,7 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
-                padding: 0;
+                padding: 4px 0;
               `}
             >
               <Div
@@ -276,7 +277,7 @@ export const Status = ({
           {modified?.map((item) => (
             <Div
               css={`
-                ${flex("space-between")} padding: 0;
+                ${flex("space-between")} padding: 4px 0;
               `}
             >
               <Div

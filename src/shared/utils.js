@@ -68,6 +68,20 @@ export const shadows = {
   lg: `filter: drop-shadow(4px 4px 12px rgba(0, 0, 0, .3));`,
 };
 
+export const styles = {
+  scrollbar: `
+    ::-webkit-scrollbar {
+      background: transparent;
+      width: 8px;
+
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 30px;
+    }
+  `,
+};
+
 const animations = {
   fadeIn: `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`,
   fadeOut: `@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }`,

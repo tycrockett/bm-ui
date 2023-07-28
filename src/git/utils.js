@@ -232,6 +232,38 @@ export const logCommits = async (parentBranch) => {
   }
 };
 
+export const handleFile = async (filepath, options) => {
+  const { flags = "", parentBranch = "" } = options;
+  if (flags.includes("-ch") || flags.includes("--checkout")) {
+    try {
+      await cmd(`git checkout ${parentBranch} -- ${filepath}`);
+    } catch (err) {
+      throw err;
+    }
+  }
+};
+
+export const renameBranch = async (branchName, options) => {
+  const { flags = "" } = options;
+  try {
+    if (branchName) {
+      const currentBranch = await getCurrentBranch();
+      const hasRemote = await hasRemoteBranch(currentBranch);
+      await cmd(`git branch -m ${branchName}`);
+      // TODO: Update repos.json
+      toast.success(`Renamed local branch ${currentBranch} -> ${branchName}`);
+      if (hasRemote) {
+        await cmd(`git push origin -u ${branchName}`);
+        toast.success(`Update remote branch to ${branchName}`);
+      } else {
+        toast.warn(`Couldn't find a remote branch for ${currentBranch}`);
+      }
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 ///// ***************
 export const getCurrentBranch = async () => {
   try {
@@ -252,40 +284,6 @@ export const getBranches = async () => {
 };
 
 const getParentBranch = () => false;
-
-export const renameBranch = async (branchName, flags) => {
-  try {
-    if (branchName) {
-      const currentBranch = await getCurrentBranch();
-      const hasRemote = await hasRemoteBranch(currentBranch);
-      await cmd(`git branch -m ${branchName}`);
-      // TODO: Update repos.json
-      toast.success(`Renamed local branch ${currentBranch} -> ${branchName}`);
-      if (hasRemote) {
-        await cmd(`git push origin -u ${branchName}`);
-        toast.success(`Update remote branch to ${branchName}`);
-      } else {
-        toast.warn(`Couldn't find a remote branch for ${currentBranch}`);
-      }
-    }
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
-
-export const removeFile = async (filepath, defaultBranch, flags) => {
-  try {
-    const currentBranch = await getCurrentBranch();
-    const parentBranch = getParentBranch(currentBranch) || defaultBranch;
-    await cmd(`git checkout ${parentBranch} -- ${filepath}`);
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
 
 export const getStatus = async () => {
   try {
