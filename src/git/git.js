@@ -29,6 +29,7 @@ import { CmdList } from "./cmd-list";
 import { Logs } from "./logs";
 import { toast } from "react-toastify";
 import { Loader } from "../shared/loader";
+import { defaultActions } from "../settings/actions";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -127,6 +128,11 @@ export const Git = () => {
     store: { settings = {}, repos = {}, lastCommand = "" },
     methods,
   } = useContext(StoreContext);
+
+  const actions = {
+    ...defaultActions,
+    ...(settings?.actions || {}),
+  };
 
   const ref = useRef();
   const positionRef = useRef();
@@ -364,6 +370,19 @@ export const Git = () => {
     }
   };
 
+  const handleGit = (key, list) => {
+    if (key === "open-github") {
+      if (branches.hasRemote) {
+        openRemote({
+          flags: cmd,
+          currentBranch: branches?.current,
+        });
+      } else {
+        toast.error(`No remote branch detected.`);
+      }
+    }
+  };
+
   const keydown = async (captured, event) => {
     if (captured === "+Tab") {
       event.preventDefault();
@@ -379,19 +398,20 @@ export const Git = () => {
         const command = list[index]?.command;
         setCmd(command);
       }
-    } else if (captured === "meta+KeyR") {
-      event.stopPropagation();
-      event.preventDefault();
-      if (branches.hasRemote) {
-        openRemote({
-          flags: cmd,
-          currentBranch: branches?.current,
-        });
-      } else {
-        toast.error(`No remote branch detected.`);
-      }
     } else {
-      ref.current.focus();
+      const entries = Object.entries(actions);
+      const entry = entries?.find(([_, item]) => item?.shortkey === captured);
+
+      if (entry?.length) {
+        const [key, item] = entry;
+        if (item?.type === "git") {
+          event.preventDefault();
+          event.stopPropagation();
+          handleGit(key, item?.list);
+        }
+      } else {
+        ref.current.focus();
+      }
     }
   };
 

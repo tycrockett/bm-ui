@@ -1,5 +1,7 @@
 import { css } from "@emotion/css";
 import { Div } from "./div";
+import { colors } from "./styles";
+import { flex, shadows } from "./utils";
 
 export const Modal = ({ children, onClose, ...props }) => {
   return (
@@ -14,6 +16,12 @@ export const Modal = ({ children, onClose, ...props }) => {
         right: 0;
         background: rgba(0, 0, 0, 0.2);
         z-index: 1000;
+        ${flex("center")}
+        > div {
+          ${shadows.lg}
+          border-radius: 8px;
+          background-color: ${colors.lightIndigo};
+        }
       `}
       onMouseDown={onClose}
     >

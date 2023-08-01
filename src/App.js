@@ -8,6 +8,7 @@ import { Settings } from "./settings/settings";
 import { Div, Text, Button, colors } from "./shared";
 import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
+import { defaultActions } from "./settings/actions";
 
 const header = `
   padding: 8px 16px;
@@ -21,6 +22,10 @@ const App = () => {
   const [mode, setMode] = useState("finder");
 
   const { settings } = store;
+  const actions = {
+    ...defaultActions,
+    ...(settings?.actions || {}),
+  };
 
   const splitDir = settings?.pwd?.split("/");
   const displayDirectory = settings?.pwd?.split("/").slice(-2)?.join("/");
@@ -54,37 +59,53 @@ const App = () => {
     });
   };
 
+  const handleActionList = (list) => {
+    for (const item of list) {
+      const { type, payload } = item;
+      if (type === "execute-command") {
+        cmd(payload);
+      }
+    }
+  };
+
   const keydown = (captured, event) => {
-    if (captured === "meta+KeyF") {
-      event.stopPropagation();
-      setMode("finder");
-    } else if (captured === "meta+KeyD") {
-      event.stopPropagation();
-      setMode("git");
-    } else if (captured === "meta+KeyS") {
-      event.stopPropagation();
-      setMode("settings");
-    } else if (captured === "meta+KeyO") {
-      event.preventDefault();
-      event.stopPropagation();
-      cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
-    } else if (captured === "meta+KeyT") {
-      cmd("open -a terminal .");
-    } else if (captured.startsWith("meta+Digit")) {
-      event.stopPropagation();
+    if (captured.startsWith("meta+Digit")) {
       const index = Number(captured.replace("meta+Digit", "")) - 1;
       const [path = ""] = Object.entries(settings?.bookmarks || {})?.[index];
       if (path) {
         directory.change(path);
       }
-    } else if (captured === "meta+Equal") {
-      event.stopPropagation();
-      event.preventDefault();
-      createBookmark();
+    } else {
+      const entries = Object.entries(actions);
+      const entry = entries?.find(([_, item]) => {
+        console.log(item);
+        return item?.shortkey === captured;
+      });
+
+      if (entry?.length) {
+        const [key, item] = entry;
+        if (item?.type === "bm") {
+          event.preventDefault();
+          event.stopPropagation();
+          if (key === "mode-finder") {
+            setMode("finder");
+          } else if (key === "mode-git") {
+            setMode("git");
+          } else if (key === "mode-settings") {
+            setMode("settings");
+          } else if (key === "create-bookmark") {
+            createBookmark();
+          }
+        } else if (item?.type === "action") {
+          event.preventDefault();
+          event.stopPropagation();
+          handleActionList(item?.list);
+        }
+      }
     }
   };
 
-  useKeyboard({ keydown, options: { useCapture: true } });
+  useKeyboard({ keydown });
 
   return (
     <Div

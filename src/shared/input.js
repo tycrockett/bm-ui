@@ -7,6 +7,9 @@ export const inputStyles = {
     padding: 12px 8px;
     border: none;
     outline: none;
+    :disabled {
+      color: black;
+    }
   `,
 };
 

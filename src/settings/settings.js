@@ -1,15 +1,20 @@
 import { ArrowSquareOut } from "phosphor-react";
+import { useContext } from "react";
+import { StoreContext } from "../context/store";
 import { cmd } from "../node/node-exports";
 import { Button, Div, Text } from "../shared";
-import { flex } from "../shared/utils";
+import { flex, styles } from "../shared/utils";
+import { Actions } from "./actions";
+import { Shortkeys } from "./shortkeys";
 
 export const Settings = () => {
-  const openSettings = () => {
-    cmd(`open ~/bm-cache/settings.json`);
-  };
-  const openRepos = () => {
-    cmd(`open ~/bm-cache/repos.json`);
-  };
+  const {
+    store: { settings = {} },
+    methods: { setSettings },
+  } = useContext(StoreContext);
+
+  const openSettings = () => cmd(`open ~/bm-cache/settings.json`);
+  const openRepos = () => cmd(`open ~/bm-cache/repos.json`);
 
   return (
     <Div
@@ -17,13 +22,24 @@ export const Settings = () => {
         padding: 16px;
       `}
     >
+      <Text
+        h2
+        css={`
+          margin-bottom: 8px;
+        `}
+      >
+        Config Files
+      </Text>
       <Div
         css={`
           ${flex("space-between")}
+          padding: 0 8px;
+          ${styles.hover}
         `}
+        onClick={openSettings}
       >
-        <Text h1>Settings</Text>
-        <Button icon onClick={openSettings}>
+        <Text h3>settings.json</Text>
+        <Button icon>
           <ArrowSquareOut />
         </Button>
       </Div>
@@ -31,13 +47,18 @@ export const Settings = () => {
       <Div
         css={`
           ${flex("space-between")}
+          padding: 0 8px;
+          ${styles.hover}
         `}
+        onClick={openRepos}
       >
-        <Text h2>Repos</Text>
-        <Button icon onClick={openRepos}>
+        <Text h3>repos.json</Text>
+        <Button icon>
           <ArrowSquareOut />
         </Button>
       </Div>
+
+      <Actions settings={settings} setSettings={setSettings} />
     </Div>
   );
 };

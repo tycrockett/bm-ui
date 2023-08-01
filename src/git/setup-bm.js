@@ -55,12 +55,10 @@ export const SetupBm = () => {
       {modal === "init" && (
         <Modal
           css={`
-            margin-top: 15vh;
             padding: 32px;
             width: 500px;
             height: max-content;
             background-color: ${colors.lightIndigo};
-            ${shadows.lg}
             border-radius: 16px;
           `}
         >

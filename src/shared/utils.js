@@ -80,6 +80,14 @@ export const styles = {
       border-radius: 30px;
     }
   `,
+  hover: `
+    :hover {
+      background-color: rgba(0, 0, 0, .2);
+      transition: background-color .2s ease;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+  `,
 };
 
 const animations = {

@@ -1,18 +1,18 @@
 import { css } from "@emotion/css";
 import { CaretDown, Check } from "phosphor-react";
 import { forwardRef, useEffect, useState } from "react";
-import { useOutsideClick } from "../../hooks/use-outside-click";
-import { colors, theme } from "./styles";
+import { useOutsideClick } from "../hooks/use-outside-click";
 import { Text } from "./text";
 
 const tags = {
   primary: `
     position: relative;
     padding: 8px;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid #EEE;
     min-width: 200px;
     cursor: pointer;
+    background-color: white;
   `,
   dark: `
     position: relative;
@@ -44,7 +44,7 @@ const buildStyles = (object, styles) => {
   const split = styles.split(" ");
   const hasRequiredVal = list.find((item) => split.includes(item));
   const tags = hasRequiredVal ? split : ["primary", ...split];
-  const obj = { ...theme, ...object };
+  const obj = { ...object };
   return tags.reduce((prev, tag) => {
     if (tag in obj) {
       return `${prev} ${obj[tag]}`;
