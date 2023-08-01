@@ -77,10 +77,7 @@ const App = () => {
       }
     } else {
       const entries = Object.entries(actions);
-      const entry = entries?.find(([_, item]) => {
-        console.log(item);
-        return item?.shortkey === captured;
-      });
+      const entry = entries?.find(([_, item]) => item?.shortkey === captured);
 
       if (entry?.length) {
         const [key, item] = entry;
