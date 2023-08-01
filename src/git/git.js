@@ -237,19 +237,9 @@ export const Git = () => {
         let next = { ...repos };
         const branchMeta =
           repos?.[settings?.pwd]?.branches?.[options.currentBranch];
-        methods.setRepos({
-          ...repos,
-          [settings?.pwd]: {
-            ...repos?.[settings?.pwd],
-            branches: {
-              ...(repos?.[settings?.pwd]?.branches || {}),
-              [args[0]]: {
-                parentBranch: options?.currentBranch,
-                createdAt: new Date().toISOString(),
-              },
-            },
-          },
-        });
+        next[settings.pwd].branches[args[0]] = { ...branchMeta };
+        delete next?.[settings?.pwd]?.branches?.[options.currentBranch];
+        methods.setRepos(next);
       } else if (command === "clear") {
         await clearBranch(options);
       } else if (command === "fetch") {
