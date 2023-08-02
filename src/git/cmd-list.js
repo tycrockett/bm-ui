@@ -1,7 +1,14 @@
 import { colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 
-export const CmdList = ({ list, index, cmd, setCmd, checkoutList }) => {
+export const CmdList = ({
+  list,
+  index,
+  cmd,
+  setCmd,
+  handleCmd,
+  checkoutList,
+}) => {
   return (
     <Div
       css={`
@@ -70,9 +77,16 @@ export const CmdList = ({ list, index, cmd, setCmd, checkoutList }) => {
                   css={`
                     padding: 4px 16px;
                     border-radius: 16px;
-                    background-color: ${colors.lightIndigo};
+                    border: 1px solid ${colors.darkIndigo};
                     margin-right: 16px;
+                    cursor: pointer;
+                    :hover {
+                      transition: background-color 0.2s ease, border 0.2s ease;
+                      background-color: ${colors.lightIndigo};
+                      border: 1px solid ${colors.lightIndigo};
+                    }
                   `}
+                  onClick={handleCmd}
                 >
                   {list[0]?.name}
                 </Text>

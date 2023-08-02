@@ -1,12 +1,4 @@
-import {
-  Gear,
-  GitBranch,
-  Monitor,
-  PencilSimple,
-  Plus,
-  Square,
-  X,
-} from "phosphor-react";
+import { Gear, GitBranch, Monitor, Plus, Square, X } from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex, styles } from "../shared/utils";
@@ -106,20 +98,20 @@ export const Actions = ({ settings, setSettings }) => {
           onClick={() => setActionKey(key)}
         >
           {item?.type === "bm" ? (
-            <Gear size={32} />
+            <Gear size={24} />
           ) : item?.type === "action" ? (
-            <Monitor size={32} />
+            <Monitor size={24} />
           ) : item?.type === "git" ? (
-            <GitBranch size={32} />
+            <GitBranch size={24} />
           ) : (
-            <Square size={32} />
+            <Square size={24} />
           )}
           <Div
             css={`
               flex-grow: 1;
             `}
           >
-            <Text h3>{item.name}</Text>
+            <Text>{item.name}</Text>
           </Div>
           <Text
             css={`

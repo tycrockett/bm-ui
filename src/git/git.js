@@ -47,7 +47,7 @@ const commands = [
   {
     name: "Add + Commit + Push",
     command: ".",
-    args: "",
+    args: "{description}",
     flags: "",
     description:
       "Adds all unstaged files, commits all files with a description message and then pushes everything if a remote branch exists.",
@@ -58,7 +58,7 @@ const commands = [
     args: "{name}",
     flags: "",
     description:
-      "Updates current branch if a remote branch exists and then creates a new branch with the current set as parent.",
+      "Pulls active branch if a remote branch exists and then creates a new branch with the active branch set as it's parent.",
   },
   {
     name: "Checkout",
@@ -73,7 +73,7 @@ const commands = [
     args: "",
     flags: "-r --remote",
     description:
-      "Delete the current branch. With the -r flag it will delete the remote branch.",
+      "Delete the current branch. Adding the -r flag it will delete the remote branch.",
   },
   {
     name: "Push",
@@ -81,22 +81,22 @@ const commands = [
     args: "",
     flags: "",
     description:
-      "git push or if no remote branch exists it will automatically set the upstream branch",
+      "Do a git push or if no remote branch exists it will automatically set the upstream branch",
   },
-  {
-    name: "Status",
-    command: "status",
-    args: "",
-    flags: "",
-    description: "Refresh displayed status.",
-  },
-
+  // {
+  //   name: "Status",
+  //   command: "status",
+  //   args: "",
+  //   flags: "",
+  //   description: "Refresh displayed status.",
+  // },
   {
     name: "Clear",
     command: "clear",
     args: "",
-    flags: "",
-    description: "Clears all uncommitted changes.",
+    flags: "-u --undo",
+    description:
+      "Clears all uncommitted changes. Adding the -u flag undoes the clear.",
   },
   {
     name: "Rename",
@@ -104,19 +104,19 @@ const commands = [
     args: "{branchName}",
     flags: "",
     description:
-      "Renames local branch and attempts to rename the remote branch.",
+      "Renames local active branch and attempts to rename the remote branch.",
   },
   {
     name: "Fetch",
     command: "fetch",
     args: "",
     flags: "",
-    description: "git fetch -p",
+    description: "Does a git fetch -p",
   },
   {
     name: "File",
     command: "file",
-    args: "{relative filepath}",
+    args: "{relativeFilepath}",
     flags: "-ch --checkout",
     description:
       "--checkout: Checks out a file from the parent branch (thereby removing any changes to the file)",
@@ -522,6 +522,7 @@ export const Git = () => {
             list={list}
             index={index}
             cmd={cmd}
+            handleCmd={handleCmd}
             setCmd={(value) => {
               setCmd(`${value} `);
               ref?.current?.focus();

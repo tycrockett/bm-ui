@@ -92,7 +92,9 @@ export const Logs = ({
               }
             `}
           >
-            <Text bold>{key}</Text>
+            <Text bold ellipsis>
+              {key}
+            </Text>
             <Text
               bold
               css={`
@@ -100,6 +102,7 @@ export const Logs = ({
                 border-radius: 30px;
                 padding: 4px 8px;
                 background-color: ${colors.lightIndigo};
+                min-width: max-content;
               `}
             >
               {item?.length} File{item?.length !== 1 ? "s" : ""}
