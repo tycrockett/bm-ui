@@ -1,4 +1,12 @@
-import { Gear, GitBranch, Monitor, Plus, Square, X } from "phosphor-react";
+import {
+  FileJs,
+  Gear,
+  GitBranch,
+  Monitor,
+  Plus,
+  Square,
+  X,
+} from "phosphor-react";
 import { useEffect, useState } from "react";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex, styles } from "../shared/utils";
@@ -77,7 +85,7 @@ export const Actions = ({ settings, setSettings }) => {
             margin: 8px 0;
           `}
         >
-          Commands
+          Actions
         </Text>
         <Button icon onClick={() => setActionKey("create-action")}>
           <Plus />
@@ -100,6 +108,8 @@ export const Actions = ({ settings, setSettings }) => {
         >
           {item?.type === "bm" ? (
             <Gear size={24} />
+          ) : item?.type === "js" ? (
+            <FileJs size={24} />
           ) : item?.type === "action" ? (
             <Monitor size={24} />
           ) : item?.type === "git" ? (

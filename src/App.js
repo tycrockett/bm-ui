@@ -1,4 +1,11 @@
-import { ArrowLeft, Gear, Monitor, Plus, Tree } from "phosphor-react";
+import {
+  ArrowLeft,
+  Gear,
+  MagicWand,
+  Monitor,
+  Plus,
+  Tree,
+} from "phosphor-react";
 import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "./context/store";
 import { Finder } from "./directory/finder";
@@ -9,6 +16,7 @@ import { Div, Text, Button, colors } from "./shared";
 import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
+import { CommandCenter } from "./command-center/command-center";
 
 const header = `
   padding: 8px 16px;
@@ -189,6 +197,17 @@ const App = () => {
             </Div>
             <Div
               css={
+                mode === "commands"
+                  ? `border-bottom: 6px solid ${colors.lightBlue}; border-radius: 5px;`
+                  : "border-bottom: 6px solid transparent;"
+              }
+            >
+              <Button icon onClick={() => setMode("commands")}>
+                <MagicWand weight="bold" />
+              </Button>
+            </Div>
+            <Div
+              css={
                 mode === "settings"
                   ? `border-bottom: 6px solid ${colors.lightBlue};
                     border-radius: 16px;
@@ -262,6 +281,8 @@ const App = () => {
           <Git />
         ) : mode === "settings" ? (
           <Settings />
+        ) : mode === "commands" ? (
+          <CommandCenter />
         ) : null}
       </Div>
     </Div>
