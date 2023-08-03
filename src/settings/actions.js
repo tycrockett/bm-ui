@@ -4,6 +4,7 @@ import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex, styles } from "../shared/utils";
 import uuid4 from "uuid4";
 import { useKeyboard } from "../hooks/use-keyboard";
+import { Select } from "../shared/select";
 
 const splice = (array, idx, deleteCount, ...items) => {
   let next = [...array];
@@ -243,7 +244,7 @@ export const Actions = ({ settings, setSettings }) => {
                       `}
                     >
                       <Text bold>Action Type</Text>
-                      <select
+                      <Select
                         value={item?.type}
                         onChange={(e) =>
                           setAction({
@@ -256,7 +257,7 @@ export const Actions = ({ settings, setSettings }) => {
                         }
                       >
                         <option value="execute-command">Execute Command</option>
-                      </select>
+                      </Select>
                     </Div>
                     {item?.type === "execute-command" ? (
                       <Input
