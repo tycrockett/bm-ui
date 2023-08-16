@@ -127,7 +127,7 @@ export const CmdList = ({
             {list[0]?.command === "checkout" ? (
               <Div
                 css={`
-                  ${flex("left")}
+                  ${flex("left wrap")}
                 `}
               >
                 {checkoutList?.map((item, idx) => (
@@ -135,6 +135,7 @@ export const CmdList = ({
                     css={`
                       ${animation("fadeIn", ".2s ease")}
                       padding: 8px 16px;
+                      margin-bottom: 8px;
                       border: 2px solid transparent;
                       transition: background-color 0.2s ease;
                       ${idx === 0

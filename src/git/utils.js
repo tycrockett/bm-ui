@@ -74,6 +74,19 @@ export const deleteBranch = async (options = {}) => {
   }
 };
 
+export const stash = async (options = {}) => {
+  const { flags = "" } = options;
+  try {
+    if (flags.includes("-a") || flags.includes("--apply")) {
+      await cmd("git stash apply");
+    } else {
+      await cmd("git stash");
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const clearBranch = async (options = {}) => {
   const { flags = "" } = options;
   try {

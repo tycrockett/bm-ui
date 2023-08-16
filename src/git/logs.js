@@ -1,3 +1,4 @@
+import { css } from "@emotion/css";
 import { format } from "date-fns";
 import { CurrencyNgn, GitCommit } from "phosphor-react";
 import { useCallback } from "react";
@@ -53,7 +54,21 @@ export const Logs = ({
         >
           <GitCommit size={32} color="white" weight="bold" />
           <Text h3 bold>
-            Commits
+            Commits{" "}
+            {commits?.length ? (
+              <span
+                className={css`
+                  margin-left: 8px;
+                  border-radius: 30px;
+                  padding: 2px 10px;
+                  background-color: ${colors.lightIndigo};
+                `}
+              >
+                {commits?.length}
+              </span>
+            ) : (
+              ""
+            )}
           </Text>
         </Div>
         <Div

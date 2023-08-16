@@ -19,6 +19,7 @@ import {
   openRemote,
   push,
   renameBranch,
+  stash,
   update,
 } from "./utils";
 import { CloudCheck, CloudSlash, Tree } from "phosphor-react";
@@ -83,13 +84,6 @@ const commands = [
     description:
       "Do a git push or if no remote branch exists it will automatically set the upstream branch",
   },
-  // {
-  //   name: "Status",
-  //   command: "status",
-  //   args: "",
-  //   flags: "",
-  //   description: "Refresh displayed status.",
-  // },
   {
     name: "Clear",
     command: "clear",
@@ -97,6 +91,13 @@ const commands = [
     flags: "-u --undo",
     description:
       "Clears all uncommitted changes. Adding the -u flag undoes the clear.",
+  },
+  {
+    name: "Stash",
+    command: "stash",
+    args: "",
+    flags: "-a --apply",
+    description: "git stash",
   },
   {
     name: "Rename",
@@ -242,6 +243,8 @@ export const Git = () => {
         methods.setRepos(next);
       } else if (command === "clear") {
         await clearBranch(options);
+      } else if (command === "stash") {
+        await stash(options);
       } else if (command === "fetch") {
         await fetch();
       } else if (command === ".") {

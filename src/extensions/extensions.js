@@ -4,7 +4,7 @@ import { cmd } from "../node/node-exports";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex } from "../shared/utils";
 
-export const CommandCenter = () => {
+export const Extensions = () => {
   const [command, setCommand] = useState(null);
   const [prompts, setPrompts] = useState([]);
 
@@ -23,7 +23,7 @@ export const CommandCenter = () => {
         padding: 16px;
       `}
     >
-      <Text h2>Command Center</Text>
+      <Text h2>Extensions</Text>
       <Input
         placeholder="Search"
         css={`
@@ -77,51 +77,60 @@ export const CommandCenter = () => {
           >
             <Text h2>{command?.name}</Text>
           </Div>
-          {!!prompts?.length
-            ? prompts.map((item, idx) => (
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    margin: 8px 0;
-                  `}
-                >
-                  <Text>{item?.label}</Text>
-                  <Input
-                    css={`
-                      width: 50%;
-                    `}
-                    value={item?.value}
-                    onChange={(e) =>
-                      setPrompts((p) => {
-                        let prompt = [...p];
-                        prompt.splice(idx, 1, {
-                          ...item,
-                          value: e.target.value,
-                        });
-                        return prompt;
-                      })
-                    }
-                  />
-                </Div>
-              ))
-            : null}
-          <Div
-            css={`
-              ${flex("right")}
-              margin-top: 24px;
-            `}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              runCommand();
+            }}
           >
-            <Button
-              secondary
+            {!!prompts?.length
+              ? prompts.map((item, idx) => (
+                  <Div
+                    css={`
+                      ${flex("space-between")}
+                      margin: 8px 0;
+                    `}
+                  >
+                    <Text>{item?.label}</Text>
+                    <Input
+                      css={`
+                        width: 50%;
+                      `}
+                      value={item?.value}
+                      onChange={(e) =>
+                        setPrompts((p) => {
+                          let prompt = [...p];
+                          prompt.splice(idx, 1, {
+                            ...item,
+                            value: e.target.value,
+                          });
+                          return prompt;
+                        })
+                      }
+                    />
+                  </Div>
+                ))
+              : null}
+            <Div
               css={`
-                margin-right: 16px;
+                ${flex("right")}
+                margin-top: 24px;
               `}
-              onClick={() => setCommand(null)}
             >
-              Cancel
-            </Button>
-            <Button onClick={runCommand}>OK</Button>
-          </Div>
+              <Button
+                secondary
+                css={`
+                  margin-right: 16px;
+                `}
+                onClick={() => setCommand(null)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" onClick={runCommand}>
+                OK
+              </Button>
+            </Div>
+          </form>
         </Modal>
       ) : null}
     </Div>

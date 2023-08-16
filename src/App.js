@@ -3,6 +3,7 @@ import {
   Gear,
   MagicWand,
   Monitor,
+  Plug,
   Plus,
   Tree,
 } from "phosphor-react";
@@ -16,7 +17,7 @@ import { Div, Text, Button, colors } from "./shared";
 import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
-import { CommandCenter } from "./command-center/command-center";
+import { Extensions } from "./extensions/extensions";
 
 const header = `
   padding: 8px 16px;
@@ -96,6 +97,8 @@ const App = () => {
             setMode("finder");
           } else if (key === "mode-git") {
             setMode("git");
+          } else if (key === "mode-command-center") {
+            setMode("extensions");
           } else if (key === "mode-settings") {
             setMode("settings");
           } else if (key === "create-bookmark") {
@@ -202,8 +205,8 @@ const App = () => {
                   : "border-bottom: 6px solid transparent;"
               }
             >
-              <Button icon onClick={() => setMode("commands")}>
-                <MagicWand weight="bold" />
+              <Button icon onClick={() => setMode("extensions")}>
+                <Plug weight="bold" />
               </Button>
             </Div>
             <Div
@@ -281,8 +284,8 @@ const App = () => {
           <Git />
         ) : mode === "settings" ? (
           <Settings />
-        ) : mode === "commands" ? (
-          <CommandCenter />
+        ) : mode === "extensions" ? (
+          <Extensions />
         ) : null}
       </Div>
     </Div>

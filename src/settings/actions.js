@@ -326,6 +326,11 @@ export const defaultActions = {
     type: "bm",
     shortkey: "meta+KeyG",
   },
+  "mode-command-center": {
+    name: "View Git",
+    type: "bm",
+    shortkey: "meta+KeyD",
+  },
   "mode-settings": {
     name: "View Settings",
     type: "bm",
