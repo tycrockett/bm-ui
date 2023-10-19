@@ -8,19 +8,10 @@ import { animation, flex, shadows } from "../shared/utils";
 import { SetupBm } from "./setup-bm";
 import {
   addCommitPush,
-  checkoutBranch,
-  clearBranch,
-  createBranch,
-  deleteBranch,
-  fetch,
   getBranches,
   getStatus,
-  handleFile,
   openRemote,
   push,
-  renameBranch,
-  stash,
-  update,
 } from "./utils";
 import { CloudCheck, CloudSlash, Tree } from "phosphor-react";
 import { css } from "@emotion/css";
@@ -36,106 +27,15 @@ const fs = window.require("fs");
 const chokidar = window.require("chokidar");
 const parse = require("parse-gitignore");
 
-const commands = [
-  {
-    name: "Update",
-    command: "update",
-    args: "",
-    flags: "",
-    description:
-      "Pulls parent origin and then automatically merges the parent branch into the current branch.",
-  },
-  {
-    name: "Add + Commit + Push",
-    command: ".",
-    args: "{description}",
-    flags: "",
-    description:
-      "Adds all unstaged files, commits all files with a description message and then pushes everything if a remote branch exists.",
-  },
-  {
-    name: "New",
-    command: "new",
-    args: "{name}",
-    flags: "",
-    description:
-      "Pulls active branch if a remote branch exists and then creates a new branch with the active branch set as it's parent.",
-  },
-  {
-    name: "Checkout",
-    command: "checkout",
-    args: "{name}",
-    flags: "-s --stash",
-    description: "Checkout a branch.",
-  },
-  {
-    name: "Delete",
-    command: "delete",
-    args: "",
-    flags: "-r --remote",
-    description:
-      "Delete the current branch. Adding the -r flag it will delete the remote branch.",
-  },
-  {
-    name: "Push",
-    command: "push",
-    args: "",
-    flags: "",
-    description:
-      "Do a git push or if no remote branch exists it will automatically set the upstream branch",
-  },
-  {
-    name: "Clear",
-    command: "clear",
-    args: "",
-    flags: "-u --undo",
-    description:
-      "Clears all uncommitted changes. Adding the -u flag undoes the clear.",
-  },
-  {
-    name: "Stash",
-    command: "stash",
-    args: "",
-    flags: "-a --apply",
-    description: "git stash",
-  },
-  {
-    name: "Rename",
-    command: "rename",
-    args: "{branchName}",
-    flags: "",
-    description:
-      "Renames local active branch and attempts to rename the remote branch.",
-  },
-  {
-    name: "Fetch",
-    command: "fetch",
-    args: "",
-    flags: "",
-    description: "Does a git fetch -p",
-  },
-  {
-    name: "File",
-    command: "file",
-    args: "{relativeFilepath}",
-    flags: "-ch --checkout",
-    description:
-      "--checkout: Checks out a file from the parent branch (thereby removing any changes to the file)",
-  },
-  {
-    name: "Parent",
-    command: "parent",
-    args: "{branchName}",
-    flags: "--point",
-    description: "--point: Points current branch's parent to {branchName}",
-  },
-];
-
 export const Git = () => {
   const {
-    store: { settings = {}, repos = {}, lastCommand = "" },
+    store: { extensions = [], settings = {}, repos = {}, lastCommand = "" },
     methods,
   } = useContext(StoreContext);
+
+  const commands = extensions
+    .filter((item) => item?.executionType === "command")
+    .map((item) => item.command);
 
   const actions = {
     ...defaultActions,
@@ -200,18 +100,14 @@ export const Git = () => {
     item.toLowerCase().includes(cmd2.toLowerCase())
   );
 
-  const handleAsyncFetch = async () => {
-    await fetch();
-    refreshGit();
-  };
-
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
     if (executingCommand.includes("clear")) {
       console.clear();
     }
 
-    const { command } = list[index];
+    const commandDetails = list[index];
+
     const [value, ...args] = executingCommand.split(" ");
     setLoading(true);
 
@@ -223,84 +119,28 @@ export const Git = () => {
     setCmd("");
     setLastCmd(new Date().toISOString());
     try {
-      if (command === "checkout") {
-        await checkoutBranch(checkoutList?.[0], options);
-        handleAsyncFetch();
-      } else if (command === "delete") {
-        await deleteBranch(options);
-        if (repos?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
-          try {
-            let nextBranches = repos?.[settings?.pwd]?.branches;
-            delete nextBranches[options.currentBranch];
-            methods.setRepos({
-              ...repos,
-              [settings?.pwd]: {
-                ...repos?.[settings?.pwd],
-                branches: nextBranches,
-              },
-            });
-          } catch {}
-        }
-      } else if (command === "update") {
-        await update(options);
-      } else if (command === "file") {
-        await handleFile(args[0], args[1], options);
-      } else if (command === "push") {
-        await push(options);
-      } else if (command === "rename") {
-        await renameBranch(args[0], options);
-        let next = { ...repos };
-        const branchMeta =
-          repos?.[settings?.pwd]?.branches?.[options.currentBranch];
-        next[settings.pwd].branches[args[0]] = { ...branchMeta };
-        delete next?.[settings?.pwd]?.branches?.[options.currentBranch];
-        methods.setRepos(next);
-      } else if (command === "clear") {
-        await clearBranch(options);
-      } else if (command === "stash") {
-        await stash(options);
-      } else if (command === "fetch") {
-        await fetch();
-      } else if (command === ".") {
-        const description = args.filter((v) => !v.startsWith("-")).join(" ");
-        await addCommitPush(description, options);
-      } else if (command === "new") {
-        await createBranch(args[0], options);
-        methods.setRepos({
-          ...repos,
-          [settings?.pwd]: {
-            ...repos?.[settings?.pwd],
-            branches: {
-              ...(repos?.[settings?.pwd]?.branches || {}),
-              [args[0]]: {
-                description: args[1] || "",
-                parentBranch: options?.currentBranch,
-                createdAt: new Date().toISOString(),
-              },
-            },
-          },
-        });
-      } else if (command === "parent") {
-        if (options.flags.includes("--point")) {
-          methods.setRepos({
-            ...repos,
-            [settings?.pwd]: {
-              ...repos?.[settings?.pwd],
-              branches: {
-                ...(repos?.[settings?.pwd]?.branches || {}),
-                [options.currentBranch]: {
-                  ...(repos?.[settings?.pwd]?.branches?.[
-                    options.currentBranch
-                  ] || {}),
-                  parentBranch: args[0],
-                },
-              },
-            },
-          });
-        }
-      }
+      const command = {
+        args,
+        options,
+        filteredBranchList: checkoutList,
+      };
+
+      const context = {
+        repos,
+        settings,
+        methods: {
+          setRepos: methods.setRepos,
+        },
+      };
+      await commandDetails.function({
+        command,
+        context,
+      });
       refreshGit();
-      methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
+      methods.set(
+        "lastCommand",
+        `${commandDetails.command}-${new Date().toISOString()}`
+      );
     } catch (err) {
       console.log(err);
       toast.error("There was an error.");

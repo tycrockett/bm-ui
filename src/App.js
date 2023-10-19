@@ -17,7 +17,7 @@ import { Div, Text, Button, colors } from "./shared";
 import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
-import { Extensions } from "./extensions/extensions";
+import { defaultExtensions, Extensions } from "./extensions/extensions";
 
 const header = `
   padding: 8px 16px;
@@ -26,7 +26,7 @@ const header = `
 const App = () => {
   const {
     store,
-    methods: { setSettings, directory },
+    methods: { set, setSettings, directory },
   } = useContext(StoreContext);
   const [mode, setMode] = useState("finder");
 
@@ -38,6 +38,11 @@ const App = () => {
 
   const splitDir = settings?.pwd?.split("/");
   const displayDirectory = settings?.pwd?.split("/").slice(-2)?.join("/");
+
+  useEffect(() => {
+    const extensions = defaultExtensions;
+    set("extensions", extensions);
+  }, []);
 
   useEffect(() => {
     const isDirectoryGit = directory.checkGit(settings?.pwd);
