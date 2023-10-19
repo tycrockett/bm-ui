@@ -124,7 +124,8 @@ export const CmdList = ({
             >
               {list[0]?.description}
             </Text>
-            {list[0]?.command === "checkout" ? (
+            {list[0]?.command === "checkout" ||
+            list[0]?.command === "parent" ? (
               <Div
                 css={`
                   ${flex("left wrap")}
@@ -149,7 +150,7 @@ export const CmdList = ({
                         background-color: ${colors.lightIndigo};
                       }
                     `}
-                    onClick={() => setCmd(`checkout ${item}`)}
+                    onClick={() => setCmd(`${list[0]?.command} ${item}`)}
                   >
                     {item}
                   </Text>

@@ -1,6 +1,6 @@
 import { css } from "@emotion/css";
 import { format } from "date-fns";
-import { CurrencyNgn, GitCommit } from "phosphor-react";
+import { GitCommit } from "phosphor-react";
 import { useCallback } from "react";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { colors, Div, Text } from "../shared";
@@ -76,7 +76,9 @@ export const Logs = ({
             text-align: right;
           `}
         >
-          <Text h3>{metaBranch?.parentBranch}</Text>
+          <Text h3 bold>
+            {metaBranch?.parentBranch}
+          </Text>
           {metaBranch?.createdAt ? (
             <Text>
               {format(new Date(metaBranch?.createdAt), "MMM d | h:mm a")}

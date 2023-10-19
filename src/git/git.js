@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StoreContext } from "../context/store";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { read } from "../node/fs-utils";
-import { colors, Div, Text } from "../shared";
+import { Button, colors, Div, Text } from "../shared";
 import { Input } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 import { SetupBm } from "./setup-bm";
@@ -122,6 +122,13 @@ const commands = [
     description:
       "--checkout: Checks out a file from the parent branch (thereby removing any changes to the file)",
   },
+  {
+    name: "Parent",
+    command: "parent",
+    args: "{branchName}",
+    flags: "--point",
+    description: "--point: Points current branch's parent to {branchName}",
+  },
 ];
 
 export const Git = () => {
@@ -148,6 +155,8 @@ export const Git = () => {
 
   const [showBranches, setShowBranches] = useState(false);
 
+  const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
+
   const parentBranch =
     repos?.[settings?.pwd]?.branches?.[branches?.current]?.parentBranch ||
     repos?.[settings?.pwd]?.defaultBranch;
@@ -156,6 +165,7 @@ export const Git = () => {
     animation: animation("shake", ".35s ease"),
     timing: 400,
   };
+
   const { animation: shakeTree } = useAnimation(animateShake, [lastCmd]);
 
   const refreshGit = async () => {
@@ -190,6 +200,11 @@ export const Git = () => {
     item.toLowerCase().includes(cmd2.toLowerCase())
   );
 
+  const handleAsyncFetch = async () => {
+    await fetch();
+    refreshGit();
+  };
+
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
     if (executingCommand.includes("clear")) {
@@ -210,6 +225,7 @@ export const Git = () => {
     try {
       if (command === "checkout") {
         await checkoutBranch(checkoutList?.[0], options);
+        handleAsyncFetch();
       } else if (command === "delete") {
         await deleteBranch(options);
         if (repos?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
@@ -228,9 +244,7 @@ export const Git = () => {
       } else if (command === "update") {
         await update(options);
       } else if (command === "file") {
-        await handleFile(args[0], options);
-      } else if (command === "file") {
-        await handleFile(args[0], options);
+        await handleFile(args[0], args[1], options);
       } else if (command === "push") {
         await push(options);
       } else if (command === "rename") {
@@ -259,12 +273,31 @@ export const Git = () => {
             branches: {
               ...(repos?.[settings?.pwd]?.branches || {}),
               [args[0]]: {
+                description: args[1] || "",
                 parentBranch: options?.currentBranch,
                 createdAt: new Date().toISOString(),
               },
             },
           },
         });
+      } else if (command === "parent") {
+        if (options.flags.includes("--point")) {
+          methods.setRepos({
+            ...repos,
+            [settings?.pwd]: {
+              ...repos?.[settings?.pwd],
+              branches: {
+                ...(repos?.[settings?.pwd]?.branches || {}),
+                [options.currentBranch]: {
+                  ...(repos?.[settings?.pwd]?.branches?.[
+                    options.currentBranch
+                  ] || {}),
+                  parentBranch: args[0],
+                },
+              },
+            },
+          });
+        }
       }
       refreshGit();
       methods.set("lastCommand", `${command}-${new Date().toISOString()}`);
@@ -297,10 +330,7 @@ export const Git = () => {
   useEffect(() => {
     const data = read(`${settings.base}/bm-cache/repos.json`, {});
     methods.setRepos(data);
-
     refreshGit();
-
-    // fetchCurrentBranch();
   }, [settings.pwd]);
 
   const list = useMemo(() => {
@@ -460,15 +490,23 @@ export const Git = () => {
               }
             `}
           >
-            <Tree
-              size={32}
-              color="white"
-              weight="bold"
-              className={css`
-                padding-right: 8px;
-                ${shakeTree}
+            <Button
+              icon
+              css={`
+                margin-right: 8px;
               `}
-            />
+              onClick={(e) => handleCmd(e, "fetch")}
+            >
+              <Tree
+                size={32}
+                color="white"
+                weight="bold"
+                className={css`
+                  ${shakeTree}
+                `}
+              />
+            </Button>
+
             <form onSubmit={handleCmd}>
               {loading ? <Loader /> : null}
               <Input
@@ -532,6 +570,17 @@ export const Git = () => {
             }}
             checkoutList={checkoutList}
           />
+          <Text
+            css={`
+              margin-bottom: 8px;
+              width: 100%;
+              text-align: left;
+            `}
+            h3
+          >
+            {repo?.description}
+          </Text>
+
           <Status
             status={status}
             currentBranch={branches?.current}

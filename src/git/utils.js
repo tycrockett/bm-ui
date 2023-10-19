@@ -245,11 +245,12 @@ export const logCommits = async (parentBranch) => {
   }
 };
 
-export const handleFile = async (filepath, options) => {
+export const handleFile = async (filepath, branch = "", options) => {
   const { flags = "", parentBranch = "" } = options;
   if (flags.includes("-ch") || flags.includes("--checkout")) {
+    const branchToCheckout = branch || parentBranch;
     try {
-      await cmd(`git checkout ${parentBranch} -- ${filepath}`);
+      await cmd(`git checkout ${branchToCheckout} -- ${filepath}`);
     } catch (err) {
       throw err;
     }
