@@ -120,6 +120,8 @@ export const StoreProvider = (props) => {
     setRepos,
     set: setStore,
     update: updateStore,
+    executeCommand: cmd,
+    clipboard: navigator.clipboard,
   };
 
   const store = data;

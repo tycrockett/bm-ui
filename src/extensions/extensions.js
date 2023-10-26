@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { cmd } from "../node/node-exports";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex } from "../shared/utils";
 import {
@@ -9,10 +8,7 @@ import {
   createBranch,
   deleteBranch,
   fetch,
-  getBranches,
-  getStatus,
   handleFile,
-  openRemote,
   push,
   renameBranch,
   stash,
@@ -21,18 +17,12 @@ import {
 import { StoreContext } from "../context/store";
 
 export const Extensions = () => {
+  const context = useContext(StoreContext);
   const {
     store: { extensions },
-  } = useContext(StoreContext);
+  } = context;
 
   const [extension, setExtension] = useState(null);
-
-  const context = {
-    methods: {
-      executeCommand: cmd,
-      clipboard: navigator.clipboard,
-    },
-  };
 
   return (
     <Div
@@ -240,7 +230,7 @@ const defaultCommands = [
     args: "{name}",
     flags: "",
     description:
-      "Pulls active branch if a remote branch exists and then creates a new branch with the active branch set as it's parent.",
+      "Pulls current branch if a remote branch exists and then creates a new branch with the current branch set as it's parent.",
     function: async ({ command, context }) => {
       await createBranch(command.args[0], command.options);
       context.methods.setRepos({
@@ -328,6 +318,16 @@ const defaultCommands = [
     description: "git stash",
     function: async ({ command, context }) => {
       await stash(command.options);
+    },
+  },
+  {
+    name: "Apply",
+    command: "apply",
+    args: "",
+    flags: "",
+    description: "git stash apply",
+    function: async ({ context }) => {
+      await context?.methods?.executeCommand("git stash apply");
     },
   },
   {
@@ -436,12 +436,6 @@ export const defaultExtensions = [
       } catch {}
     },
   },
-  // name: "Parent",
-  //   command: "parent",
-  //   args: "{branchName}",
-  //   flags: "--point",
-  //   description: "--point: Points current branch's parent to {branchName}",
-  //   function: a
 
   ...defaultCommands.map((command) => {
     return {
@@ -449,98 +443,8 @@ export const defaultExtensions = [
       name: `Default ${command?.name}`,
       description: "",
       executionType: "command",
-      command,
       hideExtension: true,
+      command,
     };
   }),
-  // context
-  // - repos
-  // - settings
-  // - methods
-  // - - setRepos
-
-  // command
-  // value - command
-  // options
-  // filteredBranchList - checkoutList
-  //
 ];
-
-// ***** DELETE
-
-// if (command === "checkout") {
-//   await checkoutBranch(checkoutList?.[0], options);
-//   await fetch();
-// } else if (command === "delete") {
-//   await deleteBranch(options);
-//   if (repos?.[settings?.pwd]?.branches?.[options?.currentBranch]) {
-//     try {
-//       let nextBranches = repos?.[settings?.pwd]?.branches;
-//       delete nextBranches[options.currentBranch];
-//       methods.setRepos({
-//         ...repos,
-//         [settings?.pwd]: {
-//           ...repos?.[settings?.pwd],
-//           branches: nextBranches,
-//         },
-//       });
-//     } catch {}
-//   }
-// } else if (command === "update") {
-//   await update(options);
-// } else if (command === "file") {
-//   await handleFile(args[0], args[1], options);
-// } else if (command === "push") {
-//   await push(options);
-// } else if (command === "rename") {
-//   await renameBranch(args[0], options);
-//   let next = { ...repos };
-//   const branchMeta =
-//     repos?.[settings?.pwd]?.branches?.[options.currentBranch];
-//   next[settings.pwd].branches[args[0]] = { ...branchMeta };
-//   delete next?.[settings?.pwd]?.branches?.[options.currentBranch];
-//   methods.setRepos(next);
-// } else if (command === "clear") {
-//   await clearBranch(options);
-// } else if (command === "stash") {
-//   await stash(options);
-// } else if (command === "fetch") {
-//   await fetch();
-// } else if (command === ".") {
-//   const description = args.filter((v) => !v.startsWith("-")).join(" ");
-//   await addCommitPush(description, options);
-// } else if (command === "new") {
-//   await createBranch(args[0], options);
-//   methods.setRepos({
-//     ...repos,
-//     [settings?.pwd]: {
-//       ...repos?.[settings?.pwd],
-//       branches: {
-//         ...(repos?.[settings?.pwd]?.branches || {}),
-//         [args[0]]: {
-//           description: args[1] || "",
-//           parentBranch: options?.currentBranch,
-//           createdAt: new Date().toISOString(),
-//         },
-//       },
-//     },
-//   });
-// } else if (command === "parent") {
-//   if (options.flags.includes("--point")) {
-//     methods.setRepos({
-//       ...repos,
-//       [settings?.pwd]: {
-//         ...repos?.[settings?.pwd],
-//         branches: {
-//           ...(repos?.[settings?.pwd]?.branches || {}),
-//           [options.currentBranch]: {
-//             ...(repos?.[settings?.pwd]?.branches?.[
-//               options.currentBranch
-//             ] || {}),
-//             parentBranch: args[0],
-//           },
-//         },
-//       },
-//     });
-//   }
-// }

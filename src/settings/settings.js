@@ -5,7 +5,6 @@ import { cmd } from "../node/node-exports";
 import { Button, Div, Text } from "../shared";
 import { flex, styles } from "../shared/utils";
 import { Actions } from "./actions";
-import { Shortkeys } from "./shortkeys";
 
 export const Settings = () => {
   const {

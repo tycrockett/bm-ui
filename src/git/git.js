@@ -28,10 +28,11 @@ const chokidar = window.require("chokidar");
 const parse = require("parse-gitignore");
 
 export const Git = () => {
+  const context = useContext(StoreContext);
   const {
     store: { extensions = [], settings = {}, repos = {}, lastCommand = "" },
     methods,
-  } = useContext(StoreContext);
+  } = context;
 
   const commands = extensions
     .filter((item) => item?.executionType === "command")
@@ -125,13 +126,6 @@ export const Git = () => {
         filteredBranchList: checkoutList,
       };
 
-      const context = {
-        repos,
-        settings,
-        methods: {
-          setRepos: methods.setRepos,
-        },
-      };
       await commandDetails.function({
         command,
         context,

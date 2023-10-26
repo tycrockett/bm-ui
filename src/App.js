@@ -1,5 +1,7 @@
 import {
   ArrowLeft,
+  Bookmark,
+  BookmarkSimple,
   Gear,
   MagicWand,
   Monitor,
@@ -24,10 +26,11 @@ const header = `
 `;
 
 const App = () => {
+  const context = useContext(StoreContext);
   const {
     store,
     methods: { set, setSettings, directory },
-  } = useContext(StoreContext);
+  } = context;
   const [mode, setMode] = useState("finder");
 
   const { settings } = store;
@@ -205,7 +208,7 @@ const App = () => {
             </Div>
             <Div
               css={
-                mode === "commands"
+                mode === "extensions"
                   ? `border-bottom: 6px solid ${colors.lightBlue}; border-radius: 5px;`
                   : "border-bottom: 6px solid transparent;"
               }
@@ -276,7 +279,7 @@ const App = () => {
             style={{ borderRadius: 0 }}
           >
             <Button icon onClick={createBookmark}>
-              <Plus weight="bold" />
+              <BookmarkSimple weight="bold" />
             </Button>
           </Div>
         </Div>
