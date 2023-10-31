@@ -8,6 +8,7 @@ import {
   Plug,
   Plus,
   Tree,
+  X,
 } from "phosphor-react";
 import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "./context/store";
@@ -20,6 +21,7 @@ import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
 import { defaultExtensions, Extensions } from "./extensions/extensions";
+import { scrollbar } from "./shared/styles";
 
 const header = `
   padding: 8px 16px;
@@ -74,6 +76,13 @@ const App = () => {
         [settings?.pwd]: current,
       },
     });
+  };
+
+  const removeBookmark = (e) => {
+    e.stopPropagation();
+    let bookmarks = { ...settings?.bookmarks };
+    delete bookmarks[settings?.pwd];
+    setSettings({ ...settings, bookmarks });
   };
 
   const handleActionList = (list) => {
@@ -241,9 +250,14 @@ const App = () => {
         >
           <Div
             css={`
-              ${flex("right grow")}
-              overflow-x: auto;
+              ${flex("left")}
+              flex-grow: 1;
+              max-width: 100%;
               padding: 8px 0;
+              overflow-x: scroll;
+              white-space: nowrap;
+              ${scrollbar.style}
+              position: relative;
             `}
           >
             {Object.entries(settings?.bookmarks || {}).map(([key, value]) => (
@@ -251,9 +265,15 @@ const App = () => {
                 css={`
                   border-radius: 8px;
                   padding: 8px;
+                  padding-left: 10px;
                   margin-right: 2px;
                   font-weight: bold;
                   cursor: pointer;
+                  ${flex("space-between")}
+                  button {
+                    margin-left: 8px;
+                  }
+                  min-width: max-content;
                   ${key === settings?.pwd
                     ? `
                         background-color: ${colors.green};
@@ -267,6 +287,9 @@ const App = () => {
                 onClick={() => directory.change(key)}
               >
                 <Text>{value}</Text>
+                <Button icon xs onClick={removeBookmark}>
+                  <X />
+                </Button>
               </Div>
             ))}
           </Div>

@@ -19,3 +19,25 @@ export const colors = {
   indigo: `#4B0082`,
   darkIndigo: `#310062`,
 };
+
+export const scrollbar = {
+  hide: `::-webkit-scrollbar { display: none; }`,
+  style: `
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 4px;
+      border-radius: 16px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: ${colors.green};
+      border-radius: 16px;
+      visibility: visible;
+      height: 3px;
+    }
+  `,
+};

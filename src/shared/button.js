@@ -46,6 +46,15 @@ export const buttonStyles = {
       min-height: 24px;
     }
   `,
+  xs: `
+  width: 20px;
+  height: 20px;
+  svg {
+    margin: 0;
+    min-width: 16px;
+    min-height: 16px;
+  }
+  `,
 };
 
 export const Button = ({ children, ...rest }) => {

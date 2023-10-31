@@ -160,10 +160,11 @@ export const Status = ({
                   onClick={() => copyItem(item)}
                   css={`
                     margin: 0;
+                    padding: 0;
                   `}
                 >
                   <FileDotted
-                    size={24}
+                    size={32}
                     color={colors.lightBlue}
                     weight="bold"
                   />
@@ -192,7 +193,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.fileCount?.[item]}</Text>
-                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                  <PlusCircle size={32} color={colors.green} weight="bold" />
                 </Div>
               </Div>
             </Div>
@@ -207,7 +208,6 @@ export const Status = ({
             >
               <Div
                 css={`
-                  ${flex("left")}
                   ${flex("left")}
                   flex-grow: 1;
                   width: 100%;
@@ -226,9 +226,10 @@ export const Status = ({
                   onClick={() => copyItem(item)}
                   css={`
                     margin: 0;
+                    padding: 0;
                   `}
                 >
-                  <FileX size={24} color={colors.red} weight="bold" />
+                  <FileX size={32} color={colors.red} weight="bold" />
                 </Button>
                 <Text h4 left-ellipsis>
                   {item}
@@ -254,7 +255,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={24} color={colors.red} weight="bold" />
+                  <MinusCircle size={32} color={colors.red} weight="bold" />
                 </Div>
                 <Div
                   css={`
@@ -268,7 +269,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.adds}</Text>
-                  <PlusCircle size={24} color={colors.green} weight="bold" />
+                  <PlusCircle size={32} color={colors.green} weight="bold" />
                 </Div>
               </Div>
             </Div>
@@ -277,7 +278,8 @@ export const Status = ({
           {modified?.map((item) => (
             <Div
               css={`
-                ${flex("space-between")} padding: 4px 0;
+                ${flex("space-between")}
+                padding: 4px 0;
               `}
             >
               <Div
@@ -294,7 +296,7 @@ export const Status = ({
                   }
                 `}
               >
-                <FileArrowUp size={24} color={colors.green} weight="bold" />
+                <FileArrowUp size={32} color={colors.green} weight="bold" />
                 <Text h4 left-ellipsis>
                   {item}
                 </Text>
@@ -313,7 +315,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={24} color={colors.red} weight="bold" />
+                  <MinusCircle size={32} color={colors.red} weight="bold" />
                 </Div>
                 <Div
                   css={`
@@ -321,7 +323,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.adds}</Text>
-                  <MinusCircle size={24} color={colors.green} weight="bold" />
+                  <MinusCircle size={32} color={colors.green} weight="bold" />
                 </Div>
               </Div>
             </Div>

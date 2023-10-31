@@ -257,7 +257,7 @@ const defaultCommands = [
     description: "Checkout a branch.",
     function: async ({ command }) => {
       await checkoutBranch(command.filteredBranchList?.[0], command.options);
-      await fetch();
+      fetch();
     },
   },
   {
@@ -398,6 +398,30 @@ const defaultCommands = [
           },
         });
       }
+    },
+  },
+  {
+    name: "Note",
+    command: "note",
+    args: "{note}",
+    flags: "",
+    description: "Adds a note to the current branch which can be viewed later.",
+    function: async ({ command, context }) => {
+      await createBranch(command.args[0], command.options);
+      context.methods.setRepos({
+        ...context.repos,
+        [context.settings?.pwd]: {
+          ...context.repos?.[context.settings?.pwd],
+          branches: {
+            ...(context.repos?.[context.settings?.pwd]?.branches || {}),
+            [command.args[0]]: {
+              description: command.args[1] || "",
+              parentBranch: command.options?.currentBranch,
+              createdAt: new Date().toISOString(),
+            },
+          },
+        },
+      });
     },
   },
 ];
