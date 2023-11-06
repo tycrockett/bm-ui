@@ -2,18 +2,32 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StoreContext } from "../context/store";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { read } from "../node/fs-utils";
+import { cmd as execCmd } from "../node/node-exports";
 import { Button, colors, Div, Text } from "../shared";
 import { Input } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 import { SetupBm } from "./setup-bm";
 import {
   addCommitPush,
+  checkoutBranch,
+  fetch,
   getBranches,
   getStatus,
   openRemote,
   push,
 } from "./utils";
-import { CloudCheck, CloudSlash, Tree } from "phosphor-react";
+import {
+  ArrowFatLineRight,
+  ArrowSquareRight,
+  CloudCheck,
+  CloudSlash,
+  Copy,
+  GitBranch,
+  KeyReturn,
+  Terminal,
+  TerminalWindow,
+  Tree,
+} from "phosphor-react";
 import { css } from "@emotion/css";
 import { useAnimation } from "../hooks/use-animation";
 import { Status } from "./status";
@@ -22,6 +36,7 @@ import { Logs } from "./logs";
 import { toast } from "react-toastify";
 import { Loader } from "../shared/loader";
 import { defaultActions } from "../settings/actions";
+import { useOutsideClick } from "../shared/use-outside-click";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -50,11 +65,11 @@ export const Git = () => {
   const [cmd, setCmd] = useState("");
   const [lastCmd, setLastCmd] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [branches, setBranches] = useState({});
   const [status, setStatus] = useState({});
 
-  const [showBranches, setShowBranches] = useState(false);
+  const [branchOptions, setBranchOptions] = useState(false);
+  const branchRef = useOutsideClick(() => setBranchOptions(false));
 
   const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
 
@@ -103,18 +118,18 @@ export const Git = () => {
 
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
+
     if (executingCommand.includes("clear")) {
       console.clear();
     }
 
     const commandDetails = list[index];
-
     const [value, ...args] = executingCommand.split(" ");
     setLoading(true);
 
     const options = {
-      flags: executingCommand,
       parentBranch,
+      flags: executingCommand,
       currentBranch: branches?.current,
     };
     setCmd("");
@@ -126,15 +141,23 @@ export const Git = () => {
         filteredBranchList: checkoutList,
       };
 
-      await commandDetails.function({
-        command,
-        context,
-      });
+      if (executingCommand.startsWith("git")) {
+        await execCmd(executingCommand);
+        methods.set(
+          "lastCommand",
+          `${executingCommand}-${new Date().toISOString()}`
+        );
+      } else {
+        await commandDetails.function({
+          command,
+          context,
+        });
+        methods.set(
+          "lastCommand",
+          `${commandDetails.command}-${new Date().toISOString()}`
+        );
+      }
       refreshGit();
-      methods.set(
-        "lastCommand",
-        `${commandDetails.command}-${new Date().toISOString()}`
-      );
     } catch (err) {
       console.log(err);
       toast.error("There was an error.");
@@ -240,6 +263,13 @@ export const Git = () => {
     }
   };
 
+  const handleCheckout = async (branch) => {
+    try {
+      await checkoutBranch(branch);
+      refreshGit();
+    } catch {}
+  };
+
   const keydown = async (captured, event) => {
     if (captured === "+Tab") {
       event.preventDefault();
@@ -273,12 +303,6 @@ export const Git = () => {
   };
 
   useKeyboard({ keydown });
-
-  useEffect(() => {
-    document.addEventListener("click", () => setShowBranches(false));
-    return () =>
-      document.removeEventListener("click", () => setShowBranches(false));
-  }, []);
   const box = positionRef?.current?.getBoundingClientRect();
   return (
     <Div
@@ -341,7 +365,12 @@ export const Git = () => {
               />
             </Button>
 
-            <form onSubmit={handleCmd}>
+            <form
+              onSubmit={handleCmd}
+              className={css`
+                position: relative;
+              `}
+            >
               {loading ? <Loader /> : null}
               <Input
                 disabled={loading}
@@ -349,47 +378,165 @@ export const Git = () => {
                 onChange={(e) => setCmd(e.target.value)}
                 ref={ref}
               />
+              <Button
+                css={`
+                  position: absolute;
+                  top: 0;
+                  right: 8px;
+                  transition: color 0.2s ease;
+                  color: ${colors.darkIndigo};
+                  :hover {
+                    background: none;
+                    color: ${colors.lightIndigo};
+                  }
+                  svg {
+                    border-radius: 30px;
+                  }
+                `}
+                onClick={handleCmd}
+                icon
+                dark
+              >
+                <ArrowSquareRight weight="fill" size={40} />
+              </Button>
             </form>
             <Div
               css={`
                 position: relative;
-                ${flex("space-between")}
-                border: 1px solid transparent;
-                border-radius: 16px;
-                padding: 8px 16px;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
                 width: 150px;
                 max-width: max-content;
-                min-width: 150px;
+                min-width: 250px;
                 transition: width 0.3s ease;
                 :hover {
                   width: 100%;
                   animation 0.3s ease grow;
-                  background-color: ${colors.lightIndigo};
-                  ${shadows.md}
-                }
-                background-color: ${colors.indigo};
-                p {
-                  margin-right: 16px;
-                }
-                svg {
-                  min-width: 32px;
                 }
               `}
-              onClick={handleRemote}
-              onContextMenu={() => {
-                setShowBranches(true);
-              }}
             >
-              <Text h3 ellipsis>
-                {branches?.current}
-              </Text>
-              {branches?.hasRemote ? (
-                <CloudCheck size={32} color={colors.lightGreen} weight="fill" />
-              ) : (
-                <CloudSlash size={32} color={colors.red} weight="fill" />
-              )}
+              <Div
+                css={`
+                  width: 100%;
+                  ${flex("space-between")}
+                  border: 1px solid transparent;
+                  border-radius: 16px;
+                  padding: 8px 16px;
+                  cursor: pointer;
+                  transition: background-color 0.2s ease;
+                  background-color: ${colors.indigo};
+                  box-sizing: border-box;
+                  :hover {
+                    background-color: ${colors.lightIndigo};
+                    ${shadows.md}
+                  }
+                  p {
+                    margin-right: 16px;
+                  }
+                  svg {
+                    min-width: 32px;
+                  }
+                `}
+                onClick={(e) => {
+                  setBranchOptions(true);
+                }}
+              >
+                <Text h3 ellipsis>
+                  {branches?.current}
+                </Text>
+                {branches?.hasRemote ? (
+                  <CloudCheck
+                    size={32}
+                    color={colors.lightGreen}
+                    weight="fill"
+                  />
+                ) : (
+                  <CloudSlash size={32} color={colors.red} weight="fill" />
+                )}
+              </Div>
+              {branchOptions ? (
+                <Div
+                  ref={branchRef}
+                  css={`
+                    ${animation("fadeIn", ".2s ease")}
+                    position: absolute;
+                    pointer-events: all;
+                    top: calc(100% + 8px);
+                    right: 0;
+                    width: 300px;
+                    background-color: ${colors.indigo};
+                    border: 1px solid white;
+                    border-radius: 16px;
+                    z-index: 100000;
+                    overflow: auto;
+                    overflow-x: hidden;
+                    max-height: 500px;
+                    ${shadows.lg}
+                    > div {
+                      ${flex("space-between")}
+                      cursor: pointer;
+                      padding: 0 8px;
+                      padding-left: 16px;
+                      width: 100%;
+                      transition: background-color 0.2s ease;
+                      font-weight: bold;
+                      box-sizing: border-box;
+                      height: 40px;
+                      :hover {
+                        background-color: ${colors.darkIndigo};
+                      }
+                      :not(:hover) {
+                        button {
+                          visibility: hidden;
+                        }
+                      }
+                    }
+                  `}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <Div css={``} onClick={handleRemote}>
+                    <Text ellipsis>
+                      {branches.hasRemote
+                        ? `Open Remote - ${branches?.current}`
+                        : `Create Remote - ${branches?.current}`}
+                    </Text>
+                  </Div>
+                  <hr
+                    className={css`
+                      padding: 0;
+                      margin: 0;
+                    `}
+                  />
+                  {branches?.list?.map((item) => (
+                    <Div
+                      css={``}
+                      onClick={(e) => {
+                        handleCheckout(item);
+                        setBranchOptions(false);
+                      }}
+                    >
+                      <Text
+                        css={`
+                          ${item === branches?.current
+                            ? `color: ${colors.lightGreen};`
+                            : ""}
+                        `}
+                      >
+                        {item}
+                      </Text>
+                      <Button
+                        icon
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(item);
+                        }}
+                      >
+                        <Copy size={16} />
+                      </Button>
+                    </Div>
+                  ))}
+                </Div>
+              ) : null}
             </Div>
           </Div>
 

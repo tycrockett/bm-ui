@@ -341,13 +341,13 @@ const defaultCommands = [
       await renameBranch(command.args[0], command.options);
       let next = { ...context.repos };
       const branchMeta =
-        context.repos?.[context.settings?.pwd]?.branches?.[
+        context.repos?.[context?.settings?.pwd]?.branches?.[
           command.options.currentBranch
         ];
-      next[context.settings.pwd].branches[command.args[0]] = {
+      next[context?.settings?.pwd].branches[command.args[0]] = {
         ...branchMeta,
       };
-      delete next?.[context.settings?.pwd]?.branches?.[
+      delete next?.[context?.settings?.pwd]?.branches?.[
         command.options.currentBranch
       ];
       context.methods.setRepos(next);

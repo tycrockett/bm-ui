@@ -40,6 +40,9 @@ export const buttonStyles = {
       min-height: 32px;
     }
   `,
+  dark: `
+    color: ${colors.darkIndigo};
+  `,
   small: `
     svg {
       min-width: 24px;
