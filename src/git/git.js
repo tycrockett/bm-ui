@@ -21,6 +21,7 @@ import {
   ArrowSquareRight,
   CloudCheck,
   CloudSlash,
+  Command,
   Copy,
   GitBranch,
   KeyReturn,
@@ -494,12 +495,33 @@ export const Git = () => {
                     e.stopPropagation();
                   }}
                 >
-                  <Div css={``} onClick={handleRemote}>
+                  <Div
+                    css={`
+                      ${flex("space-between")}
+                    `}
+                    onClick={handleRemote}
+                  >
                     <Text ellipsis>
                       {branches.hasRemote
                         ? `Open Remote - ${branches?.current}`
                         : `Create Remote - ${branches?.current}`}
                     </Text>
+                    <Div
+                      css={`
+                        ${flex("right")}
+                        svg {
+                          min-width: 20px;
+                          margin: 0;
+                          padding: 0;
+                        }
+                        p {
+                          color: ${colors.lightBlue};
+                        }
+                      `}
+                    >
+                      <Command color={colors.lightBlue} size={20} />
+                      <Text>R</Text>
+                    </Div>
                   </Div>
                   <hr
                     className={css`
