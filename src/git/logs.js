@@ -25,7 +25,7 @@ export const Logs = ({
     return null;
   }
   const metaBranch = repo?.branches?.[currentBranch];
-  console.log(metaBranch);
+
   return (
     <Div
       css={`
@@ -108,6 +108,7 @@ export const Logs = ({
                 background-color: rgba(0, 0, 0, 0.2);
               }
             `}
+            onClick={() => navigator.clipboard.writeText(key?.split(" ")?.[0])}
           >
             <Text bold ellipsis>
               {key}

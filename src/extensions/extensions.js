@@ -234,11 +234,12 @@ const defaultCommands = [
     function: async ({ command, context }) => {
       await createBranch(command.args[0], command.options);
       context.methods.setRepos({
-        ...context.repos,
-        [context.settings?.pwd]: {
-          ...context.repos?.[context.settings?.pwd],
+        ...context.store?.repos,
+        [context.store?.settings?.pwd]: {
+          ...context.store?.repos?.[context.store?.settings?.pwd],
           branches: {
-            ...(context.repos?.[context.settings?.pwd]?.branches || {}),
+            ...(context.store?.repos?.[context.store?.settings?.pwd]
+              ?.branches || {}),
             [command.args[0]]: {
               description: command.args[1] || "",
               parentBranch: command.options?.currentBranch,
@@ -270,17 +271,18 @@ const defaultCommands = [
     function: async ({ command, context }) => {
       await deleteBranch(command.options);
       if (
-        context.repos?.[context.settings?.pwd]?.branches?.[
+        context.store?.repos?.[context.store?.settings?.pwd]?.branches?.[
           command.options?.currentBranch
         ]
       ) {
         try {
-          let nextBranches = context.repos?.[context.settings?.pwd]?.branches;
+          let nextBranches =
+            context.store?.repos?.[context.store?.settings?.pwd]?.branches;
           delete nextBranches[command.options.currentBranch];
           context.methods.setRepos({
-            ...context.repos,
-            [context.settings?.pwd]: {
-              ...context.repos?.[context.settings?.pwd],
+            ...context.store?.repos,
+            [context.store?.settings?.pwd]: {
+              ...context.store?.repos?.[context.store?.settings?.pwd],
               branches: nextBranches,
             },
           });
@@ -334,20 +336,20 @@ const defaultCommands = [
     name: "Rename",
     command: "rename",
     args: "{branchName}",
-    flags: "",
+    flags: "--local",
     description:
-      "Renames local active branch and attempts to rename the remote branch.",
+      "Renames local active branch and attempts to rename the remote branch. --local: will stop attempts to rename the remote branch.",
     function: async ({ command, context }) => {
       await renameBranch(command.args[0], command.options);
-      let next = { ...context.repos };
+      let next = { ...context.store?.repos };
       const branchMeta =
-        context.repos?.[context?.settings?.pwd]?.branches?.[
+        context.store?.repos?.[context?.store?.settings?.pwd]?.branches?.[
           command.options.currentBranch
         ];
-      next[context?.settings?.pwd].branches[command.args[0]] = {
+      next[context?.store?.settings?.pwd].branches[command.args[0]] = {
         ...branchMeta,
       };
-      delete next?.[context?.settings?.pwd]?.branches?.[
+      delete next?.[context?.store?.settings?.pwd]?.branches?.[
         command.options.currentBranch
       ];
       context.methods.setRepos(next);
@@ -383,15 +385,15 @@ const defaultCommands = [
     function: async ({ command, context }) => {
       if (command.options.flags.includes("--point")) {
         context.methods.setRepos({
-          ...context.repos,
-          [context.settings?.pwd]: {
-            ...context.repos?.[context.settings?.pwd],
+          ...context.store?.repos,
+          [context.store?.settings?.pwd]: {
+            ...context.store?.repos?.[context.store?.settings?.pwd],
             branches: {
-              ...(context.repos?.[context.settings?.pwd]?.branches || {}),
+              ...(context.store?.repos?.[context.store?.settings?.pwd]
+                ?.branches || {}),
               [command.options.currentBranch]: {
-                ...(context.repos?.[context.settings?.pwd]?.branches?.[
-                  command.options.currentBranch
-                ] || {}),
+                ...(context.store?.repos?.[context.store?.settings?.pwd]
+                  ?.branches?.[command.options.currentBranch] || {}),
                 parentBranch: command.args[0],
               },
             },
@@ -407,21 +409,26 @@ const defaultCommands = [
     flags: "",
     description: "Adds a note to the current branch which can be viewed later.",
     function: async ({ command, context }) => {
-      await createBranch(command.args[0], command.options);
-      context.methods.setRepos({
-        ...context.repos,
-        [context.settings?.pwd]: {
-          ...context.repos?.[context.settings?.pwd],
-          branches: {
-            ...(context.repos?.[context.settings?.pwd]?.branches || {}),
-            [command.args[0]]: {
-              description: command.args[1] || "",
-              parentBranch: command.options?.currentBranch,
-              createdAt: new Date().toISOString(),
+      const branchName = command.options?.currentBranch;
+      const branches =
+        context.store?.repos?.[context.store?.settings?.pwd]?.branches || {};
+      const matches = command?.options?.executingCommand.match('"(.*)"');
+      if (matches?.length) {
+        const note = matches[1];
+        context.methods.setRepos({
+          ...context.store?.repos,
+          [context.store?.settings?.pwd]: {
+            ...context.store?.repos?.[context.store?.settings?.pwd],
+            branches: {
+              ...branches,
+              [branchName]: {
+                ...(branches?.[branchName] || {}),
+                notes: [...(branches?.[branchName]?.notes || []), note],
+              },
             },
           },
-        },
-      });
+        });
+      }
     },
   },
 ];

@@ -10,23 +10,17 @@ import { SetupBm } from "./setup-bm";
 import {
   addCommitPush,
   checkoutBranch,
-  fetch,
   getBranches,
   getStatus,
   openRemote,
   push,
 } from "./utils";
 import {
-  ArrowFatLineRight,
   ArrowSquareRight,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
-  GitBranch,
-  KeyReturn,
-  Terminal,
-  TerminalWindow,
   Tree,
 } from "phosphor-react";
 import { css } from "@emotion/css";
@@ -46,7 +40,13 @@ const parse = require("parse-gitignore");
 export const Git = () => {
   const context = useContext(StoreContext);
   const {
-    store: { extensions = [], settings = {}, repos = {}, lastCommand = "" },
+    store: {
+      extensions = [],
+      settings = {},
+      repos = {},
+      logs = [],
+      lastCommand = "",
+    },
     methods,
   } = context;
 
@@ -130,18 +130,18 @@ export const Git = () => {
 
     const options = {
       parentBranch,
+      executingCommand,
       flags: executingCommand,
       currentBranch: branches?.current,
     };
     setCmd("");
     setLastCmd(new Date().toISOString());
+    const command = {
+      args,
+      options,
+      filteredBranchList: checkoutList,
+    };
     try {
-      const command = {
-        args,
-        options,
-        filteredBranchList: checkoutList,
-      };
-
       if (executingCommand.startsWith("git")) {
         await execCmd(executingCommand);
         methods.set(
@@ -161,7 +161,17 @@ export const Git = () => {
       refreshGit();
     } catch (err) {
       console.log(err);
-      toast.error("There was an error.");
+      methods.set("logs", [
+        {
+          timestamp: new Date().toISOString(),
+          pwd: settings?.pwd,
+          type: "command",
+          message: err?.message || "",
+          data: command,
+        },
+        ...logs,
+      ]);
+      toast.error("There was an error. Check logs for more information.");
     } finally {
       setLoading(false);
     }
@@ -270,7 +280,6 @@ export const Git = () => {
       refreshGit();
     } catch {}
   };
-
   const keydown = async (captured, event) => {
     if (captured === "+Tab") {
       event.preventDefault();
@@ -583,6 +592,17 @@ export const Git = () => {
           >
             {repo?.description}
           </Text>
+          {repo?.notes?.length ? (
+            <Div
+              css={`
+                padding: 24px 0;
+              `}
+            >
+              {repo?.notes?.map((item) => (
+                <Text>{item}</Text>
+              ))}
+            </Div>
+          ) : null}
 
           <Status
             status={status}

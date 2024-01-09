@@ -168,7 +168,7 @@ export const openRemote = async (options) => {
     if (flags.includes("--all") || flags.includes("-a")) {
       url = `https://github.${base}/branches`;
     } else {
-      url = `https://github.${base}/branches/all?query=${currentBranch}`;
+      url = `https://github.${base}/compare/${currentBranch}?expand=1`;
     }
     if (flags.includes("-c") || flags.includes("--copy")) {
       navigator.clipboard.writeText(url);
@@ -266,7 +266,7 @@ export const renameBranch = async (branchName, options) => {
       await cmd(`git branch -m ${branchName}`);
       // TODO: Update repos.json
       toast.success(`Renamed local branch ${currentBranch} -> ${branchName}`);
-      if (hasRemote) {
+      if (hasRemote && !flags.includes("--local")) {
         await cmd(`git push origin -u ${branchName}`);
         toast.success(`Update remote branch to ${branchName}`);
       } else {

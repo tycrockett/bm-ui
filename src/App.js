@@ -2,9 +2,11 @@ import {
   ArrowLeft,
   Bookmark,
   BookmarkSimple,
+  Bug,
   Gear,
   MagicWand,
   Monitor,
+  Notepad,
   Plug,
   Plus,
   Tree,
@@ -22,6 +24,7 @@ import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
 import { defaultExtensions, Extensions } from "./extensions/extensions";
 import { scrollbar } from "./shared/styles";
+import { Logs } from "./logs/logs";
 
 const header = `
   padding: 8px 16px;
@@ -49,13 +52,17 @@ const App = () => {
     set("extensions", extensions);
   }, []);
 
-  useEffect(() => {
+  const updateMode = () => {
     const isDirectoryGit = directory.checkGit(settings?.pwd);
     if (isDirectoryGit) {
       setMode("git");
     } else {
       setMode("finder");
     }
+  };
+
+  useEffect(() => {
+    updateMode();
   }, [settings?.pwd]);
 
   const goBack = () => {
@@ -131,6 +138,11 @@ const App = () => {
   };
 
   useKeyboard({ keydown });
+
+  const updateDirectory = (key) => {
+    directory.change(key);
+    updateMode();
+  };
 
   return (
     <Div
@@ -217,6 +229,17 @@ const App = () => {
             </Div>
             <Div
               css={
+                mode === "logs"
+                  ? `border-bottom: 6px solid ${colors.lightBlue}; border-radius: 5px;`
+                  : "border-bottom: 6px solid transparent;"
+              }
+            >
+              <Button icon onClick={() => setMode("logs")}>
+                <Notepad weight="bold" />
+              </Button>
+            </Div>
+            <Div
+              css={
                 mode === "extensions"
                   ? `border-bottom: 6px solid ${colors.lightBlue}; border-radius: 5px;`
                   : "border-bottom: 6px solid transparent;"
@@ -284,7 +307,7 @@ const App = () => {
                         background-color: rgba(0, 0, 0, .2);
                       `}
                 `}
-                onClick={() => directory.change(key)}
+                onClick={() => updateDirectory(key)}
               >
                 <Text>{value}</Text>
                 <Button icon xs onClick={removeBookmark}>
@@ -317,6 +340,8 @@ const App = () => {
           <Settings />
         ) : mode === "extensions" ? (
           <Extensions />
+        ) : mode === "logs" ? (
+          <Logs />
         ) : null}
       </Div>
     </Div>
