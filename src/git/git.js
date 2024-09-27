@@ -392,7 +392,7 @@ export const Git = () => {
                   transition: background-color 0.2s ease;
                   background-color: ${branches?.hasRemote
                     ? colors.lightGreen
-                    : colors.red};
+                    : colors.darkIndigo};
 
                   box-sizing: border-box;
                   :hover {
@@ -593,7 +593,7 @@ export const Git = () => {
           />
           <Div
             css={`
-              margin-top: 8px;
+              margin-top: 16px;
               width: 100%;
             `}
           >

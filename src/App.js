@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  ArrowSquareOut,
   Bookmark,
   BookmarkSimple,
   CaretDown,
@@ -23,6 +24,7 @@ import { useOutsideClick } from "./shared/use-outside-click";
 
 const header = `
   padding: 8px 16px;
+  margin-top: 16px;
 `;
 
 const App = () => {
@@ -102,6 +104,7 @@ const App = () => {
     for (const item of list) {
       const { type, payload } = item;
       if (type === "execute-command") {
+        console.log(payload);
         cmd(payload);
       }
     }
@@ -272,9 +275,32 @@ const App = () => {
                       onClick={() => updateDirectory(key)}
                     >
                       <Text>{value}</Text>
-                      <Button icon xs onClick={(e) => removeBookmark(e, key)}>
-                        <X />
-                      </Button>
+                      <Div
+                        css={`
+                          ${flex("right")}
+                          button {
+                            :hover {
+                              background-color: ${colors.darkIndigo};
+                            }
+                          }
+                        `}
+                      >
+                        <Button
+                          icon
+                          xs
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            cmd(
+                              'open -n -b "com.microsoft.VSCode" --args "$PWD"'
+                            );
+                          }}
+                        >
+                          <ArrowSquareOut />
+                        </Button>
+                        <Button icon xs onClick={(e) => removeBookmark(e, key)}>
+                          <X />
+                        </Button>
+                      </Div>
                     </Div>
                   )
                 )}

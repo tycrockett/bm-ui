@@ -5,9 +5,10 @@ import { StoreContext } from "../context/store";
 import { useAnimation } from "../hooks/use-animation";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { getFilesInDirectory } from "../node/fs-utils";
-import { Div, Text, colors, Input } from "../shared";
-import { animation, flex } from "../shared/utils";
+import { Div, Text, colors, Input, Button } from "../shared";
+import { animation, flex, shadows } from "../shared/utils";
 import { scrollbar } from "../shared/styles";
+import { cmd } from "../node/node-exports";
 
 export const Finder = () => {
   const ref = useRef();
@@ -71,8 +72,8 @@ export const Finder = () => {
     <Div
       css={`
         ${directoryList?.length ? "" : animation("fadeIn", ".2s ease")}
-        padding: 16px;
-        margin-bottom: 16px;
+        padding: 0 16px;
+        margin: 8px 0;
         input {
           width: calc(100% - 32px);
         }
@@ -88,14 +89,32 @@ export const Finder = () => {
           }
         `}
       >
-        <Monitor
-          size={32}
-          color="white"
-          weight="bold"
-          className={css`
-            padding-right: 8px;
+        <Div
+          css={`
+            ${flex("space-between")}
+            border: 1px solid ${colors.darkIndigo};
+            border-radius: 50%;
+            padding: 4px;
+            margin: 4px;
+            margin-right: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            background-color: ${colors.darkIndigo};
+
+            box-sizing: border-box;
+            :hover {
+              outline: 2px solid ${colors.lightIndigo};
+              outline-offset: 2px;
+              ${shadows.md}
+            }
+            svg {
+              min-width: 32px;
+            }
           `}
-        />
+          onClick={() => cmd('open -n -b "com.microsoft.VSCode" --args "$PWD"')}
+        >
+          <Monitor size={32} color="white" weight="bold" />
+        </Div>
         <form onSubmit={handleSubmit}>
           <Input
             value={search}
@@ -109,7 +128,7 @@ export const Finder = () => {
         <Text
           h4
           css={`
-            margin-left: 40px;
+            margin-left: 64px;
             border-radius: 8px;
             border: 1px solid ${colors.black};
             width: max-content;
@@ -124,7 +143,7 @@ export const Finder = () => {
       ) : null}
       <Div
         css={`
-          margin-left: 40px;
+          margin-left: 64px;
           transition: display 0.2s ease;
           max-height: calc(100vh - 200px);
           overflow-y: auto;
@@ -137,7 +156,7 @@ export const Finder = () => {
             css={`
               ${animation("fadeIn", ".3s ease")}
               width: 400px;
-              background-color: ${colors.dark};
+              background-color: ${colors.darkIndigo};
               border-radius: 8px;
               padding: 4px 8px;
               font-weight: bold;
@@ -146,24 +165,13 @@ export const Finder = () => {
               cursor: pointer;
               color: white;
               border: 1px solid transparent;
-              ${!!search && index == idx
-                ? `
-                border: 1px solid white;
-              `
-                : ""}
-              p {
-                color: white;
-              }
+              ${!!search && index == idx ? `border: 1px solid white;` : ""}
               :hover {
-                background-color: ${colors.light};
-                color: ${colors.black};
-                p {
-                  color: ${colors.black};
-                }
+                background-color: ${colors.lightIndigo};
               }
               svg {
                 min-width: 32px;
-                padding-right: 16px;
+                padding-right: 8px;
               }
             `}
           >

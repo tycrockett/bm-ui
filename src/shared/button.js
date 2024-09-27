@@ -44,6 +44,14 @@ export const buttonStyles = {
   dark: `
     color: ${colors.darkIndigo};
   `,
+  md: `
+    width: 40px;
+    height: 40px;
+    svg {
+      min-width: 24px;
+      min-height: 24px;
+    }
+  `,
   sm: `
     width: 24px;
     height: 24px;

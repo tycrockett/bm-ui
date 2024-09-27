@@ -17,7 +17,7 @@ export const CmdList = ({
         ${flex("start column")}
         ${!hasCmd ? `display: none; max-height: 0;` : `height: auto;`}
         border-radius: 16px;
-        padding: 16px;
+        padding: 16px 0;
         width: 100%;
         transition: height 0.5s ease;
       `}
@@ -48,9 +48,8 @@ export const CmdList = ({
                 }
                 ${idx === index && !!cmd
                   ? `
-                      font-weight: bold;
-                      padding: 8px 16px;
-                      border: 2px solid ${colors.lightBlue};
+                      padding: 4px 8px;
+                      background-color: ${colors.lightIndigo};
                     `
                   : ""}
               `}
@@ -76,12 +75,11 @@ export const CmdList = ({
                 `}
               >
                 <Text
-                  h3
                   bold
                   css={`
-                    padding: 4px 16px;
+                    padding: 4px 8px;
                     border-radius: 16px;
-                    border: 1px solid ${colors.darkIndigo};
+                    background-color: ${colors.lightIndigo};
                     margin-right: 16px;
                     cursor: pointer;
                     :hover {
@@ -94,9 +92,7 @@ export const CmdList = ({
                 >
                   {list[0]?.name}
                 </Text>
-                <Text h4 bold>
-                  {list[0]?.args}
-                </Text>
+                <Text bold>{list[0]?.args}</Text>
                 <Text
                   h4
                   css={`
@@ -137,15 +133,14 @@ export const CmdList = ({
                   <Text
                     css={`
                       ${animation("fadeIn", ".2s ease")}
-                      padding: 8px 16px;
+                      padding: 4px 8px;
                       margin-bottom: 8px;
-                      border: 2px solid transparent;
+                      border: 1px solid transparent;
                       transition: background-color 0.2s ease;
                       ${idx === 0
-                        ? `border: 2px solid ${colors.lightBlue}; font-weight: bold;`
-                        : `background-color: ${colors.indigo};`}
-                      ${shadows.md}
-                            border-radius: 30px;
+                        ? `background-color: ${colors.lightIndigo}; border: 1px solid ${colors.lightIndigo}; font-weight: bold;`
+                        : `background-color: ${colors.darkIndigo};`}
+                      border-radius: 30px;
                       margin-right: 8px;
                       cursor: pointer;
                       :hover {
