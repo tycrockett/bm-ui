@@ -20,17 +20,25 @@ export const Logs = () => {
       `}
     >
       {!list?.length ? (
-        <Text h2>Looks like there are no logs to view.</Text>
+        <Text
+          h2
+          css={`
+            margin: 32px 0;
+          `}
+        >
+          Looks like there are no logs to view.
+        </Text>
       ) : (
         list?.map((item) => (
           <Div
             css={`
               background-color: rgba(0, 0, 0, 0.2);
               border-radius: 8px;
-              padding: 8px;
+              padding: 16px;
               margin: 8px 0;
             `}
           >
+            <Text bold>{item?.title}</Text>
             <pre style={{ color: "white" }}>{item?.message}</pre>
           </Div>
         ))

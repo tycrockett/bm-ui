@@ -9,6 +9,7 @@ import {
   deleteBranch,
   fetch,
   handleFile,
+  pruneLocalBranches,
   push,
   renameBranch,
   stash,
@@ -261,6 +262,23 @@ const defaultCommands = [
       fetch();
     },
   },
+
+  {
+    name: "Branches",
+    command: "branches",
+    args: "",
+    flags: "-p --prune --open-remote -or",
+    description:
+      "--prune removes all branches without a remote branch. --open-remote opens all branches with a remove branch.",
+    function: async ({ command, context }) => {
+      const flags = command?.options?.flags;
+      if (flags.includes("--prune") || flags.includes("-p")) {
+        console.log(command?.branches);
+        await pruneLocalBranches(command?.branches, command?.options);
+      }
+    },
+  },
+
   {
     name: "Delete",
     command: "delete",
@@ -270,14 +288,10 @@ const defaultCommands = [
       "Delete the current branch. Adding the -r flag it will delete the remote branch.",
     function: async ({ command, context }) => {
       await deleteBranch(command.options);
-      if (
-        context.store?.repos?.[context.store?.settings?.pwd]?.branches?.[
-          command.options?.currentBranch
-        ]
-      ) {
+      let nextBranches =
+        context.store?.repos?.[context.store?.settings?.pwd]?.branches;
+      if (nextBranches?.[command.options?.currentBranch]) {
         try {
-          let nextBranches =
-            context.store?.repos?.[context.store?.settings?.pwd]?.branches;
           delete nextBranches[command.options.currentBranch];
           context.methods.setRepos({
             ...context.store?.repos,
@@ -294,7 +308,7 @@ const defaultCommands = [
     name: "Push",
     command: "push",
     args: "",
-    flags: "",
+    flags: "-f --force",
     description:
       "Do a git push or if no remote branch exists it will automatically set the upstream branch",
     function: async ({ command, context }) => {
@@ -366,12 +380,22 @@ const defaultCommands = [
     },
   },
   {
-    name: "File",
-    command: "file",
+    name: "Pop",
+    command: "pop",
+    args: "",
+    flags: "",
+    description: "Undo most recent commit",
+    function: async ({ command, context }) => {
+      await context?.methods?.executeCommand("git reset HEAD~");
+    },
+  },
+  {
+    name: "Remove",
+    command: "remove",
     args: "{relativeFilepath}",
-    flags: "-ch --checkout",
+    flags: "",
     description:
-      "--checkout: Checks out a file from the parent branch (thereby removing any changes to the file)",
+      "Checks out a file from the parent branch (thereby removing any file changes in the branch)",
     function: async ({ command, context }) => {
       await handleFile(command.args[0], command.args[1], command.options);
     },
@@ -431,6 +455,36 @@ const defaultCommands = [
       }
     },
   },
+  {
+    name: "list",
+    command: "list",
+    args: "{commit hash}",
+    flags: "--files",
+    description: "Lists items in the logs.",
+    function: async ({ command, context }) => {
+      const [hash] = command?.args;
+      if (command?.options?.flags?.includes("--files")) {
+        const data = await context?.methods?.executeCommand(
+          `git diff-tree --no-commit-id --name-only ${hash} -r`
+        );
+
+        context?.methods?.set("logs", [
+          {
+            timestamp: new Date().toISOString(),
+            pwd: context?.store?.settings?.pwd,
+            type: "git-list",
+            title: "List Files",
+            message: data?.toString(),
+            data: command,
+          },
+          ...context?.store?.logs,
+        ]);
+        context?.methods?.set("mode", "logs");
+      }
+    },
+  },
+
+  // git diff-tree --no-commit-id --name-only bd61ad98 -r
 ];
 
 export const defaultExtensions = [

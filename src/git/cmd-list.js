@@ -9,13 +9,17 @@ export const CmdList = ({
   handleCmd,
   checkoutList,
 }) => {
+  const hasCmd = !!cmd && !cmd.startsWith(">");
+
   return (
     <Div
       css={`
         ${flex("start column")}
+        ${!hasCmd ? `display: none; max-height: 0;` : `height: auto;`}
         border-radius: 16px;
         padding: 16px;
         width: 100%;
+        transition: height 0.5s ease;
       `}
     >
       <Div

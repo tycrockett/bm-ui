@@ -122,6 +122,10 @@ export const Git = () => {
 
     if (executingCommand.includes("clear")) {
       console.clear();
+    } else if (executingCommand.startsWith(">")) {
+      const cmd = executingCommand.replace(">", "").trim();
+      await execCmd(cmd);
+      executingCommand = "";
     }
 
     const commandDetails = list[index];
@@ -133,6 +137,7 @@ export const Git = () => {
       executingCommand,
       flags: executingCommand,
       currentBranch: branches?.current,
+      defaultBranch: repos?.[settings?.pwd]?.defaultBranch,
     };
     setCmd("");
     setLastCmd(new Date().toISOString());
@@ -140,6 +145,7 @@ export const Git = () => {
       args,
       options,
       filteredBranchList: checkoutList,
+      branches: branches.list,
     };
     try {
       if (executingCommand.startsWith("git")) {
@@ -166,6 +172,7 @@ export const Git = () => {
           timestamp: new Date().toISOString(),
           pwd: settings?.pwd,
           type: "command",
+          title: `Error executing command - ${commandDetails?.command}`,
           message: err?.message || "",
           data: command,
         },
@@ -375,47 +382,50 @@ export const Git = () => {
               />
             </Button>
 
-            <form
-              onSubmit={handleCmd}
-              className={css`
-                position: relative;
-              `}
-            >
+            <form onSubmit={handleCmd}>
               {loading ? <Loader /> : null}
-              <Input
-                disabled={loading}
-                value={cmd}
-                onChange={(e) => setCmd(e.target.value)}
-                ref={ref}
-              />
-              <Button
+              <Div
                 css={`
-                  position: absolute;
-                  top: 0;
-                  right: 8px;
-                  transition: color 0.2s ease;
-                  color: ${colors.darkIndigo};
-                  :hover {
-                    background: none;
-                    color: ${colors.lightIndigo};
-                  }
-                  svg {
-                    border-radius: 30px;
-                  }
+                  position: relative;
+                  background-color: ${loading ? colors.indigo : "white"};
+                  border-radius: 8px;
+                  padding-right: 32px;
                 `}
-                onClick={handleCmd}
-                icon
-                dark
               >
-                <ArrowSquareRight weight="fill" size={40} />
-              </Button>
+                <Input
+                  disabled={loading}
+                  value={cmd}
+                  onChange={(e) => setCmd(e.target.value)}
+                  ref={ref}
+                />
+                <Button
+                  dark
+                  icon
+                  css={`
+                    position: absolute;
+                    top: 0;
+                    right: 4px;
+                    transition: color 0.2s ease;
+                    color: ${colors.darkIndigo};
+                    :hover {
+                      background: none;
+                      color: ${colors.lightIndigo};
+                    }
+                    svg {
+                      border-radius: 30px;
+                    }
+                  `}
+                  onClick={handleCmd}
+                >
+                  <ArrowSquareRight weight="fill" size={40} />
+                </Button>
+              </Div>
             </form>
             <Div
               css={`
                 position: relative;
-                width: 150px;
+                width: 200px;
                 max-width: max-content;
-                min-width: 250px;
                 transition: width 0.3s ease;
                 :hover {
                   width: 100%;
@@ -434,6 +444,7 @@ export const Git = () => {
                   transition: background-color 0.2s ease;
                   background-color: ${colors.indigo};
                   box-sizing: border-box;
+                  ${shadows.sm}
                   :hover {
                     background-color: ${colors.lightIndigo};
                     ${shadows.md}
@@ -449,9 +460,6 @@ export const Git = () => {
                   setBranchOptions(true);
                 }}
               >
-                <Text h3 ellipsis>
-                  {branches?.current}
-                </Text>
                 {branches?.hasRemote ? (
                   <CloudCheck
                     size={32}
@@ -582,6 +590,18 @@ export const Git = () => {
             }}
             checkoutList={checkoutList}
           />
+          <Div
+            css={`
+              margin-top: 8px;
+              padding-bottom: 8px;
+              border-bottom: 1px solid white;
+              width: 100%;
+            `}
+          >
+            <Text h3 bold>
+              {branches?.current}
+            </Text>
+          </Div>
           <Text
             css={`
               margin-bottom: 8px;

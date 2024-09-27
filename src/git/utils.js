@@ -105,11 +105,15 @@ export const push = async (options) => {
   const { flags = "", currentBranch = "" } = options;
   try {
     const hasRemote = await hasRemoteBranch(currentBranch);
+    const pushCommand =
+      flags.includes("--force") || flags.includes("-f")
+        ? "git push --force"
+        : "git push";
     if (hasRemote) {
-      await cmd(`git push`);
+      await cmd(pushCommand);
     } else if (!flags.includes("--disable-set-upstream")) {
       await cmd(`git push --set-upstream origin ${currentBranch}`);
-      await cmd(`git push`);
+      await cmd(pushCommand);
     }
   } catch (err) {
     throw err;
@@ -192,6 +196,32 @@ export const hasRemoteBranch = async (currentBranch = "") => {
   }
 };
 
+const pruneLocal = async (branch) => {
+  try {
+    const hasRemote = await hasRemoteBranch(branch);
+    if (!hasRemote) {
+      await cmd(`git branch -D ${branch}`);
+    }
+  } catch (err) {}
+};
+
+export const pruneLocalBranches = async (branches, options) => {
+  try {
+    const { defaultBranch = "", currentBranch = "" } = options;
+    console.log(defaultBranch);
+    if (defaultBranch !== currentBranch) {
+      await cmd(`git checkout ${defaultBranch}`);
+    }
+    const list = branches?.filter((item) => item !== defaultBranch);
+    console.log(list);
+    await fetch();
+    await Promise.allSettled(list?.map(pruneLocal));
+    await fetch();
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const fetch = async () =>
   new Promise((res, rej) => {
     const spn = spawn("git", ["fetch", "-p"]);
@@ -247,13 +277,11 @@ export const logCommits = async (parentBranch) => {
 
 export const handleFile = async (filepath, branch = "", options) => {
   const { flags = "", parentBranch = "" } = options;
-  if (flags.includes("-ch") || flags.includes("--checkout")) {
-    const branchToCheckout = branch || parentBranch;
-    try {
-      await cmd(`git checkout ${branchToCheckout} -- ${filepath}`);
-    } catch (err) {
-      throw err;
-    }
+  const branchToCheckout = branch || parentBranch;
+  try {
+    await cmd(`git checkout ${branchToCheckout} -- ${filepath}`);
+  } catch (err) {
+    throw err;
   }
 };
 

@@ -1,11 +1,13 @@
 import { css } from "@emotion/css";
 import { format } from "date-fns";
 import { GitCommit } from "phosphor-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { toast } from "react-toastify";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { colors, Div, Text } from "../shared";
 import { animation, flex, styles } from "../shared/utils";
 import { logCommits } from "./utils";
+import { cmd } from "../node/node-exports";
 
 export const Logs = ({
   currentBranch,
@@ -20,6 +22,24 @@ export const Logs = ({
   );
   const [logs] = useAsyncValue(getLogs, [lastCommand, parentBranch, pwd]);
   const commits = Object.entries(logs || {});
+
+  const [hash, setHash] = useState("all");
+
+  const deleteFile = (file) => {
+    try {
+      cmd(`git checkout ${parentBranch} -- ${file}`);
+    } catch {
+      toast.error("Failed to delete file.");
+    }
+  };
+
+  const copyFile = (file) => {
+    try {
+      navigator.clipboard.writeText(file);
+    } catch {
+      toast.error("Failed to copy file.");
+    }
+  };
 
   if (currentBranch === repo?.defaultBranch) {
     return null;
@@ -86,6 +106,18 @@ export const Logs = ({
           ) : null}
         </Div>
       </Div>
+      <Text
+        css={`
+          padding-left: 16px;
+          cursor: pointer;
+          :hover {
+            text-decoration: underline;
+          }
+        `}
+        onClick={() => setHash(hash ? "" : "all")}
+      >
+        Expand Files
+      </Text>
       <Div
         css={`
           max-height: 25vh;
@@ -95,36 +127,68 @@ export const Logs = ({
         `}
       >
         {commits?.map(([key, item]) => (
-          <Div
-            css={`
-              ${animation("fadeIn", ".2s ease")}
-              ${flex("space-between")}
-              padding: 4px 16px;
-              margin-top: 8px;
-              border-radius: 8px;
-              transition: background-color 0.2s ease;
-              cursor: pointer;
-              :hover {
-                background-color: rgba(0, 0, 0, 0.2);
-              }
-            `}
-            onClick={() => navigator.clipboard.writeText(key?.split(" ")?.[0])}
-          >
-            <Text bold ellipsis>
-              {key}
-            </Text>
-            <Text
-              bold
+          <Div>
+            <Div
               css={`
-                ${flex("center")}
-                border-radius: 30px;
-                padding: 4px 8px;
-                background-color: ${colors.lightIndigo};
-                min-width: max-content;
+                ${animation("fadeIn", ".2s ease")}
+                ${flex("space-between")}
+              padding: 4px 16px;
+                margin-top: 8px;
+                border-radius: 8px;
+                transition: background-color 0.2s ease;
+                cursor: pointer;
+                :hover {
+                  background-color: rgba(0, 0, 0, 0.2);
+                }
               `}
             >
-              {item?.length} File{item?.length !== 1 ? "s" : ""}
-            </Text>
+              <Text bold ellipsis>
+                {key}
+              </Text>
+              <Text
+                bold
+                css={`
+                  ${flex("center")}
+                  border-radius: 30px;
+                  padding: 4px 8px;
+                  background-color: ${colors.lightIndigo};
+                  min-width: max-content;
+                `}
+              >
+                {item?.length} File{item?.length !== 1 ? "s" : ""}
+              </Text>
+            </Div>
+            {hash === key || hash === "all"
+              ? logs[key]?.map((file) =>
+                  file ? (
+                    <Div
+                      css={css`
+                        padding: 8px 16px;
+                        padding-left: 32px;
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.2);
+                          cursor: pointer;
+                        }
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                      `}
+                    >
+                      <Text>{file}</Text>
+                      <Div
+                        css={css`
+                          display: flex;
+                          justify-content: right;
+                          align-items: center;
+                        `}
+                      >
+                        <button onClick={() => deleteFile(file)}>D</button>
+                        <button onClick={() => copyFile(file)}>C</button>
+                      </Div>
+                    </Div>
+                  ) : null
+                )
+              : null}
           </Div>
         ))}
       </Div>

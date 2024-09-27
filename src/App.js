@@ -36,9 +36,9 @@ const App = () => {
     store,
     methods: { set, setSettings, directory },
   } = context;
-  const [mode, setMode] = useState("finder");
+  const setMode = (mode) => set("mode", mode);
 
-  const { settings } = store;
+  const { settings, mode = "finder" } = store;
   const actions = {
     ...defaultActions,
     ...(settings?.actions || {}),
@@ -85,10 +85,10 @@ const App = () => {
     });
   };
 
-  const removeBookmark = (e) => {
+  const removeBookmark = (e, key) => {
     e.stopPropagation();
     let bookmarks = { ...settings?.bookmarks };
-    delete bookmarks[settings?.pwd];
+    delete bookmarks[key];
     setSettings({ ...settings, bookmarks });
   };
 
@@ -310,7 +310,7 @@ const App = () => {
                 onClick={() => updateDirectory(key)}
               >
                 <Text>{value}</Text>
-                <Button icon xs onClick={removeBookmark}>
+                <Button icon xs onClick={(e) => removeBookmark(e, key)}>
                   <X />
                 </Button>
               </Div>
