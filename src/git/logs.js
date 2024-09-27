@@ -68,12 +68,12 @@ export const Logs = ({
           css={`
             ${flex("left")}
             p {
-              margin-left: 16px;
+              margin-left: 8px;
             }
           `}
         >
-          <GitCommit size={32} color="white" weight="bold" />
-          <Text h3 bold>
+          <GitCommit size={16} color="white" weight="bold" />
+          <Text bold>
             Commits{" "}
             {commits?.length ? (
               <span
@@ -96,28 +96,33 @@ export const Logs = ({
             text-align: right;
           `}
         >
-          <Text h3 bold>
-            {metaBranch?.parentBranch}
-          </Text>
-          {metaBranch?.createdAt ? (
-            <Text>
-              {format(new Date(metaBranch?.createdAt), "MMM d | h:mm a")}
-            </Text>
-          ) : null}
+          <Text bold>{metaBranch?.parentBranch}</Text>
         </Div>
       </Div>
-      <Text
+      <Div
         css={`
-          padding-left: 16px;
-          cursor: pointer;
-          :hover {
-            text-decoration: underline;
-          }
+          ${flex("space-between")}
+          padding: 4px 16px;
         `}
-        onClick={() => setHash(hash ? "" : "all")}
       >
-        Expand Files
-      </Text>
+        <Text
+          css={`
+            cursor: pointer;
+            :hover {
+              text-decoration: underline;
+            }
+          `}
+          onClick={() => setHash(hash ? "" : "all")}
+        >
+          Expand Files
+        </Text>
+
+        {metaBranch?.createdAt ? (
+          <Text>
+            {format(new Date(metaBranch?.createdAt), "MMM d | h:mm a")}
+          </Text>
+        ) : null}
+      </Div>
       <Div
         css={`
           max-height: 25vh;

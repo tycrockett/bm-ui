@@ -32,7 +32,7 @@ export const Status = ({
     !!status?.deleted?.length ||
     !!status?.untracked?.length;
 
-  const { animation: fadeIn } = useAnimation(
+  const { animation: shake } = useAnimation(
     { animation: animation("shake", ".4s ease"), timing: 500 },
     [status?.lastUpdate]
   );
@@ -66,7 +66,6 @@ export const Status = ({
   return (
     <Div
       css={`
-        ${hasStatus ? fadeIn : ""}
         margin-bottom: 32px;
         flex-grow: 1;
         height: 100%;
@@ -90,10 +89,13 @@ export const Status = ({
                 p {
                   margin-left: 16px;
                 }
+                svg {
+                  ${hasStatus ? shake : ""}
+                }
               `}
             >
               <GitPullRequest size={32} color="white" weight="bold" />
-              <Text h3 bold css={``}>
+              <Text bold css={``}>
                 Status
               </Text>
             </Div>
@@ -129,7 +131,7 @@ export const Status = ({
                 }
               `}
             >
-              <Text h3>There are uncommitted changes.</Text>
+              <Text bold>There are uncommitted changes.</Text>
               <Button onClick={completeMerge}>Complete Merge</Button>
             </Div>
           ) : null}
@@ -169,7 +171,7 @@ export const Status = ({
                     weight="bold"
                   />
                 </Button>
-                <Text h4 left-ellipsis>
+                <Text bold left-ellipsis>
                   {item}
                 </Text>
               </Div>
@@ -231,7 +233,7 @@ export const Status = ({
                 >
                   <FileX size={32} color={colors.red} weight="bold" />
                 </Button>
-                <Text h4 left-ellipsis>
+                <Text bold left-ellipsis>
                   {item}
                 </Text>
               </Div>
@@ -297,7 +299,7 @@ export const Status = ({
                 `}
               >
                 <FileArrowUp size={32} color={colors.green} weight="bold" />
-                <Text h4 left-ellipsis>
+                <Text bold left-ellipsis>
                   {item}
                 </Text>
               </Div>
@@ -335,10 +337,8 @@ export const Status = ({
             ${flex("space-between")}
           `}
         >
-          <Text h3 bold>
-            No changes detected.
-          </Text>
-          <Text h4 bold>
+          <Text bold>No changes detected.</Text>
+          <Text bold>
             {status?.lastUpdate
               ? format(new Date(status?.lastUpdate), "h:mm a")
               : ""}

@@ -33,7 +33,8 @@ export const buttonStyles = {
     height: 40px;
     color: white;
     :hover {
-      background-color: rgba(0, 0, 0, .2);
+    transition: background-color .2s ease;
+      background-color: ${colors.lightIndigo};
     }
     svg {
       min-width: 32px;
@@ -43,20 +44,22 @@ export const buttonStyles = {
   dark: `
     color: ${colors.darkIndigo};
   `,
-  small: `
+  sm: `
+    width: 24px;
+    height: 24px;
     svg {
-      min-width: 24px;
-      min-height: 24px;
+      min-width: 16px;
+      min-height: 16px;
     }
   `,
   xs: `
-  width: 20px;
-  height: 20px;
-  svg {
-    margin: 0;
-    min-width: 16px;
-    min-height: 16px;
-  }
+    width: 20px;
+    height: 20px;
+    svg {
+      margin: 0;
+      min-width: 16px;
+      min-height: 16px;
+    }
   `,
 };
 

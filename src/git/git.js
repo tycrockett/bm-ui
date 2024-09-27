@@ -16,11 +16,14 @@ import {
   push,
 } from "./utils";
 import {
+  ArrowElbowRightDown,
+  ArrowRight,
   ArrowSquareRight,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
+  KeyReturn,
   Tree,
 } from "phosphor-react";
 import { css } from "@emotion/css";
@@ -326,7 +329,7 @@ export const Git = () => {
       ref={positionRef}
       css={`
         padding: 0 16px;
-        margin: 16px 0;
+        margin: 8px 0;
       `}
     >
       {settings?.pwd in repos ? (
@@ -365,68 +368,13 @@ export const Git = () => {
               }
             `}
           >
-            <Button
-              icon
-              css={`
-                margin-right: 8px;
-              `}
-              onClick={(e) => handleCmd(e, "fetch")}
-            >
-              <Tree
-                size={32}
-                color="white"
-                weight="bold"
-                className={css`
-                  ${shakeTree}
-                `}
-              />
-            </Button>
-
-            <form onSubmit={handleCmd}>
-              {loading ? <Loader /> : null}
-              <Div
-                css={`
-                  position: relative;
-                  background-color: ${loading ? colors.indigo : "white"};
-                  border-radius: 8px;
-                  padding-right: 32px;
-                `}
-              >
-                <Input
-                  disabled={loading}
-                  value={cmd}
-                  onChange={(e) => setCmd(e.target.value)}
-                  ref={ref}
-                />
-                <Button
-                  dark
-                  icon
-                  css={`
-                    position: absolute;
-                    top: 0;
-                    right: 4px;
-                    transition: color 0.2s ease;
-                    color: ${colors.darkIndigo};
-                    :hover {
-                      background: none;
-                      color: ${colors.lightIndigo};
-                    }
-                    svg {
-                      border-radius: 30px;
-                    }
-                  `}
-                  onClick={handleCmd}
-                >
-                  <ArrowSquareRight weight="fill" size={40} />
-                </Button>
-              </Div>
-            </form>
             <Div
               css={`
                 position: relative;
                 width: 200px;
                 max-width: max-content;
                 transition: width 0.3s ease;
+                margin-right: 8px;
                 :hover {
                   width: 100%;
                   animation 0.3s ease grow;
@@ -435,40 +383,33 @@ export const Git = () => {
             >
               <Div
                 css={`
-                  width: 100%;
                   ${flex("space-between")}
-                  border: 1px solid transparent;
-                  border-radius: 16px;
-                  padding: 8px 16px;
+                  border: 1px solid ${colors.darkIndigo};
+                  border-radius: 50%;
+                  padding: 4px;
+                  margin: 4px;
                   cursor: pointer;
                   transition: background-color 0.2s ease;
-                  background-color: ${colors.indigo};
+                  background-color: ${branches?.hasRemote
+                    ? colors.lightGreen
+                    : colors.red};
+
                   box-sizing: border-box;
-                  ${shadows.sm}
                   :hover {
-                    background-color: ${colors.lightIndigo};
+                    outline: 2px solid ${colors.lightIndigo};
+                    outline-offset: 2px;
                     ${shadows.md}
-                  }
-                  p {
-                    margin-right: 16px;
                   }
                   svg {
                     min-width: 32px;
                   }
+                  ${shakeTree}
                 `}
                 onClick={(e) => {
                   setBranchOptions(true);
                 }}
               >
-                {branches?.hasRemote ? (
-                  <CloudCheck
-                    size={32}
-                    color={colors.lightGreen}
-                    weight="fill"
-                  />
-                ) : (
-                  <CloudSlash size={32} color={colors.red} weight="fill" />
-                )}
+                <Tree size={32} color="white" weight="bold" className={css``} />
               </Div>
               {branchOptions ? (
                 <Div
@@ -478,32 +419,35 @@ export const Git = () => {
                     position: absolute;
                     pointer-events: all;
                     top: calc(100% + 8px);
-                    right: 0;
+                    left: 0;
                     width: 300px;
-                    background-color: ${colors.indigo};
+                    background-color: ${colors.darkIndigo};
                     border: 1px solid white;
                     border-radius: 16px;
                     z-index: 100000;
                     overflow: auto;
                     overflow-x: hidden;
                     max-height: 500px;
+                    padding-bottom: 8px;
                     ${shadows.lg}
                     > div {
                       ${flex("space-between")}
                       cursor: pointer;
-                      padding: 0 8px;
+                      padding: 4px 8px;
                       padding-left: 16px;
                       width: 100%;
-                      transition: background-color 0.2s ease;
-                      font-weight: bold;
                       box-sizing: border-box;
-                      height: 40px;
                       :hover {
-                        background-color: ${colors.darkIndigo};
+                        background-color: ${colors.lightIndigo};
                       }
                       :not(:hover) {
                         button {
                           visibility: hidden;
+                        }
+                      }
+                      button {
+                        :hover {
+                          background-color: ${colors.darkIndigo};
                         }
                       }
                     }
@@ -518,7 +462,12 @@ export const Git = () => {
                     `}
                     onClick={handleRemote}
                   >
-                    <Text ellipsis>
+                    <Text
+                      ellipsis
+                      css={`
+                        padding: 4px 0;
+                      `}
+                    >
                       {branches.hasRemote
                         ? `Open Remote - ${branches?.current}`
                         : `Create Remote - ${branches?.current}`}
@@ -527,16 +476,11 @@ export const Git = () => {
                       css={`
                         ${flex("right")}
                         svg {
-                          min-width: 20px;
-                          margin: 0;
-                          padding: 0;
-                        }
-                        p {
-                          color: ${colors.lightBlue};
+                          min-width: 16px;
                         }
                       `}
                     >
-                      <Command color={colors.lightBlue} size={20} />
+                      <Command color="white" size={16} />
                       <Text>R</Text>
                     </Div>
                   </Div>
@@ -565,18 +509,75 @@ export const Git = () => {
                       </Text>
                       <Button
                         icon
+                        sm
                         onClick={(e) => {
                           e.stopPropagation();
                           navigator.clipboard.writeText(item);
                         }}
                       >
-                        <Copy size={16} />
+                        <Copy />
                       </Button>
                     </Div>
                   ))}
                 </Div>
               ) : null}
             </Div>
+
+            <form onSubmit={handleCmd}>
+              {loading ? <Loader /> : null}
+              <Div
+                css={`
+                  position: relative;
+                  opacity: 0.3;
+                  border: 1px solid ${colors.darkIndigo};
+                  ${shadows.lg}
+                  ${loading
+                    ? `
+                    background-color: ${colors.indigo};
+                    padding-right: 0;
+                  `
+                    : `
+                    background-color: white;
+                    padding-right: 32px;
+                  `}
+                  border-radius: 8px;
+                `}
+              >
+                <Input
+                  disabled={loading}
+                  value={cmd}
+                  onChange={(e) => setCmd(e.target.value)}
+                  ref={ref}
+                />
+                {!loading ? (
+                  <Button
+                    dark
+                    icon
+                    sm
+                    css={`
+                      position: absolute;
+                      top: 0;
+                      right: 0;
+                      transition: color 0.2s ease;
+                      transition: background-color 0.2s ease;
+                      color: ${colors.darkIndigo};
+                      border-radius: 50%;
+                      background-color: ${colors.darkIndigo};
+                      color: white;
+                      border: none;
+                      margin: 8px;
+                      :hover {
+                        background: ${colors.lightIndigo};
+                        color: white;
+                      }
+                    `}
+                    onClick={handleCmd}
+                  >
+                    <ArrowElbowRightDown weight="bold" />
+                  </Button>
+                ) : null}
+              </Div>
+            </form>
           </Div>
 
           <CmdList
@@ -593,14 +594,10 @@ export const Git = () => {
           <Div
             css={`
               margin-top: 8px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid white;
               width: 100%;
             `}
           >
-            <Text h3 bold>
-              {branches?.current}
-            </Text>
+            <Text bold>{branches?.current}</Text>
           </Div>
           <Text
             css={`
@@ -608,7 +605,6 @@ export const Git = () => {
               width: 100%;
               text-align: left;
             `}
-            h3
           >
             {repo?.description}
           </Text>

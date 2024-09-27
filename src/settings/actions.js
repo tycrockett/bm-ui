@@ -327,7 +327,7 @@ export const defaultActions = {
     shortkey: "meta+KeyG",
   },
   "mode-command-center": {
-    name: "View Git",
+    name: "View Extensions",
     type: "bm",
     shortkey: "meta+KeyD",
   },

@@ -21,7 +21,7 @@ export const Logs = () => {
     >
       {!list?.length ? (
         <Text
-          h2
+          bold
           css={`
             margin: 32px 0;
           `}

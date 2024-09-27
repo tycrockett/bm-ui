@@ -17,7 +17,7 @@ export const colors = {
 
   lightIndigo: `#6500B0`,
   indigo: `#4B0082`,
-  darkIndigo: `#310062`,
+  darkIndigo: `#282c34`,
 };
 
 export const scrollbar = {
@@ -34,7 +34,7 @@ export const scrollbar = {
     }
 
     ::-webkit-scrollbar-thumb {
-      background: ${colors.green};
+      background: ${colors.lightIndigo};
       border-radius: 16px;
       visibility: visible;
       height: 3px;

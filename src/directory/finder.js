@@ -7,6 +7,7 @@ import { useKeyboard } from "../hooks/use-keyboard";
 import { getFilesInDirectory } from "../node/fs-utils";
 import { Div, Text, colors, Input } from "../shared";
 import { animation, flex } from "../shared/utils";
+import { scrollbar } from "../shared/styles";
 
 export const Finder = () => {
   const ref = useRef();
@@ -106,23 +107,28 @@ export const Finder = () => {
 
       {search === ".." ? (
         <Text
-          h2
+          h4
           css={`
+            margin-left: 40px;
             border-radius: 8px;
             border: 1px solid ${colors.black};
             width: max-content;
-            padding: 16px;
-            color: ${colors.black};
-            background-color: white;
+            padding: 8px;
+            background-color: ${colors.lightIndigo};
+            cursor: pointer;
           `}
+          onClick={handleSubmit}
         >
           Go back
         </Text>
       ) : null}
       <Div
         css={`
-          ${flex("center wrap")}
-          transition: display .2s ease;
+          margin-left: 40px;
+          transition: display 0.2s ease;
+          max-height: calc(100vh - 200px);
+          overflow-y: auto;
+          ${scrollbar.style}
         `}
       >
         {list.map((item, idx) => (
@@ -130,14 +136,13 @@ export const Finder = () => {
             onClick={() => directory.change(settings?.pwd + "/" + item.name)}
             css={`
               ${animation("fadeIn", ".3s ease")}
-              width: 150px;
+              width: 400px;
               background-color: ${colors.dark};
               border-radius: 8px;
-              padding: 8px;
+              padding: 4px 8px;
               font-weight: bold;
               ${flex("left")}
-              margin-right: 16px;
-              margin-bottom: 16px;
+              margin-bottom: 8px;
               cursor: pointer;
               color: white;
               border: 1px solid transparent;
@@ -163,9 +168,9 @@ export const Finder = () => {
             `}
           >
             {item?.isFolder ? (
-              <Folder size={32} weight="fill" />
+              <Folder size={24} weight="fill" />
             ) : item?.isFile ? (
-              <File size={32} weight="fill" />
+              <File size={24} weight="fill" />
             ) : null}
             <Text ellipsis>{item.name}</Text>
           </Div>
