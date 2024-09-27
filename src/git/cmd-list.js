@@ -107,15 +107,13 @@ export const CmdList = ({
                 </Text>
               </Div>
               <Text
-                h3
                 bold
                 css={`
-                  padding: 4px 16px;
-                  border-radius: 16px;
-                  ${shadows.lg}
-                  background-color: ${colors.indigo};
-                  color: white;
-                  margin-right: 16px;
+                  padding: 4px 8px;
+                  border-radius: 30px;
+                  background-color: white;
+                  color: ${colors.darkIndigo};
+                  margin-right: 32px;
                 `}
               >
                 {list[0]?.command}
