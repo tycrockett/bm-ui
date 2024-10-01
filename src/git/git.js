@@ -535,7 +535,7 @@ export const Git = () => {
                   ${shadows.lg}
                   ${loading
                     ? `
-                    background-color: ${colors.indigo};
+                    background-color: white;
                     padding-right: 0;
                   `
                     : `
