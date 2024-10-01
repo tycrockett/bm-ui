@@ -183,7 +183,8 @@ const App = () => {
             css={`
               position: relative;
               border-radius: 8px;
-              background-color: ${colors.darkIndigo};
+              background-color: ${colors.darkIndigo}33;
+              border: 1px solid ${colors.darkIndigo};
               padding: 0 8px;
               flex-grow: 1;
               width: 100%;
@@ -192,7 +193,7 @@ const App = () => {
               cursor: pointer;
               transition: background 0.2s ease;
               :hover {
-                background-color: ${colors.lightIndigo};
+                background-color: ${colors.darkIndigo};
               }
             `}
             onClick={() => setDropdown(dropdown ? "" : "directory")}

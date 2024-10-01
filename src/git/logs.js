@@ -1,10 +1,10 @@
 import { css } from "@emotion/css";
 import { format } from "date-fns";
-import { GitCommit } from "phosphor-react";
+import { CopySimple, GitCommit, Trash } from "phosphor-react";
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { useAsyncValue } from "../hooks/use-async-value";
-import { colors, Div, Text } from "../shared";
+import { Button, colors, Div, Text } from "../shared";
 import { animation, flex, styles } from "../shared/utils";
 import { logCommits } from "./utils";
 import { cmd } from "../node/node-exports";
@@ -170,10 +170,6 @@ export const Logs = ({
                       css={css`
                         padding: 8px 16px;
                         padding-left: 32px;
-                        :hover {
-                          background-color: rgba(0, 0, 0, 0.2);
-                          cursor: pointer;
-                        }
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
@@ -187,8 +183,12 @@ export const Logs = ({
                           align-items: center;
                         `}
                       >
-                        <button onClick={() => deleteFile(file)}>D</button>
-                        <button onClick={() => copyFile(file)}>C</button>
+                        <Button icon sm onClick={() => deleteFile(file)}>
+                          <Trash />
+                        </Button>
+                        <Button icon sm onClick={() => copyFile(file)}>
+                          <CopySimple />
+                        </Button>
                       </Div>
                     </Div>
                   ) : null

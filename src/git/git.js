@@ -526,7 +526,11 @@ export const Git = () => {
               <Div
                 css={`
                   position: relative;
+                  transition: opacity 0.2s ease;
                   opacity: 0.3;
+                  :focus-within {
+                    opacity: 0.8;
+                  }
                   border: 1px solid ${colors.darkIndigo};
                   ${shadows.lg}
                   ${loading

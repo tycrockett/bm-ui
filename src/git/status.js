@@ -139,6 +139,7 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
+                padding: 2px 0;
               `}
             >
               <Div
@@ -202,6 +203,7 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
+                padding: 2px 0;
               `}
             >
               <Div
@@ -250,22 +252,21 @@ export const Status = ({
                     font-weight: bold;
                   `}
                 >
-                  <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={16} color={colors.red} weight="fill" />
-                </Div>
-                <Div
-                  css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
-                  `}
-                >
-                  <Text>{status?.files?.[item]?.adds}</Text>
-                  <PlusCircle size={16} color={colors.green} weight="fill" />
+                  <Text>
+                    {status?.files?.[item]?.adds -
+                      status?.files?.[item]?.deletes}
+                  </Text>
+                  <PlusCircle
+                    size={16}
+                    color={
+                      status?.files?.[item]?.adds -
+                        status?.files?.[item]?.deletes >
+                      0
+                        ? colors.green
+                        : colors.red
+                    }
+                    weight="fill"
+                  />
                 </Div>
               </Div>
             </Div>
@@ -275,6 +276,7 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
+                padding: 2px 0;
               `}
             >
               <Div
@@ -304,19 +306,30 @@ export const Status = ({
               >
                 <Div
                   css={`
-                    ${flex("right")} width: 100px;
+                    width: 100px;
+                    ${flex("right")}
+                    padding: 0 8px;
+                    border-radius: 30px;
+                    ${shadows.lg}
+                    margin: 0 8px;
+                    font-weight: bold;
                   `}
                 >
-                  <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={16} color={colors.red} weight="fill" />
-                </Div>
-                <Div
-                  css={`
-                    ${flex("right")} width: 100px;
-                  `}
-                >
-                  <Text>{status?.files?.[item]?.adds}</Text>
-                  <PlusCircle size={16} color={colors.green} weight="fill" />
+                  <Text>
+                    {status?.files?.[item]?.adds -
+                      status?.files?.[item]?.deletes}
+                  </Text>
+                  <PlusCircle
+                    size={16}
+                    color={
+                      status?.files?.[item]?.adds -
+                        status?.files?.[item]?.deletes >
+                      0
+                        ? colors.green
+                        : colors.red
+                    }
+                    weight="fill"
+                  />
                 </Div>
               </Div>
             </Div>
