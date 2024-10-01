@@ -228,7 +228,7 @@ const App = () => {
                       padding: 8px;
                       height: 16px;
                       :hover {
-                        background-color: ${colors.lightIndigo};
+                        background-color: rgba(0, 0, 0, 0.5);
                       }
                       :not(:hover) {
                         button {
@@ -263,7 +263,7 @@ const App = () => {
                         padding: 8px;
                         height: 16px;
                         :hover {
-                          background-color: ${colors.lightIndigo};
+                          background-color: rgba(0, 0, 0, 0.5);
                         }
                         :not(:hover) {
                           button {
@@ -279,11 +279,6 @@ const App = () => {
                       <Div
                         css={`
                           ${flex("right")}
-                          button {
-                            :hover {
-                              background-color: ${colors.darkIndigo};
-                            }
-                          }
                         `}
                       >
                         <Button
@@ -342,7 +337,7 @@ const App = () => {
                   css={`
                     ${flex("space-between")} padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => setMode("git")}
@@ -364,7 +359,7 @@ const App = () => {
                   css={`
                     ${flex("space-between")} padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => setMode("finder")}
@@ -386,7 +381,7 @@ const App = () => {
                   css={`
                     ${flex("space-between")} padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => setMode("logs")}
@@ -408,7 +403,7 @@ const App = () => {
                   css={`
                     ${flex("space-between")} padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => setMode("extensions")}
@@ -431,7 +426,7 @@ const App = () => {
                   css={`
                     ${flex("space-between")} padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => setMode("settings")}
@@ -453,7 +448,7 @@ const App = () => {
                   css={`
                     padding: 8px;
                     :hover {
-                      background-color: ${colors.lightIndigo};
+                      background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
                   onClick={() => createBookmark()}

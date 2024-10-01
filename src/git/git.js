@@ -436,7 +436,7 @@ export const Git = () => {
                       width: 100%;
                       box-sizing: border-box;
                       :hover {
-                        background-color: ${colors.lightIndigo};
+                        background-color: rgba(0, 0, 0, 0.4);
                       }
                       :not(:hover) {
                         button {
