@@ -18,6 +18,7 @@ export const colors = {
   lightIndigo: `#6500B0`,
   indigo: `#4B0082`,
   darkIndigo: `#282c34`,
+  indigoGradient: `linear-gradient(45deg, #282d2d, #282c34)`,
 };
 
 export const scrollbar = {

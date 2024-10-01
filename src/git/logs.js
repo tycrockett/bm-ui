@@ -51,7 +51,7 @@ export const Logs = ({
       css={`
         ${animation("fadeIn", ".2s ease")}
         transition: height .5s ease;
-        background-color: rgba(0, 0, 0, 0.2);
+        background: ${colors.indigoGradient};
         padding: 16px 0;
         border-radius: 8px;
         box-sizing: border-box;
@@ -125,7 +125,7 @@ export const Logs = ({
       </Div>
       <Div
         css={`
-          max-height: 25vh;
+          max-height: 40vh;
           overflow-y: auto;
           overflow-x: hidden;
           ${styles.scrollbar}
@@ -169,14 +169,24 @@ export const Logs = ({
                     <Div
                       css={css`
                         padding: 8px 16px;
+                        height: 24px;
                         padding-left: 32px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.5);
+                        }
+                        :not(:hover) {
+                          .actions {
+                            display: none;
+                          }
+                        }
                       `}
                     >
                       <Text>{file}</Text>
                       <Div
+                        className="actions"
                         css={css`
                           display: flex;
                           justify-content: right;
