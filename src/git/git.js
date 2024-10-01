@@ -214,6 +214,8 @@ export const Git = () => {
   const list = useMemo(() => {
     if (!cmd) {
       return commands;
+    } else if (cmd === "*") {
+      return commands;
     }
     let value = cmd;
     if (cmd.includes(" ")) {
