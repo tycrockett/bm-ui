@@ -390,9 +390,7 @@ export const Git = () => {
                   margin: 4px;
                   cursor: pointer;
                   transition: background-color 0.2s ease;
-                  background-color: ${branches?.hasRemote
-                    ? colors.lightGreen
-                    : colors.darkIndigo};
+                  background-color: ${colors.darkIndigo};
 
                   box-sizing: border-box;
                   :hover {
@@ -595,6 +593,14 @@ export const Git = () => {
             css={`
               margin-top: 16px;
               width: 100%;
+              p {
+                width: max-content;
+                padding: 4px 8px;
+                border-radius: 30px;
+                background-color: ${branches?.hasRemote
+                  ? colors.lightGreen
+                  : colors.darkIndigo};
+              }
             `}
           >
             <Text bold>{branches?.current}</Text>
@@ -611,7 +617,8 @@ export const Git = () => {
           {repo?.notes?.length ? (
             <Div
               css={`
-                padding: 24px 0;
+                padding: 8px 0;
+                padding-bottom: 16px;
               `}
             >
               {repo?.notes?.map((item) => (

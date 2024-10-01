@@ -94,7 +94,7 @@ export const Status = ({
                 }
               `}
             >
-              <GitPullRequest size={32} color="white" weight="bold" />
+              <GitPullRequest size={24} color="white" weight="fill" />
               <Text bold css={``}>
                 Status
               </Text>
@@ -139,7 +139,6 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
-                padding: 4px 0;
               `}
             >
               <Div
@@ -166,14 +165,12 @@ export const Status = ({
                   `}
                 >
                   <FileDotted
-                    size={32}
+                    size={24}
                     color={colors.lightBlue}
-                    weight="bold"
+                    weight="fill"
                   />
                 </Button>
-                <Text bold left-ellipsis>
-                  {item}
-                </Text>
+                <Text left-ellipsis>{item}</Text>
               </Div>
               <Div
                 css={`
@@ -195,7 +192,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.fileCount?.[item]}</Text>
-                  <PlusCircle size={32} color={colors.green} weight="bold" />
+                  <PlusCircle size={16} color={colors.green} weight="fill" />
                 </Div>
               </Div>
             </Div>
@@ -205,7 +202,6 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
-                padding: 4px 0;
               `}
             >
               <Div
@@ -231,11 +227,9 @@ export const Status = ({
                     padding: 0;
                   `}
                 >
-                  <FileX size={32} color={colors.red} weight="bold" />
+                  <FileX size={24} color={colors.red} weight="fill" />
                 </Button>
-                <Text bold left-ellipsis>
-                  {item}
-                </Text>
+                <Text left-ellipsis>{item}</Text>
               </Div>
               <Div
                 css={`
@@ -257,7 +251,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={32} color={colors.red} weight="bold" />
+                  <MinusCircle size={16} color={colors.red} weight="fill" />
                 </Div>
                 <Div
                   css={`
@@ -271,7 +265,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.adds}</Text>
-                  <PlusCircle size={32} color={colors.green} weight="bold" />
+                  <PlusCircle size={16} color={colors.green} weight="fill" />
                 </Div>
               </Div>
             </Div>
@@ -281,7 +275,6 @@ export const Status = ({
             <Div
               css={`
                 ${flex("space-between")}
-                padding: 4px 0;
               `}
             >
               <Div
@@ -298,10 +291,8 @@ export const Status = ({
                   }
                 `}
               >
-                <FileArrowUp size={32} color={colors.green} weight="bold" />
-                <Text bold left-ellipsis>
-                  {item}
-                </Text>
+                <FileArrowUp size={24} color={colors.green} weight="fill" />
+                <Text left-ellipsis>{item}</Text>
               </Div>
               <Div
                 css={`
@@ -317,7 +308,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.deletes}</Text>
-                  <MinusCircle size={32} color={colors.red} weight="bold" />
+                  <MinusCircle size={16} color={colors.red} weight="fill" />
                 </Div>
                 <Div
                   css={`
@@ -325,7 +316,7 @@ export const Status = ({
                   `}
                 >
                   <Text>{status?.files?.[item]?.adds}</Text>
-                  <MinusCircle size={32} color={colors.green} weight="bold" />
+                  <PlusCircle size={16} color={colors.green} weight="fill" />
                 </Div>
               </Div>
             </Div>

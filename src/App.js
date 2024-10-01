@@ -24,7 +24,7 @@ import { useOutsideClick } from "./shared/use-outside-click";
 
 const header = `
   padding: 8px 16px;
-  margin-top: 16px;
+  margin-top: 32px;
 `;
 
 const App = () => {
@@ -165,15 +165,15 @@ const App = () => {
         <Div
           css={`
             ${flex("left")}
+            margin-bottom: 16px;
           `}
         >
           <Button
             icon
-            xs
             disabled={settings?.pwd === "~"}
             onClick={goBack}
             css={`
-              margin-right: 24px;
+              margin-right: 16px;
               padding: 16px;
             `}
           >
