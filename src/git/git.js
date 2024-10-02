@@ -68,7 +68,7 @@ export const Git = () => {
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState({});
   const [status, setStatus] = useState({});
-  const [ports, setPorts] = useState({});
+  const [ports, setPorts] = useState([]);
   const [branchOptions, setBranchOptions] = useState(false);
   const branchRef = useOutsideClick(() => setBranchOptions(false));
 
@@ -86,6 +86,7 @@ export const Git = () => {
   const { animation: shakeTree } = useAnimation(animateShake, [lastCmd]);
 
   const updatePort = async () => {
+    setPorts([]);
     const list = await execCmd(
       `lsof -iTCP -sTCP:LISTEN -n -P | grep $(whoami) | awk '{print $9, $2}'`
     );
@@ -539,6 +540,7 @@ export const Git = () => {
         <Div
           css={`
             ${flex("right")}
+            ${animation("fadeIn", ".35s ease")}
           `}
         >
           {ports?.length
