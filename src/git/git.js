@@ -344,7 +344,7 @@ export const Git = () => {
           position: relative;
           ${flex("left")}
           margin: 16px 0;
-          width: 100%;
+          width: max-content;
           height: 32px;
         `}
         onClick={(e) => {

@@ -146,6 +146,11 @@ const App = () => {
     }
   };
 
+  const openBookmark = (pwd) => {
+    const path = pwd?.replace("~", store?.settings?.base);
+    cmd(`open -n -b "com.microsoft.VSCode" --args "${path}"`);
+  };
+
   useKeyboard({ keydown });
 
   const updateDirectory = (key) => {
@@ -285,9 +290,7 @@ const App = () => {
                           xs
                           onClick={(e) => {
                             e.stopPropagation();
-                            cmd(
-                              `open -n -b "com.microsoft.VSCode" --args "${value}"`
-                            );
+                            openBookmark(key);
                           }}
                         >
                           <ArrowSquareOut />
@@ -449,17 +452,29 @@ const App = () => {
                     <Text>S</Text>
                   </Div>
                 </Div>
-                <Text
+                <Div
                   css={`
+                    ${flex("space-between")}
                     padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
                   `}
-                  onClick={() => createBookmark()}
+                  onClick={() => setMode("settings")}
                 >
-                  Create Bookmark
-                </Text>
+                  <Text>Create Bookmark</Text>
+                  <Div
+                    css={`
+                      ${flex("right")}
+                      svg {
+                        min-width: 16px;
+                      }
+                    `}
+                  >
+                    <Command color="white" size={16} />
+                    <Text>+</Text>
+                  </Div>
+                </Div>
               </Div>
             ) : null}
           </Div>
