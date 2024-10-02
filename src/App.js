@@ -331,6 +331,7 @@ const App = () => {
                   cursor: pointer;
                   ${shadows.lg}
                 `}
+                onClick={() => setDropdown("")}
               >
                 <Div
                   css={`

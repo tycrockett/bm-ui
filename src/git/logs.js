@@ -59,7 +59,7 @@ export const Logs = ({
     <Div
       css={`
         ${animation("fadeIn", ".2s ease")}
-        transition: height .5s ease;
+        transition: height 0.5s ease;
         background: ${colors.indigoGradient};
         padding: 16px 0;
         border-radius: 8px;
@@ -146,7 +146,7 @@ export const Logs = ({
               css={`
                 ${animation("fadeIn", ".2s ease")}
                 ${flex("space-between")}
-              padding: 4px 16px;
+                padding: 4px 16px;
                 margin-top: 8px;
                 border-radius: 8px;
                 transition: background-color 0.2s ease;

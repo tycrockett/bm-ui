@@ -123,17 +123,23 @@ export const Git = () => {
   const handleCmd = async (event, executingCommand = cmd) => {
     event?.preventDefault();
 
+    setCmd("");
+    setLoading(true);
+    setLastCmd(new Date().toISOString());
+
     if (executingCommand.includes("clear")) {
       console.clear();
     } else if (executingCommand.startsWith(">")) {
       const cmd = executingCommand.replace(">", "").trim();
+      console.log(cmd);
       await execCmd(cmd);
       executingCommand = "";
+      setLoading(false);
+      return;
     }
 
     const commandDetails = list[index];
     const [value, ...args] = executingCommand.split(" ");
-    setLoading(true);
 
     const options = {
       parentBranch,
@@ -142,8 +148,7 @@ export const Git = () => {
       currentBranch: branches?.current,
       defaultBranch: repos?.[settings?.pwd]?.defaultBranch,
     };
-    setCmd("");
-    setLastCmd(new Date().toISOString());
+
     const command = {
       args,
       options,

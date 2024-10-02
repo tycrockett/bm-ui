@@ -13,6 +13,7 @@ import { useAnimation } from "../hooks/use-animation";
 import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
+import { useMemo } from "react";
 
 export const Status = ({
   status,
@@ -46,26 +47,40 @@ export const Status = ({
     }
   };
 
-  const files = useMemo(() => {
-    const untracked = status?.untracked?.filter(
-      (item) => Number(status?.fileCount?.[item]) > 0
-    );
-    const deleted = status?.deleted?.filter(
-      (item) =>
-        Number(status?.files?.[item]?.deletes) > 0 ||
-        Number(status?.files?.[item]?.adds) > 0
-    );
-    const modified = status?.modified?.filter(
-      (item) =>
-        Number(status?.files?.[item]?.deletes) > 0 ||
-        Number(status?.files?.[item]?.adds) > 0
-    );
+  // const files = useMemo(() => {
+  //   const untracked = status?.untracked?.filter(
+  //     (item) => Number(status?.fileCount?.[item]) > 0
+  //   );
+  //   const deleted = status?.deleted?.filter(
+  //     (item) =>
+  //       Number(status?.files?.[item]?.deletes) > 0 ||
+  //       Number(status?.files?.[item]?.adds) > 0
+  //   );
+  //   const modified = status?.modified?.filter(
+  //     (item) =>
+  //       Number(status?.files?.[item]?.deletes) > 0 ||
+  //       Number(status?.files?.[item]?.adds) > 0
+  //   );
 
-    return [untracked, deleted, modified].reduce((prev, item) => {
-      const split = item.split("/");
-      split.reduce((acc, val) => {}, prev);
-    }, []);
-  });
+  //   return [untracked, deleted, modified].reduce((prev, item) => {
+  //     const split = item.split("/");
+  //     split.reduce((acc, val) => {}, prev);
+  //   }, []);
+  // });
+
+  const untracked = status?.untracked?.filter(
+    (item) => Number(status?.fileCount?.[item]) > 0
+  );
+  const deleted = status?.deleted?.filter(
+    (item) =>
+      Number(status?.files?.[item]?.deletes) > 0 ||
+      Number(status?.files?.[item]?.adds) > 0
+  );
+  const modified = status?.modified?.filter(
+    (item) =>
+      Number(status?.files?.[item]?.deletes) > 0 ||
+      Number(status?.files?.[item]?.adds) > 0
+  );
 
   const unmergedChanges =
     hasStatus && !untracked?.length && !deleted?.length && !modified?.length;
