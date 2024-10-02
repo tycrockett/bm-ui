@@ -215,17 +215,16 @@ const App = () => {
                   background-color: ${colors.darkIndigo};
                   z-index: 1000;
                   border-radius: 16px;
-                  border: 2px solid white;
                   overflow: hidden;
                   padding: 8px 0;
-                  ${shadows.md}
+                  ${shadows.lg}
                 `}
                 ref={dirRef}
               >
                 {!(settings?.pwd in settings?.bookmarks) ? (
                   <Div
                     css={`
-                      padding: 8px;
+                      padding: 16px;
                       height: 16px;
                       :hover {
                         background-color: rgba(0, 0, 0, 0.5);
@@ -243,7 +242,7 @@ const App = () => {
                     `}
                     onClick={() => createBookmark()}
                   >
-                    <Text>{settings?.pwd}</Text>
+                    <Text bold>{settings?.pwd}</Text>
                     <Div
                       css={`
                         ${flex("right")}
@@ -260,7 +259,7 @@ const App = () => {
                   ([key, value]) => (
                     <Div
                       css={`
-                        padding: 8px;
+                        padding: 8px 16px;
                         height: 16px;
                         :hover {
                           background-color: rgba(0, 0, 0, 0.5);
@@ -287,7 +286,7 @@ const App = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             cmd(
-                              'open -n -b "com.microsoft.VSCode" --args "$PWD"'
+                              `open -n -b "com.microsoft.VSCode" --args "${value}"`
                             );
                           }}
                         >
@@ -327,15 +326,16 @@ const App = () => {
                   background-color: ${colors.darkIndigo};
                   z-index: 1000;
                   border-radius: 16px;
-                  border: 2px solid white;
                   overflow: hidden;
                   padding: 8px 0;
                   cursor: pointer;
+                  ${shadows.lg}
                 `}
               >
                 <Div
                   css={`
-                    ${flex("space-between")} padding: 8px;
+                    ${flex("space-between")}
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
@@ -357,7 +357,8 @@ const App = () => {
                 </Div>
                 <Div
                   css={`
-                    ${flex("space-between")} padding: 8px;
+                    ${flex("space-between")}
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
@@ -379,7 +380,8 @@ const App = () => {
                 </Div>
                 <Div
                   css={`
-                    ${flex("space-between")} padding: 8px;
+                    ${flex("space-between")}
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
@@ -401,7 +403,8 @@ const App = () => {
                 </Div>
                 <Div
                   css={`
-                    ${flex("space-between")} padding: 8px;
+                    ${flex("space-between")}
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
@@ -424,7 +427,8 @@ const App = () => {
 
                 <Div
                   css={`
-                    ${flex("space-between")} padding: 8px;
+                    ${flex("space-between")}
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }
@@ -446,7 +450,7 @@ const App = () => {
                 </Div>
                 <Text
                   css={`
-                    padding: 8px;
+                    padding: 8px 16px;
                     :hover {
                       background-color: rgba(0, 0, 0, 0.5);
                     }

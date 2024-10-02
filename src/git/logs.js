@@ -1,13 +1,14 @@
 import { css } from "@emotion/css";
 import { format } from "date-fns";
 import { CopySimple, GitCommit, Trash } from "phosphor-react";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { Button, colors, Div, Text } from "../shared";
 import { animation, flex, styles } from "../shared/utils";
 import { logCommits } from "./utils";
 import { cmd } from "../node/node-exports";
+import { StoreContext } from "../context/store";
 
 export const Logs = ({
   currentBranch,
@@ -16,11 +17,19 @@ export const Logs = ({
   lastCommand,
   pwd,
 }) => {
+  const context = useContext(StoreContext);
+  const { store } = context;
+
   const getLogs = useCallback(
     () => logCommits(parentBranch),
     [parentBranch, pwd]
   );
-  const [logs] = useAsyncValue(getLogs, [lastCommand, parentBranch, pwd]);
+  const [logs] = useAsyncValue(getLogs, [
+    lastCommand,
+    parentBranch,
+    pwd,
+    store?.mode,
+  ]);
   const commits = Object.entries(logs || {});
 
   const [hash, setHash] = useState("all");

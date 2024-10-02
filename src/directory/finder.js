@@ -1,11 +1,9 @@
-import { css } from "@emotion/css";
-import { File, Folder, Monitor, Terminal } from "phosphor-react";
+import { File, Folder, Monitor } from "phosphor-react";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { StoreContext } from "../context/store";
-import { useAnimation } from "../hooks/use-animation";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { getFilesInDirectory } from "../node/fs-utils";
-import { Div, Text, colors, Input, Button } from "../shared";
+import { Div, Text, colors, Input } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 import { scrollbar } from "../shared/styles";
 import { cmd } from "../node/node-exports";
@@ -143,8 +141,8 @@ export const Finder = () => {
       ) : null}
       <Div
         css={`
-          margin-left: 64px;
-          transition: display 0.2s ease;
+          max-width: 440px;
+          margin: 0 auto;
           max-height: calc(100vh - 200px);
           overflow-y: auto;
           ${scrollbar.style}
@@ -155,7 +153,7 @@ export const Finder = () => {
             onClick={() => directory.change(settings?.pwd + "/" + item.name)}
             css={`
               ${animation("fadeIn", ".3s ease")}
-              width: 400px;
+              width: calc(100% - 32px);
               background-color: ${colors.darkIndigo};
               border-radius: 8px;
               padding: 4px 8px;

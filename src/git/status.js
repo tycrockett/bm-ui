@@ -46,19 +46,26 @@ export const Status = ({
     }
   };
 
-  const untracked = status?.untracked?.filter(
-    (item) => Number(status?.fileCount?.[item]) > 0
-  );
-  const deleted = status?.deleted?.filter(
-    (item) =>
-      Number(status?.files?.[item]?.deletes) > 0 ||
-      Number(status?.files?.[item]?.adds) > 0
-  );
-  const modified = status?.modified?.filter(
-    (item) =>
-      Number(status?.files?.[item]?.deletes) > 0 ||
-      Number(status?.files?.[item]?.adds) > 0
-  );
+  const files = useMemo(() => {
+    const untracked = status?.untracked?.filter(
+      (item) => Number(status?.fileCount?.[item]) > 0
+    );
+    const deleted = status?.deleted?.filter(
+      (item) =>
+        Number(status?.files?.[item]?.deletes) > 0 ||
+        Number(status?.files?.[item]?.adds) > 0
+    );
+    const modified = status?.modified?.filter(
+      (item) =>
+        Number(status?.files?.[item]?.deletes) > 0 ||
+        Number(status?.files?.[item]?.adds) > 0
+    );
+
+    return [untracked, deleted, modified].reduce((prev, item) => {
+      const split = item.split("/");
+      split.reduce((acc, val) => {}, prev);
+    }, []);
+  });
 
   const unmergedChanges =
     hasStatus && !untracked?.length && !deleted?.length && !modified?.length;
@@ -155,22 +162,9 @@ export const Status = ({
                     margin-right: 16px;
                   }
                 `}
+                onClick={() => copyItem(item)}
               >
-                <Button
-                  icon
-                  small
-                  onClick={() => copyItem(item)}
-                  css={`
-                    margin: 0;
-                    padding: 0;
-                  `}
-                >
-                  <FileDotted
-                    size={24}
-                    color={colors.lightBlue}
-                    weight="fill"
-                  />
-                </Button>
+                <FileDotted size={24} color={colors.lightBlue} weight="fill" />
                 <Text left-ellipsis>{item}</Text>
               </Div>
               <Div

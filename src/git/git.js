@@ -334,10 +334,171 @@ export const Git = () => {
         margin: 8px 0;
       `}
     >
+      <Div
+        css={`
+          position: relative;
+          ${flex("left")}
+          margin: 16px 0;
+          width: 100%;
+          height: 32px;
+        `}
+        onClick={(e) => {
+          setBranchOptions(true);
+        }}
+      >
+        <Div
+          css={`
+            width: 32px;
+            height: 24px;
+            ${flex("center")}
+            background-color: ${branches?.hasRemote
+              ? colors.lightGreen
+              : colors.red};
+            padding: 8px;
+            padding-left: 16px;
+            border-radius: 30px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            cursor: pointer;
+          `}
+        >
+          {branches.hasRemote ? (
+            <CloudCheck size={24} color="white" weight="bold" />
+          ) : (
+            <CloudSlash size={24} color="white" weight="bold" />
+          )}
+        </Div>
+        <Div
+          flex="left"
+          css={`
+            min-width: 100px;
+            height: 24px;
+            padding: 16px;
+            padding-top: 12px;
+            padding-bottom: 4px;
+            border-radius: 30px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background-color: ${colors.darkIndigo};
+            cursor: pointer;
+          `}
+        >
+          <Text bold>{branches?.current}</Text>
+        </Div>
+        {branchOptions ? (
+          <Div
+            ref={branchRef}
+            css={`
+              ${animation("fadeIn", ".2s ease")}
+              position: absolute;
+              pointer-events: all;
+              top: calc(100% + 16px);
+              left: 0;
+              width: 300px;
+              background-color: ${colors.darkIndigo};
+              border-radius: 16px;
+              z-index: 100000;
+              overflow: auto;
+              overflow-x: hidden;
+              max-height: 500px;
+              padding-bottom: 8px;
+              ${shadows.lg}
+              > div {
+                ${flex("space-between")}
+                cursor: pointer;
+                padding: 4px 16px;
+                padding-left: 16px;
+                width: 100%;
+                box-sizing: border-box;
+                :hover {
+                  background-color: rgba(0, 0, 0, 0.4);
+                }
+                :not(:hover) {
+                  button {
+                    visibility: hidden;
+                  }
+                }
+                button {
+                  :hover {
+                    background-color: ${colors.darkIndigo};
+                  }
+                }
+              }
+            `}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Div
+              css={`
+                ${flex("space-between")}
+              `}
+              onClick={handleRemote}
+            >
+              <Text
+                ellipsis
+                css={`
+                  padding: 8px 0;
+                `}
+              >
+                {branches.hasRemote
+                  ? `Open Remote - ${branches?.current}`
+                  : `Create Remote - ${branches?.current}`}
+              </Text>
+              <Div
+                css={`
+                  ${flex("right")}
+                  svg {
+                    min-width: 16px;
+                  }
+                `}
+              >
+                <Command color="white" size={16} />
+                <Text>R</Text>
+              </Div>
+            </Div>
+            <hr
+              className={css`
+                padding: 0;
+                margin: 0;
+              `}
+            />
+            {branches?.list?.map((item) => (
+              <Div
+                css={``}
+                onClick={(e) => {
+                  handleCheckout(item);
+                  setBranchOptions(false);
+                }}
+              >
+                <Text
+                  css={`
+                    ${item === branches?.current
+                      ? `color: ${colors.lightGreen};`
+                      : ""}
+                  `}
+                >
+                  {item}
+                </Text>
+                <Button
+                  icon
+                  sm
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(item);
+                  }}
+                >
+                  <Copy />
+                </Button>
+              </Div>
+            ))}
+          </Div>
+        ) : null}
+      </Div>
       {settings?.pwd in repos ? (
         <Div
           css={`
-            height: calc(100vh - ${box?.top + 16}px);
+            height: calc(100vh - ${box?.top + 64}px);
             ${flex("start column")}
             overflow-y: auto;
             overflow-x: hidden;
@@ -370,159 +531,6 @@ export const Git = () => {
               }
             `}
           >
-            <Div
-              css={`
-                position: relative;
-                width: 200px;
-                max-width: max-content;
-                transition: width 0.3s ease;
-                margin-right: 8px;
-                :hover {
-                  width: 100%;
-                  animation 0.3s ease grow;
-                }
-              `}
-            >
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  border: 1px solid ${colors.darkIndigo};
-                  border-radius: 50%;
-                  padding: 4px;
-                  margin: 4px;
-                  cursor: pointer;
-                  transition: background-color 0.2s ease;
-                  background-color: ${colors.darkIndigo};
-
-                  box-sizing: border-box;
-                  :hover {
-                    outline: 2px solid ${colors.lightIndigo};
-                    outline-offset: 2px;
-                    ${shadows.md}
-                  }
-                  svg {
-                    min-width: 32px;
-                  }
-                  ${shakeTree}
-                `}
-                onClick={(e) => {
-                  setBranchOptions(true);
-                }}
-              >
-                <Tree size={32} color="white" weight="bold" className={css``} />
-              </Div>
-              {branchOptions ? (
-                <Div
-                  ref={branchRef}
-                  css={`
-                    ${animation("fadeIn", ".2s ease")}
-                    position: absolute;
-                    pointer-events: all;
-                    top: calc(100% + 8px);
-                    left: 0;
-                    width: 300px;
-                    background-color: ${colors.darkIndigo};
-                    border: 1px solid white;
-                    border-radius: 16px;
-                    z-index: 100000;
-                    overflow: auto;
-                    overflow-x: hidden;
-                    max-height: 500px;
-                    padding-bottom: 8px;
-                    ${shadows.lg}
-                    > div {
-                      ${flex("space-between")}
-                      cursor: pointer;
-                      padding: 4px 8px;
-                      padding-left: 16px;
-                      width: 100%;
-                      box-sizing: border-box;
-                      :hover {
-                        background-color: rgba(0, 0, 0, 0.4);
-                      }
-                      :not(:hover) {
-                        button {
-                          visibility: hidden;
-                        }
-                      }
-                      button {
-                        :hover {
-                          background-color: ${colors.darkIndigo};
-                        }
-                      }
-                    }
-                  `}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <Div
-                    css={`
-                      ${flex("space-between")}
-                    `}
-                    onClick={handleRemote}
-                  >
-                    <Text
-                      ellipsis
-                      css={`
-                        padding: 4px 0;
-                      `}
-                    >
-                      {branches.hasRemote
-                        ? `Open Remote - ${branches?.current}`
-                        : `Create Remote - ${branches?.current}`}
-                    </Text>
-                    <Div
-                      css={`
-                        ${flex("right")}
-                        svg {
-                          min-width: 16px;
-                        }
-                      `}
-                    >
-                      <Command color="white" size={16} />
-                      <Text>R</Text>
-                    </Div>
-                  </Div>
-                  <hr
-                    className={css`
-                      padding: 0;
-                      margin: 0;
-                    `}
-                  />
-                  {branches?.list?.map((item) => (
-                    <Div
-                      css={``}
-                      onClick={(e) => {
-                        handleCheckout(item);
-                        setBranchOptions(false);
-                      }}
-                    >
-                      <Text
-                        css={`
-                          ${item === branches?.current
-                            ? `color: ${colors.lightGreen};`
-                            : ""}
-                        `}
-                      >
-                        {item}
-                      </Text>
-                      <Button
-                        icon
-                        sm
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigator.clipboard.writeText(item);
-                        }}
-                      >
-                        <Copy />
-                      </Button>
-                    </Div>
-                  ))}
-                </Div>
-              ) : null}
-            </Div>
-
             <form onSubmit={handleCmd}>
               {loading ? <Loader /> : null}
               <Div
@@ -582,6 +590,45 @@ export const Git = () => {
                 ) : null}
               </Div>
             </form>
+            <Div
+              css={`
+                position: relative;
+                width: 200px;
+                max-width: max-content;
+                transition: width 0.3s ease;
+                margin-left: 8px;
+                :hover {
+                  width: 100%;
+                  animation 0.3s ease grow;
+                }
+              `}
+            >
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  border: 1px solid ${colors.darkIndigo};
+                  border-radius: 50%;
+                  padding: 4px;
+                  margin: 4px;
+                  cursor: pointer;
+                  transition: background-color 0.2s ease;
+                  background-color: ${colors.darkIndigo};
+
+                  box-sizing: border-box;
+                  // :hover {
+                  //   outline: 2px solid ${colors.lightIndigo};
+                  //   outline-offset: 2px;
+                  //   ${shadows.md}
+                  // }
+                  svg {
+                    min-width: 32px;
+                  }
+                  ${shakeTree}
+                `}
+              >
+                <Tree size={32} color="white" weight="bold" className={css``} />
+              </Div>
+            </Div>
           </Div>
 
           <CmdList
@@ -595,22 +642,6 @@ export const Git = () => {
             }}
             checkoutList={checkoutList}
           />
-          <Div
-            css={`
-              margin-top: 16px;
-              width: 100%;
-              p {
-                width: max-content;
-                padding: 4px 8px;
-                border-radius: 30px;
-                background-color: ${branches?.hasRemote
-                  ? colors.lightGreen
-                  : colors.darkIndigo};
-              }
-            `}
-          >
-            <Text bold>{branches?.current}</Text>
-          </Div>
           <Text
             css={`
               margin-bottom: 8px;
