@@ -13,7 +13,6 @@ import { useAnimation } from "../hooks/use-animation";
 import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
-import { useMemo } from "react";
 
 export const Status = ({
   status,
