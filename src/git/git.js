@@ -572,11 +572,12 @@ export const Git = () => {
       {settings?.pwd in repos ? (
         <Div
           css={`
-            height: calc(100vh - ${box?.top + 64}px);
+            height: calc(100vh - ${box?.top + 96}px);
             ${flex("start column")}
             overflow-y: auto;
             overflow-x: hidden;
             box-sizing: border-box;
+            // border: 1px solid;
           `}
         >
           <Div
