@@ -585,6 +585,7 @@ export const Git = () => {
               ${flex("left")}
               width: 100%;
               box-sizing: border-box;
+              margin-bottom: 16px;
               select {
                 width: 200px;
                 padding: 12px 8px;
