@@ -21,6 +21,7 @@ import { defaultActions } from "./settings/actions";
 import { defaultExtensions, Extensions } from "./extensions/extensions";
 import { Logs } from "./logs/logs";
 import { useOutsideClick } from "./shared/use-outside-click";
+import { useInterval } from "./git/useInterval";
 
 const header = `
   padding: 8px 16px;
@@ -31,7 +32,7 @@ const App = () => {
   const context = useContext(StoreContext);
   const {
     store,
-    methods: { set, setSettings, directory },
+    methods: { set, setSettings, directory, lastCommand },
   } = context;
   const setMode = (mode) => set("mode", mode);
 
@@ -53,6 +54,50 @@ const App = () => {
 
   const splitDir = settings?.pwd?.split("/");
   const displayDirectory = settings?.pwd?.split("/").slice(-1)?.join("/");
+
+  const updatePort = async () => {
+    const list = await cmd(
+      `lsof -iTCP -sTCP:LISTEN -n -P | grep $(whoami) | awk '{print $9, $2}'`
+    );
+    const ports = list.split("\n");
+    let promises = [];
+    for (const port of ports) {
+      const [, pid] = port.split(" ");
+      if (!!pid) {
+        try {
+          const promise = cmd(`lsof -p ${pid} | grep cwd | awk '{print $9}'`);
+          promises.push(promise);
+        } catch {}
+      }
+    }
+    const results = await Promise.all(promises);
+    const grouped = results.reduce((p, v, idx) => {
+      const values = ports[idx].split(" ");
+      const path = v.replace("\n", "");
+      const port = values?.[0]?.replace("*", "");
+      const pid = values?.[1];
+      if (path.startsWith(settings?.base)) {
+        return {
+          ...p,
+          [path]: [
+            ...(p?.[path] || []),
+            {
+              path,
+              port,
+              pid,
+            },
+          ],
+        };
+      }
+      return p;
+    }, {});
+    setSettings({
+      ...settings,
+      ports: grouped,
+    });
+  };
+
+  useInterval(updatePort, 5000);
 
   useEffect(() => {
     const extensions = defaultExtensions;

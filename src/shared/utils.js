@@ -34,7 +34,7 @@ export const useStyles = (componentStyles, componentProps = {}) => {
     );
   }, [styleProps, cssStyle, classes]);
 
-  return { className, ...props };
+  return { className, ...rest, ...props };
 };
 
 export const flex = (options) => {

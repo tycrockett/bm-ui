@@ -64,11 +64,9 @@ export const Git = () => {
 
   const [index, setIndex] = useState(0);
   const [cmd, setCmd] = useState("");
-  const [lastCmd, setLastCmd] = useState("");
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState({});
   const [status, setStatus] = useState({});
-  const [ports, setPorts] = useState([]);
   const [branchOptions, setBranchOptions] = useState(false);
   const branchRef = useOutsideClick(() => setBranchOptions(false));
 
@@ -83,42 +81,7 @@ export const Git = () => {
     timing: 400,
   };
 
-  const { animation: shakeTree } = useAnimation(animateShake, [lastCmd]);
-
-  const updatePort = async () => {
-    setPorts([]);
-    const list = await execCmd(
-      `lsof -iTCP -sTCP:LISTEN -n -P | grep $(whoami) | awk '{print $9, $2}'`
-    );
-    const ports = list.split("\n");
-    let promises = [];
-    for (const port of ports) {
-      const [, pid] = port.split(" ");
-      if (!!pid) {
-        try {
-          const promise = execCmd(
-            `lsof -p ${pid} | grep cwd | awk '{print $9}'`
-          );
-          promises.push(promise);
-        } catch {}
-      }
-    }
-    const results = await Promise.all(promises);
-    const path = settings.pwd.replace("~", settings?.base);
-    const filtered = results
-      .reduce((p, v, idx) => {
-        const values = ports[idx].split(" ");
-        const port = values?.[0]?.replace("*", "");
-        const pid = values?.[1];
-        return [...p, { path: v.replace("\n", ""), port, pid }];
-      }, [])
-      .filter((item) => item?.path?.startsWith(path));
-    setPorts(filtered);
-  };
-
-  useEffect(() => {
-    updatePort();
-  }, [lastCmd, settings.pwd]);
+  const { animation: shakeTree } = useAnimation(animateShake, [lastCommand]);
 
   const refreshGit = async () => {
     const branches = await getBranches();
@@ -157,7 +120,10 @@ export const Git = () => {
 
     setCmd("");
     setLoading(true);
-    setLastCmd(new Date().toISOString());
+    methods.set(
+      "lastCommand",
+      `${executingCommand}-${new Date().toISOString()}`
+    );
 
     if (executingCommand.includes("clear")) {
       console.clear();
@@ -190,19 +156,11 @@ export const Git = () => {
     try {
       if (executingCommand.startsWith("git")) {
         await execCmd(executingCommand);
-        methods.set(
-          "lastCommand",
-          `${executingCommand}-${new Date().toISOString()}`
-        );
       } else {
         await commandDetails.function({
           command,
           context,
         });
-        methods.set(
-          "lastCommand",
-          `${commandDetails.command}-${new Date().toISOString()}`
-        );
       }
       refreshGit();
     } catch (err) {
@@ -363,6 +321,13 @@ export const Git = () => {
 
   useKeyboard({ keydown });
   const box = positionRef?.current?.getBoundingClientRect();
+
+  const readTerminal = async (pid) => {
+    process.kill(pid);
+  };
+
+  const basePath = settings?.pwd?.replace("~", settings?.base);
+  console.log(settings?.ports?.[basePath]);
   return (
     <Div
       ref={positionRef}
@@ -543,8 +508,8 @@ export const Git = () => {
             ${animation("fadeIn", ".35s ease")}
           `}
         >
-          {ports?.length
-            ? ports.map((port) => (
+          {settings?.ports?.[basePath]?.length
+            ? settings?.ports?.[basePath]?.map((port) => (
                 <Div
                   css={`
                     border-radius: 16px;
@@ -553,12 +518,13 @@ export const Git = () => {
                     ${flex("right")}
                     cursor: pointer;
                   `}
+                  onClick={() => readTerminal(port.pid)}
                 >
                   <Div
                     css={`
                       border-radius: 50%;
-                      width: 10px;
-                      height: 10px;
+                      width: 6px;
+                      height: 6px;
                       background-color: ${colors.lightGreen};
                       margin-right: 8px;
                       border: 3px solid ${colors.green};

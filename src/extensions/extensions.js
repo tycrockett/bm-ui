@@ -110,7 +110,8 @@ const ExtensionForm = ({ context, extension, exitExtension }) => {
     initializeForm();
   }, []);
 
-  const executeExtension = async () => {
+  const executeExtension = async (e) => {
+    e.preventDefault();
     if (typeof extension.function === "function") {
       try {
         await extension.function({
@@ -138,7 +139,7 @@ const ExtensionForm = ({ context, extension, exitExtension }) => {
       >
         <Text h2>{extension?.name}</Text>
       </Div>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={executeExtension}>
         {extension?.formInputs?.map(({ label, accessorKey }) => (
           <Div
             css={`
@@ -190,9 +191,7 @@ const ExtensionForm = ({ context, extension, exitExtension }) => {
           >
             Cancel
           </Button>
-          <Button type="submit" onClick={executeExtension}>
-            OK
-          </Button>
+          <Button type="submit">OK</Button>
         </Div>
       </form>
     </Modal>
@@ -489,8 +488,8 @@ const defaultCommands = [
 
 export const defaultExtensions = [
   {
-    id: "open-local-build",
-    name: "Open Local Build",
+    id: "open-local-url",
+    name: "Open local url",
     description: "",
 
     executionType: "form",
