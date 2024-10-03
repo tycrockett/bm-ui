@@ -10,7 +10,7 @@ import { logCommits } from "./utils";
 import { cmd } from "../node/node-exports";
 import { StoreContext } from "../context/store";
 
-export const Logs = ({
+export const Commits = ({
   currentBranch,
   parentBranch,
   repo,

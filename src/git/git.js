@@ -27,7 +27,7 @@ import { css } from "@emotion/css";
 import { useAnimation } from "../hooks/use-animation";
 import { Status } from "./status";
 import { CmdList } from "./cmd-list";
-import { Logs } from "./logs";
+import { Commits } from "./commits";
 import { toast } from "react-toastify";
 import { Loader } from "../shared/loader";
 import { defaultActions } from "../settings/actions";
@@ -327,7 +327,7 @@ export const Git = () => {
   };
 
   const basePath = settings?.pwd?.replace("~", settings?.base);
-  console.log(settings?.ports?.[basePath]);
+
   return (
     <Div
       ref={positionRef}
@@ -713,7 +713,7 @@ export const Git = () => {
             parentBranch={parentBranch}
             completeMerge={completeMerge}
           />
-          <Logs
+          <Commits
             currentBranch={branches?.current}
             repo={repos?.[settings?.pwd]}
             parentBranch={parentBranch}
