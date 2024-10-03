@@ -208,141 +208,145 @@ export const Status = ({
             </Div>
           ))}
 
-          {deleted?.map((item) => (
-            <Div
-              css={`
-                ${flex("space-between")}
-                padding: 2px 0;
-              `}
-            >
+          {deleted?.map((item) => {
+            const netChange =
+              status?.files?.[item]?.adds - status?.files?.[item]?.deletes;
+            return (
               <Div
                 css={`
-                  ${flex("left")}
-                  flex-grow: 1;
-                  width: 100%;
-                  overflow: hidden;
-                  p {
-                    width: 100%;
-                  }
-                  svg {
-                    margin-right: 16px;
-                  }
-                `}
-              >
-                <Button
-                  icon
-                  small
-                  onClick={() => copyItem(item)}
-                  css={`
-                    margin: 0;
-                    padding: 0;
-                  `}
-                >
-                  <FileX size={24} color={colors.red} weight="fill" />
-                </Button>
-                <Text left-ellipsis>{item}</Text>
-              </Div>
-              <Div
-                css={`
-                  ${flex("right")}
-                  p {
-                    margin-right: 4px;
-                  }
+                  ${flex("space-between")}
+                  padding: 2px 0;
                 `}
               >
                 <Div
                   css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
+                    ${flex("left")}
+                    flex-grow: 1;
+                    width: 100%;
+                    overflow: hidden;
+                    p {
+                      width: 100%;
+                    }
+                    svg {
+                      margin-right: 16px;
+                    }
                   `}
                 >
-                  <Text>
-                    {status?.files?.[item]?.adds -
-                      status?.files?.[item]?.deletes}
-                  </Text>
-                  <PlusCircle
-                    size={16}
-                    color={
-                      status?.files?.[item]?.adds -
-                        status?.files?.[item]?.deletes >
-                      0
-                        ? colors.green
-                        : colors.red
+                  <Button
+                    icon
+                    small
+                    onClick={() => copyItem(item)}
+                    css={`
+                      margin: 0;
+                      padding: 0;
+                    `}
+                  >
+                    <FileX size={24} color={colors.red} weight="fill" />
+                  </Button>
+                  <Text left-ellipsis>{item}</Text>
+                </Div>
+                <Div
+                  css={`
+                    ${flex("right")}
+                    p {
+                      margin-right: 4px;
                     }
-                    weight="fill"
-                  />
+                  `}
+                >
+                  <Div
+                    css={`
+                      min-width: 50px;
+                      ${flex("left")}
+                      padding: 0 8px;
+                      border-radius: 30px;
+                      ${shadows.lg}
+                      margin: 0 8px;
+                      font-weight: bold;
+                      svg {
+                        margin-right: 8px;
+                      }
+                    `}
+                  >
+                    {netChange >= 0 ? (
+                      <PlusCircle
+                        size={16}
+                        color={colors.green}
+                        weight="fill"
+                      />
+                    ) : (
+                      <MinusCircle size={16} color={colors.red} weight="fill" />
+                    )}
+                    <Text>{Math.abs(netChange)}</Text>
+                  </Div>
                 </Div>
               </Div>
-            </Div>
-          ))}
+            );
+          })}
 
-          {modified?.map((item) => (
-            <Div
-              css={`
-                ${flex("space-between")}
-                padding: 2px 0;
-              `}
-            >
+          {modified?.map((item) => {
+            const netChange =
+              status?.files?.[item]?.adds - status?.files?.[item]?.deletes;
+            return (
               <Div
                 css={`
-                  ${flex("left")}
-                  flex-grow: 1;
-                  width: 100%;
-                  overflow: hidden;
-                  p {
-                    width: 100%;
-                  }
-                  svg {
-                    margin-right: 16px;
-                  }
-                `}
-              >
-                <FileArrowUp size={24} color={colors.green} weight="fill" />
-                <Text left-ellipsis>{item}</Text>
-              </Div>
-              <Div
-                css={`
-                  ${flex("right")}
-                  svg {
-                    margin-left: 8px;
-                  }
+                  ${flex("space-between")}
+                  padding: 2px 0;
                 `}
               >
                 <Div
                   css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
+                    ${flex("left")}
+                    flex-grow: 1;
+                    width: 100%;
+                    overflow: hidden;
+                    p {
+                      width: 100%;
+                    }
+                    svg {
+                      margin-right: 16px;
+                    }
                   `}
                 >
-                  <Text>
-                    {status?.files?.[item]?.adds -
-                      status?.files?.[item]?.deletes}
-                  </Text>
-                  <PlusCircle
-                    size={16}
-                    color={
-                      status?.files?.[item]?.adds -
-                        status?.files?.[item]?.deletes >
-                      0
-                        ? colors.green
-                        : colors.red
+                  <FileArrowUp size={24} color={colors.green} weight="fill" />
+                  <Text left-ellipsis>{item}</Text>
+                </Div>
+                <Div
+                  css={`
+                    ${flex("right")}
+                    svg {
+                      margin-left: 8px;
                     }
-                    weight="fill"
-                  />
+                  `}
+                >
+                  <Div
+                    css={`
+                      min-width: 50px;
+                      ${flex("left")}
+                      padding: 0 8px;
+                      border-radius: 30px;
+                      ${shadows.lg}
+                      margin: 0 8px;
+                      font-weight: bold;
+                      svg {
+                        margin-right: 8px;
+                      }
+                    `}
+                  >
+                    {netChange >= 0 ? (
+                      <PlusCircle
+                        size={16}
+                        color={colors.green}
+                        weight="fill"
+                      />
+                    ) : (
+                      <MinusCircle size={16} color={colors.red} weight="fill" />
+                    )}
+                    <Text>{Math.abs(netChange)}</Text>
+                  </Div>
                 </Div>
               </Div>
-            </Div>
-          ))}
+            );
+          })}
         </>
       ) : (
         <Div

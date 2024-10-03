@@ -557,10 +557,11 @@ export const Git = () => {
                   <Div
                     css={`
                       border-radius: 50%;
-                      width: 16px;
-                      height: 16px;
+                      width: 10px;
+                      height: 10px;
                       background-color: ${colors.lightGreen};
                       margin-right: 8px;
+                      border: 3px solid ${colors.green};
                     `}
                   />
                   <Text bold>{port.port}</Text>
