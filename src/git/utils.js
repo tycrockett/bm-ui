@@ -250,7 +250,6 @@ export const fetch = async () =>
 export const logCommits = async (parentBranch) => {
   if (parentBranch) {
     try {
-      console.log();
       const files = await cmd(
         `git show --name-only --oneline ${parentBranch}..HEAD`
       );
@@ -265,7 +264,6 @@ export const logCommits = async (parentBranch) => {
         }
         return prev;
       }, {});
-      return split;
     } catch (err) {
       console.log(err);
       return [];
