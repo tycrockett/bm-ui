@@ -96,6 +96,12 @@ const App = () => {
   useInterval(updatePort, 5000);
 
   useEffect(() => {
+    if (store.lastCommand?.startsWith("kill-pid")) {
+      updatePort();
+    }
+  }, [store.lastCommand]);
+
+  useEffect(() => {
     const extensions = defaultExtensions;
     set("extensions", extensions);
   }, []);
@@ -198,8 +204,6 @@ const App = () => {
     directory.change(key);
     updateMode();
   };
-
-  console.log(settings?.bookmarks);
 
   return (
     <Div

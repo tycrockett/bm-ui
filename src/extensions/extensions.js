@@ -315,12 +315,12 @@ const defaultCommands = [
     },
   },
   {
-    name: "Clear",
-    command: "clear",
+    name: "Clean",
+    command: "clean",
     args: "",
     flags: "-u --undo",
     description:
-      "Clears all uncommitted changes. Adding the -u flag undoes the clear.",
+      "Cleans branch all uncommitted changes. Adding the -u flag undoes the clear.",
     function: async ({ command, context }) => {
       await clearBranch(command.options);
     },

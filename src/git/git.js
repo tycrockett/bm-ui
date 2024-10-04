@@ -21,7 +21,9 @@ import {
   CloudSlash,
   Command,
   Copy,
+  Terminal,
   Tree,
+  X,
 } from "phosphor-react";
 import { css } from "@emotion/css";
 import { useAnimation } from "../hooks/use-animation";
@@ -33,11 +35,16 @@ import { Loader } from "../shared/loader";
 import { defaultActions } from "../settings/actions";
 import { useOutsideClick } from "../shared/use-outside-click";
 
+import { useTerminal } from "../terminal/useTerminal";
+import Ansi from "ansi-to-react";
+import { scrollbar } from "../shared/styles";
+
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
 const parse = require("parse-gitignore");
 
 export const Git = () => {
+  const terminalRef = useRef();
   const context = useContext(StoreContext);
   const {
     store: {
@@ -50,6 +57,8 @@ export const Git = () => {
     },
     methods,
   } = context;
+
+  const terminal = useTerminal();
 
   const commands = extensions
     .filter((item) => item?.executionType === "command")
@@ -70,6 +79,8 @@ export const Git = () => {
   const [status, setStatus] = useState({});
   const [branchOptions, setBranchOptions] = useState(false);
   const branchRef = useOutsideClick(() => setBranchOptions(false));
+
+  const [tab, setTab] = useState("git");
 
   const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
 
@@ -121,24 +132,25 @@ export const Git = () => {
 
     setCmd("");
     setLoading(true);
-    methods.set(
-      "lastCommand",
-      `${executingCommand}-${new Date().toISOString()}`
-    );
+    const lastCommand = `${executingCommand}-${new Date().toISOString()}`;
 
     if (executingCommand.includes("clear")) {
       console.clear();
-    } else if (executingCommand.startsWith(">")) {
-      const cmd = executingCommand.replace(">", "").trim();
-      console.log(cmd);
-      await execCmd(cmd);
-      executingCommand = "";
-      setLoading(false);
-      return;
     }
 
     const commandDetails = list[index];
     const [value, ...args] = executingCommand.split(" ");
+
+    if (!commandDetails) {
+      terminal.onSubmit(cmd);
+      setLoading(false);
+      setTab("terminal");
+      methods.set("lastCommand", lastCommand);
+      return;
+    }
+    if (tab === "terminal") {
+      setTab("git");
+    }
 
     const options = {
       parentBranch,
@@ -154,6 +166,7 @@ export const Git = () => {
       filteredBranchList: checkoutList,
       branches: branches.list,
     };
+
     try {
       if (executingCommand.startsWith("git")) {
         await execCmd(executingCommand);
@@ -179,6 +192,7 @@ export const Git = () => {
       ]);
       toast.error("There was an error. Check logs for more information.");
     } finally {
+      methods.set("lastCommand", lastCommand);
       setLoading(false);
     }
   };
@@ -247,6 +261,16 @@ export const Git = () => {
       }
       return -1;
     });
+  }, [cmd]);
+
+  useEffect(() => {
+    if (cmd) {
+      if (list[index]) {
+        setTab("git");
+      } else {
+        setTab("terminal");
+      }
+    }
   }, [cmd]);
 
   const handleRemote = async () => {
@@ -324,10 +348,42 @@ export const Git = () => {
   const box = positionRef?.current?.getBoundingClientRect();
 
   const readTerminal = async (pid) => {
-    process.kill(pid);
+    console.log("KILL", pid);
+    await process.kill(pid);
+    methods.set("lastCommand", `kill-pid-${new Date().toISOString()}`);
   };
 
   const basePath = settings?.pwd?.replace("~", settings?.base);
+
+  const processes = Object.values(terminal?.processes?.children || {})?.filter(
+    (item) =>
+      new Date(item?.createdAt) < Date.now() - 5000 &&
+      item?.pwd === settings?.pwd
+  );
+
+  const handleTerminalItem = (item) => {
+    if (item?.message?.includes("[eslint]")) {
+      const split = item?.message?.split("\n")?.filter((item) => item);
+      let index = split.findIndex((item) => item.includes("[eslint]"));
+      const file = split[index + 1];
+      const lineData = split[index + 2];
+      const line = lineData
+        ?.split(" ")
+        .filter((item) => item)?.[1]
+        ?.split(":")
+        ?.slice(0, 2)
+        ?.join(":");
+
+      const path = settings?.pwd?.replace("~", settings?.base);
+      const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}:${line}"`;
+      execCmd(command);
+    }
+  };
+
+  useEffect(() => {
+    console.log("hi");
+    terminalRef?.current?.scrollIntoView({ behavior: "smooth" });
+  }, [terminal.list?.length]);
 
   return (
     <Div
@@ -633,93 +689,229 @@ export const Git = () => {
                 ) : null}
               </Div>
             </form>
+
             <Div
               css={`
-                position: relative;
-                width: 200px;
-                max-width: max-content;
-                transition: width 0.3s ease;
-                margin-left: 8px;
+                ${flex("center")}
+                border: 1px solid ${colors.darkIndigo};
+                border-radius: 50%;
+                padding: 4px;
+                margin: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                background-color: ${colors.darkIndigo};
+                width: 32px;
+                height: 32px;
+
+                box-sizing: border-box;
                 :hover {
-                  width: 100%;
-                  animation 0.3s ease grow;
+                  outline: 2px solid ${colors.lightIndigo};
+                  outline-offset: 2px;
+                  ${shadows.md}
                 }
+                svg {
+                  min-width: 32px;
+                }
+                ${shakeTree}
+              `}
+              onClick={() => setTab("git")}
+            >
+              <Tree size={24} color="white" weight="bold" className={css``} />
+            </Div>
+            <Div
+              css={`
+                ${flex("center")}
+                border: 1px solid ${colors.darkIndigo};
+                border-radius: 50%;
+                padding: 4px;
+                margin: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                background-color: ${colors.darkIndigo};
+                width: 32px;
+                height: 32px;
+                box-sizing: border-box;
+                :hover {
+                  outline: 2px solid ${colors.lightIndigo};
+                  outline-offset: 2px;
+                  ${shadows.md}
+                }
+                svg {
+                  min-width: 24px;
+                }
+                ${shakeTree}
+              `}
+              onClick={() => setTab("terminal")}
+            >
+              <Terminal
+                size={24}
+                color="white"
+                weight="bold"
+                className={css``}
+              />
+            </Div>
+          </Div>
+          {tab === "git" ? (
+            <>
+              <CmdList
+                list={list}
+                index={index}
+                cmd={cmd}
+                handleCmd={handleCmd}
+                setCmd={(value) => {
+                  setCmd(`${value} `);
+                  ref?.current?.focus();
+                }}
+                checkoutList={checkoutList}
+              />
+              <Text
+                css={`
+                  margin-bottom: 8px;
+                  width: 100%;
+                  text-align: left;
+                `}
+              >
+                {repo?.description}
+              </Text>
+              {repo?.notes?.length ? (
+                <Div
+                  css={`
+                    padding: 8px 0;
+                    padding-bottom: 16px;
+                  `}
+                >
+                  {repo?.notes?.map((item) => (
+                    <Text>{item}</Text>
+                  ))}
+                </Div>
+              ) : null}
+
+              <Status
+                status={status}
+                currentBranch={branches?.current}
+                parentBranch={parentBranch}
+                completeMerge={completeMerge}
+              />
+              <Commits
+                currentBranch={branches?.current}
+                repo={repos?.[settings?.pwd]}
+                parentBranch={parentBranch}
+                lastCommand={lastCommand}
+                pwd={settings?.pwd}
+              />
+            </>
+          ) : tab === "terminal" ? (
+            <Div
+              css={`
+                ${flex("space-between column")}
+                width: calc(100% - 32px);
               `}
             >
               <Div
                 css={`
-                  ${flex("space-between")}
-                  border: 1px solid ${colors.darkIndigo};
-                  border-radius: 50%;
-                  padding: 4px;
-                  margin: 4px;
-                  cursor: pointer;
-                  transition: background-color 0.2s ease;
-                  background-color: ${colors.darkIndigo};
-
-                  box-sizing: border-box;
-                  // :hover {
-                  //   outline: 2px solid ${colors.lightIndigo};
-                  //   outline-offset: 2px;
-                  //   ${shadows.md}
-                  // }
-                  svg {
-                    min-width: 32px;
-                  }
-                  ${shakeTree}
+                  ${flex("left")}
+                  padding-bottom: 8px;
+                  gap: 8px;
+                  width: 100%;
                 `}
               >
-                <Tree size={32} color="white" weight="bold" className={css``} />
+                <Div
+                  css={`
+                    border-radius: 8px;
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                    width: 32px;
+                    height: 24px;
+                    padding: 4px;
+                    cursor: pointer;
+                    background-color: ${colors.darkIndigo};
+                    transition: border-bottom 0.2s ease;
+                    ${!terminal?.processes?.pid
+                      ? `${shadows.md}
+                        border-bottom: 3px solid white;
+                      `
+                      : `border-bottom: 3px solid ${colors.darkIndigo};`}
+                  `}
+                  onClick={() => terminal?.processes?.setPid("")}
+                />
+                {processes?.map((item) => (
+                  <Text
+                    css={`
+                      padding: 8px;
+                      border-radius: 8px;
+                      border-bottom-left-radius: 0;
+                      border-bottom-right-radius: 0;
+                      cursor: pointer;
+                      background-color: ${colors.darkIndigo};
+                      transition: border-bottom 0.2s ease;
+                      ${terminal?.processes?.pid === item?.pid
+                        ? `${shadows.md}
+                          border-bottom: 3px solid white;
+                        `
+                        : `border-bottom: 3px solid ${colors.darkIndigo};`}
+                    `}
+                    onClick={() => terminal?.processes?.setPid(item?.pid)}
+                  >
+                    {item?.command}
+                  </Text>
+                ))}
+              </Div>
+              <Div
+                css={`
+                  position: relative;
+                  flex-grow: 1;
+                  width: calc(100% - 32px);
+                  background-color: ${colors.darkIndigo};
+                  border-radius: 8px;
+                  overflow: hidden;
+                  overflow-y: auto;
+                  padding: 16px;
+                  max-height: calc(100vh - 350px);
+                  min-height: 8px;
+                  ${scrollbar.style}
+                `}
+              >
+                <Button
+                  icon
+                  sm
+                  css={`
+                    position: absolute;
+                    top: 8px;
+                    right: 8px;
+                  `}
+                  disabled={!terminal?.processes?.pid}
+                  onClick={() => readTerminal(terminal?.processes?.pid)}
+                >
+                  <X size={24} />
+                </Button>
+                {terminal.list.map((item, idx) => (
+                  <pre
+                    onClick={() => handleTerminalItem(item, idx)}
+                    className={css`
+                      border-radius: 8px;
+                      padding: 4px 8px;
+                      margin: -4px -8px;
+                      :hover {
+                        background-color: rgba(0, 0, 0, 0.3);
+                      }
+                      cursor: default;
+                      word-break: break-word;
+                      white-space: pre-wrap;
+                      color: white;
+                      ${item?.type === "error"
+                        ? "color: red;"
+                        : item?.type === "close"
+                        ? "color: purple;"
+                        : ""}
+                    `}
+                  >
+                    <Ansi>{item?.message}</Ansi>
+                  </pre>
+                ))}
+                <div ref={terminalRef} />
               </Div>
             </Div>
-          </Div>
-
-          <CmdList
-            list={list}
-            index={index}
-            cmd={cmd}
-            handleCmd={handleCmd}
-            setCmd={(value) => {
-              setCmd(`${value} `);
-              ref?.current?.focus();
-            }}
-            checkoutList={checkoutList}
-          />
-          <Text
-            css={`
-              margin-bottom: 8px;
-              width: 100%;
-              text-align: left;
-            `}
-          >
-            {repo?.description}
-          </Text>
-          {repo?.notes?.length ? (
-            <Div
-              css={`
-                padding: 8px 0;
-                padding-bottom: 16px;
-              `}
-            >
-              {repo?.notes?.map((item) => (
-                <Text>{item}</Text>
-              ))}
-            </Div>
           ) : null}
-
-          <Status
-            status={status}
-            currentBranch={branches?.current}
-            parentBranch={parentBranch}
-            completeMerge={completeMerge}
-          />
-          <Commits
-            currentBranch={branches?.current}
-            repo={repos?.[settings?.pwd]}
-            parentBranch={parentBranch}
-            lastCommand={lastCommand}
-            pwd={settings?.pwd}
-          />
         </Div>
       ) : (
         <SetupBm />

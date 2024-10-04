@@ -96,7 +96,7 @@ export const StoreProvider = (props) => {
       const cachePath = `${cacheKey}/settings.json`;
       setCachePath(cachePath);
       let data = read(cachePath);
-      data = { ...data, base, pwd: data.pwd || "~" };
+      data = { ...data, base, pwd: data.pwd || "~", cacheKey };
       const isDirectoryGit = await checkGit(data);
       setStore("settings", { ...data, isDirectoryGit });
       const path = data.pwd.replace("~", base);
