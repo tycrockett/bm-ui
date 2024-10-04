@@ -31,7 +31,7 @@ const App = () => {
   const context = useContext(StoreContext);
   const {
     store,
-    methods: { set, setSettings, setStore, directory },
+    methods: { set, setSettings, directory },
   } = context;
   const setMode = (mode) => set("mode", mode);
 
@@ -90,7 +90,7 @@ const App = () => {
       }
       return p;
     }, {});
-    setStore("ports", grouped);
+    set("ports", grouped);
   };
 
   useInterval(updatePort, 5000);

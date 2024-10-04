@@ -27,6 +27,7 @@ export const Commits = ({
   const [logs] = useAsyncValue(getLogs, [
     lastCommand,
     parentBranch,
+    currentBranch,
     pwd,
     store?.mode,
   ]);
@@ -59,7 +60,6 @@ export const Commits = ({
     <Div
       css={`
         ${animation("fadeIn", ".2s ease")}
-        transition: height 0.5s ease;
         background: ${colors.indigoGradient};
         padding: 16px 0;
         border-radius: 8px;
@@ -136,6 +136,7 @@ export const Commits = ({
       <Div
         css={`
           max-height: 40vh;
+          transition: height 0.5s ease;
           overflow-y: auto;
           overflow-x: hidden;
           ${styles.scrollbar}
