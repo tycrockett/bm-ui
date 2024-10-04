@@ -1,7 +1,6 @@
 import {
   ArrowLeft,
   ArrowSquareOut,
-  Bookmark,
   BookmarkSimple,
   CaretDown,
   Command,
@@ -21,7 +20,7 @@ import { defaultActions } from "./settings/actions";
 import { defaultExtensions, Extensions } from "./extensions/extensions";
 import { Logs } from "./logs/logs";
 import { useOutsideClick } from "./shared/use-outside-click";
-import { useInterval } from "./git/useInterval";
+import { useInterval } from "./hooks/useInterval";
 
 const header = `
   padding: 8px 16px;
@@ -32,7 +31,7 @@ const App = () => {
   const context = useContext(StoreContext);
   const {
     store,
-    methods: { set, setSettings, directory, lastCommand },
+    methods: { set, setSettings, setStore, directory },
   } = context;
   const setMode = (mode) => set("mode", mode);
 
@@ -91,15 +90,10 @@ const App = () => {
       }
       return p;
     }, {});
-    setSettings({
-      ...settings,
-      ports: grouped,
-    });
+    setStore("ports", grouped);
   };
 
-  useEffect(() => {
-    updatePort();
-  }, [lastCommand, settings?.pwd]);
+  useInterval(updatePort, 1000);
 
   useEffect(() => {
     const extensions = defaultExtensions;
@@ -205,6 +199,8 @@ const App = () => {
     updateMode();
   };
 
+  console.log(settings?.bookmarks);
+
   return (
     <Div
       css={`
@@ -273,7 +269,7 @@ const App = () => {
                 `}
                 ref={dirRef}
               >
-                {!(settings?.pwd in settings?.bookmarks) ? (
+                {!(settings?.pwd in (settings?.bookmarks || {})) ? (
                   <Div
                     css={`
                       padding: 16px;

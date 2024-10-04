@@ -43,6 +43,7 @@ export const Git = () => {
     store: {
       extensions = [],
       settings = {},
+      ports = {},
       repos = {},
       logs = [],
       lastCommand = "",
@@ -508,8 +509,8 @@ export const Git = () => {
             ${animation("fadeIn", ".35s ease")}
           `}
         >
-          {settings?.ports?.[basePath]?.length
-            ? settings?.ports?.[basePath]?.map((port) => (
+          {ports?.[basePath]?.length
+            ? ports?.[basePath]?.map((port) => (
                 <Div
                   css={`
                     border-radius: 16px;
@@ -544,7 +545,6 @@ export const Git = () => {
             overflow-y: auto;
             overflow-x: hidden;
             box-sizing: border-box;
-            // border: 1px solid;
           `}
         >
           <Div
