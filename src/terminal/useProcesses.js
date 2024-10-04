@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import { StoreContext } from "../context/store";
+import { useEffect, useState } from "react";
 const { ipcRenderer } = window.require("electron");
 
-const ansiEscapePattern = /\x1Bc/g;
+const ansiEscapePattern = /\x1Bc|\033c/g;
 
 export const useProcesses = (setList) => {
   const [pid, setPid] = useState("");

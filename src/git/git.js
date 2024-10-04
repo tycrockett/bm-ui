@@ -702,11 +702,13 @@ export const Git = () => {
                 background-color: ${colors.darkIndigo};
                 width: 32px;
                 height: 32px;
-
                 box-sizing: border-box;
+                ${tab === "git"
+                  ? `outline: 2px solid ${colors.lightIndigo};`
+                  : ""}
+                outline-offset: 2px;
                 :hover {
                   outline: 2px solid ${colors.lightIndigo};
-                  outline-offset: 2px;
                   ${shadows.md}
                 }
                 svg {
@@ -731,9 +733,12 @@ export const Git = () => {
                 width: 32px;
                 height: 32px;
                 box-sizing: border-box;
+                ${tab === "terminal"
+                  ? `outline: 2px solid ${colors.lightIndigo};`
+                  : ""}
+                outline-offset: 2px;
                 :hover {
                   outline: 2px solid ${colors.lightIndigo};
-                  outline-offset: 2px;
                   ${shadows.md}
                 }
                 svg {
@@ -810,27 +815,27 @@ export const Git = () => {
               <Div
                 css={`
                   ${flex("left")}
-                  padding-bottom: 8px;
+                  margin-bottom: 8px;
+                  border-bottom: 3px solid ${colors.darkIndigo};
                   gap: 8px;
                   width: 100%;
                 `}
               >
                 <Div
                   css={`
+                    width: 32px;
+                    height: 16px;
+                    padding: 8px;
                     border-radius: 8px;
                     border-bottom-left-radius: 0;
                     border-bottom-right-radius: 0;
-                    width: 32px;
-                    height: 24px;
-                    padding: 4px;
                     cursor: pointer;
                     background-color: ${colors.darkIndigo};
-                    transition: border-bottom 0.2s ease;
                     ${!terminal?.processes?.pid
                       ? `${shadows.md}
-                        border-bottom: 3px solid white;
-                      `
-                      : `border-bottom: 3px solid ${colors.darkIndigo};`}
+                      border-bottom: 2px solid ${colors.darkIndigo};
+                    `
+                      : `border-bottom: none; margin-bottom: 2px;`}
                   `}
                   onClick={() => terminal?.processes?.setPid("")}
                 />
@@ -843,12 +848,11 @@ export const Git = () => {
                       border-bottom-right-radius: 0;
                       cursor: pointer;
                       background-color: ${colors.darkIndigo};
-                      transition: border-bottom 0.2s ease;
                       ${terminal?.processes?.pid === item?.pid
                         ? `${shadows.md}
-                          border-bottom: 3px solid white;
-                        `
-                        : `border-bottom: 3px solid ${colors.darkIndigo};`}
+                        border-bottom: 2px solid ${colors.darkIndigo};
+                      `
+                        : `border-bottom: none; margin-bottom: 2px;`}
                     `}
                     onClick={() => terminal?.processes?.setPid(item?.pid)}
                   >
