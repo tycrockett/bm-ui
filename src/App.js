@@ -93,7 +93,7 @@ const App = () => {
     setStore("ports", grouped);
   };
 
-  useInterval(updatePort, 1000);
+  useInterval(updatePort, 5000);
 
   useEffect(() => {
     const extensions = defaultExtensions;
