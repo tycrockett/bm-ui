@@ -111,7 +111,7 @@ export const Commits = ({
       <Div
         css={`
           ${flex("space-between")}
-          padding: 4px 16px;
+          padding: 8px 16px;
         `}
       >
         <Text
@@ -120,10 +120,11 @@ export const Commits = ({
             :hover {
               text-decoration: underline;
             }
+            color: #777;
           `}
           onClick={() => setHash(hash ? "" : "all")}
         >
-          Expand Files
+          expand files
         </Text>
 
         {metaBranch?.createdAt ? (
@@ -138,6 +139,7 @@ export const Commits = ({
           overflow-y: auto;
           overflow-x: hidden;
           ${styles.scrollbar}
+          max-width: 100%;
         `}
       >
         {commits?.map(([key, item]) => (
@@ -146,27 +148,51 @@ export const Commits = ({
               css={`
                 ${animation("fadeIn", ".2s ease")}
                 ${flex("space-between")}
+                border-top: 1px solid ${colors.dark};
                 padding: 4px 16px;
                 margin-top: 8px;
-                border-radius: 8px;
                 transition: background-color 0.2s ease;
                 cursor: pointer;
                 :hover {
-                  background-color: rgba(0, 0, 0, 0.2);
+                  background-color: rgba(0, 0, 0, 0.3);
                 }
               `}
             >
-              <Text bold ellipsis>
-                {key}
-              </Text>
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  flex-grow: 1;
+                  margin-right: 16px;
+                `}
+              >
+                <Text
+                  bold
+                  css={`
+                    flex-grow: 1;
+                    overflow: hidden;
+                    white-space: wrap;
+                  `}
+                >
+                  {key.split(" ").slice(1).join(" ")}
+                </Text>
+                <Text
+                  bold
+                  css={`
+                    min-width: max-content;
+                  `}
+                >
+                  {key.split(" ")[0]}
+                </Text>
+              </Div>
+
               <Text
                 bold
                 css={`
                   ${flex("center")}
                   border-radius: 30px;
-                  padding: 4px 8px;
+                  padding: 4px;
                   background-color: ${colors.lightIndigo};
-                  min-width: max-content;
+                  min-width: 100px;
                 `}
               >
                 {item?.length} File{item?.length !== 1 ? "s" : ""}
@@ -179,12 +205,13 @@ export const Commits = ({
                       css={css`
                         padding: 8px 16px;
                         height: 24px;
-                        padding-left: 32px;
+                        padding-left: 64px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
+                        cursor: default;
                         :hover {
-                          background-color: rgba(0, 0, 0, 0.5);
+                          background-color: rgba(0, 0, 0, 0.3);
                         }
                         :not(:hover) {
                           .actions {

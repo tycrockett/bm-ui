@@ -97,7 +97,9 @@ const App = () => {
     });
   };
 
-  useInterval(updatePort, 5000);
+  useEffect(() => {
+    updatePort();
+  }, [lastCommand, settings?.pwd]);
 
   useEffect(() => {
     const extensions = defaultExtensions;
