@@ -381,7 +381,6 @@ export const Git = () => {
   };
 
   useEffect(() => {
-    console.log("hi");
     terminalRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [terminal.list?.length]);
 
