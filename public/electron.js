@@ -55,6 +55,8 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
     },
   };
 
+  event.reply("start-spawn", child.pid);
+
   child.stdout.on("data", (data) => {
     const value = {
       type: "data",

@@ -31,6 +31,9 @@ export const useProcesses = (setList) => {
       console.log(data);
       setChildren(data);
     });
+    ipcRenderer.on("start-spawn", (event, data) => {
+      setPid(data);
+    });
     ipcRenderer.on("message", (event, data) => {
       console.log(data);
       if (data?.message === "[3J[H[2J" || ansiEscapePattern.test(data?.message)) {
@@ -47,6 +50,7 @@ export const useProcesses = (setList) => {
       console.log("Clear");
       ipcRenderer.removeAllListeners("message");
       ipcRenderer.removeAllListeners("pids");
+      ipcRenderer.removeAllListeners("start-spawn");
     };
   }, []);
 
