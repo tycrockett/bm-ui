@@ -159,13 +159,12 @@ export const Status = ({
   return (
     <Div
       css={`
-        flex-grow: 1;
-        margin-bottom: 32px;
+        flex-grow: 4;
+        flex-shrink: 1;
+        margin-bottom: 16px;
         width: 100%;
         box-sizing: border-box;
         overflow-y: auto;
-        border: 1px solid blue;
-        max-height: calc(100vh - 415px);
         ${styles.scrollbar}
       `}
     >

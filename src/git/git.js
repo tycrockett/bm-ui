@@ -758,6 +758,7 @@ export const Git = () => {
               css={`
                 ${flex("column")}
                 width: 100%;
+                height: calc(100vh - 500px);
                 flex-grow: 1;
               `}
             >

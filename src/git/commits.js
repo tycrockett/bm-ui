@@ -65,6 +65,7 @@ export const Commits = ({
         border-radius: 8px;
         box-sizing: border-box;
         width: 100%;
+        flex-grow: 1;
       `}
     >
       <Div
