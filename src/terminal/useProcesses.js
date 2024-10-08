@@ -36,7 +36,13 @@ export const useProcesses = (setList) => {
     });
     ipcRenderer.on("message", (event, data) => {
       console.log(data);
-      if (data?.message === "[3J[H[2J" || ansiEscapePattern.test(data?.message)) {
+      if (
+        data?.message?.includes("[3J[H[2J") ||
+        data?.message?.includes("\x1Bc") ||
+        data?.message?.includes("\u001b[2J") ||
+        data?.message?.includes("\x1b[2J") ||
+        data?.message?.includes("\x1b[H")
+      ) {
         setList([]);
       } else {
         setList((c) => [...c, data]);

@@ -62,7 +62,17 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
       type: "data",
       message: data.toString(),
     };
-    childProcesses[child.pid].output.push(value);
+    const output = data.toString("utf-8");
+    if (
+      output.includes("\x1Bc") ||
+      output.includes("\u001b[2J") ||
+      output.includes("\x1b[2J") ||
+      output.includes("\x1b[H")
+    ) {
+      childProcesses[child.pid].output = [];
+    } else {
+      childProcesses[child.pid].output.push(value);
+    }
     event.reply("pids", childProcesses);
     event.reply("message", value);
   });

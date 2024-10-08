@@ -703,7 +703,7 @@ export const Git = () => {
                 height: 32px;
                 box-sizing: border-box;
                 ${tab === "git"
-                  ? `outline: 2px solid ${colors.lightIndigo};`
+                  ? `background-color: ${colors.lightIndigo};`
                   : ""}
                 outline-offset: 2px;
                 :hover {
@@ -733,7 +733,7 @@ export const Git = () => {
                 height: 32px;
                 box-sizing: border-box;
                 ${tab === "terminal"
-                  ? `outline: 2px solid ${colors.lightIndigo};`
+                  ? `background-color: ${colors.lightIndigo};`
                   : ""}
                 outline-offset: 2px;
                 :hover {
@@ -795,6 +795,7 @@ export const Git = () => {
                 currentBranch={branches?.current}
                 parentBranch={parentBranch}
                 completeMerge={completeMerge}
+                settings={settings}
               />
               <Commits
                 currentBranch={branches?.current}
@@ -862,56 +863,62 @@ export const Git = () => {
               <Div
                 css={`
                   position: relative;
-                  flex-grow: 1;
-                  width: calc(100% - 32px);
-                  background-color: ${colors.darkIndigo};
-                  border-radius: 8px;
-                  overflow: hidden;
-                  overflow-y: auto;
-                  padding: 16px;
-                  max-height: calc(100vh - 350px);
-                  min-height: 8px;
-                  ${scrollbar.style}
+                  width: 100%;
                 `}
               >
-                <Button
-                  icon
-                  sm
+                <Div
                   css={`
-                    position: absolute;
-                    top: 8px;
-                    right: 8px;
+                    flex-grow: 1;
+
+                    background-color: #121212;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    overflow-y: auto;
+                    padding: 16px;
+                    max-height: calc(100vh - 350px);
+                    min-height: 8px;
+                    ${scrollbar.style}
                   `}
-                  disabled={!terminal?.processes?.pid}
-                  onClick={() => readTerminal(terminal?.processes?.pid)}
                 >
-                  <X size={24} />
-                </Button>
-                {terminal.list.map((item, idx) => (
-                  <pre
-                    onClick={() => handleTerminalItem(item, idx)}
-                    className={css`
-                      border-radius: 8px;
-                      padding: 4px 8px;
-                      margin: -4px -8px;
-                      :hover {
-                        background-color: rgba(0, 0, 0, 0.3);
-                      }
-                      cursor: default;
-                      word-break: break-word;
-                      white-space: pre-wrap;
-                      color: white;
-                      ${item?.type === "error"
-                        ? "color: red;"
-                        : item?.type === "close"
-                        ? "color: purple;"
-                        : ""}
+                  <Button
+                    icon
+                    sm
+                    css={`
+                      position: absolute;
+                      top: 8px;
+                      right: 8px;
                     `}
+                    disabled={!terminal?.processes?.pid}
+                    onClick={() => readTerminal(terminal?.processes?.pid)}
                   >
-                    <Ansi>{item?.message}</Ansi>
-                  </pre>
-                ))}
-                <div ref={terminalRef} />
+                    <X size={24} />
+                  </Button>
+                  {terminal.list.map((item, idx) => (
+                    <pre
+                      onClick={() => handleTerminalItem(item, idx)}
+                      className={css`
+                        border-radius: 8px;
+                        padding: 4px 8px;
+                        margin: -4px -8px;
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.3);
+                        }
+                        cursor: default;
+                        word-break: break-word;
+                        white-space: pre-wrap;
+                        color: white;
+                        ${item?.type === "error"
+                          ? "color: #FF8888;"
+                          : item?.type === "close"
+                          ? "color: purple;"
+                          : ""}
+                      `}
+                    >
+                      <Ansi>{item?.message}</Ansi>
+                    </pre>
+                  ))}
+                  <div ref={terminalRef} />
+                </Div>
               </Div>
             </Div>
           ) : null}

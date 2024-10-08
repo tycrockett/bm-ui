@@ -7,14 +7,38 @@ import {
   FileArrowUp,
   MinusCircle,
   GitPullRequest,
+  Folder,
+  Question,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
 import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
+import { useMemo } from "react";
+
+const dedupe = (arr) => [...new Set(arr)];
+
+function nestFiles(filePaths) {
+  const result = {};
+  filePaths.forEach((data) => {
+    const parts = data.pathname.split("/"); // Split the path into parts by '/'
+    let current = result;
+    const pathname = parts.slice(0, -1).join("/");
+    current[pathname] = [
+      ...(current[pathname] || []),
+      {
+        ...data,
+        filename: parts.at(-1),
+      },
+    ];
+  });
+
+  return result;
+}
 
 export const Status = ({
+  settings,
   status,
   currentBranch,
   parentBranch,
@@ -47,26 +71,6 @@ export const Status = ({
   };
 
   // const files = useMemo(() => {
-  //   const untracked = status?.untracked?.filter(
-  //     (item) => Number(status?.fileCount?.[item]) > 0
-  //   );
-  //   const deleted = status?.deleted?.filter(
-  //     (item) =>
-  //       Number(status?.files?.[item]?.deletes) > 0 ||
-  //       Number(status?.files?.[item]?.adds) > 0
-  //   );
-  //   const modified = status?.modified?.filter(
-  //     (item) =>
-  //       Number(status?.files?.[item]?.deletes) > 0 ||
-  //       Number(status?.files?.[item]?.adds) > 0
-  //   );
-
-  //   return [untracked, deleted, modified].reduce((prev, item) => {
-  //     const split = item.split("/");
-  //     split.reduce((acc, val) => {}, prev);
-  //   }, []);
-  // });
-
   const untracked = status?.untracked?.filter(
     (item) => Number(status?.fileCount?.[item]) > 0
   );
@@ -81,8 +85,73 @@ export const Status = ({
       Number(status?.files?.[item]?.adds) > 0
   );
 
+  // });
+
+  const fileStatus = useMemo(() => {
+    const untracked =
+      status?.untracked
+        ?.filter((item) => Number(status?.fileCount?.[item]) > 0)
+        ?.map((pathname) => ({
+          pathname,
+          type: "untracked",
+          adds: status.files[pathname]?.adds || 0,
+          deletes: status.files[pathname]?.deletes || 0,
+        })) || [];
+
+    const deleted =
+      status?.deleted
+        ?.filter(
+          (item) =>
+            Number(status?.files?.[item]?.deletes) > 0 ||
+            Number(status?.files?.[item]?.adds) > 0
+        )
+        ?.map((pathname) => ({
+          pathname,
+          type: "deleted",
+          adds: status.files[pathname]?.adds || 0,
+          deletes: status.files[pathname]?.deletes || 0,
+        })) || [];
+
+    const modified =
+      status?.modified
+        ?.filter(
+          (item) =>
+            Number(status?.files?.[item]?.deletes) > 0 ||
+            Number(status?.files?.[item]?.adds) > 0
+        )
+        ?.map((pathname) => ({
+          pathname,
+          type: "modified",
+          adds: status.files[pathname]?.adds || 0,
+          deletes: status.files[pathname]?.deletes || 0,
+        })) || [];
+
+    const files = [...untracked, ...deleted, ...modified];
+
+    const nested = nestFiles(files);
+    const keys = Object.entries(nested).map(([pathname, files]) => {
+      let list = [];
+      const filteredFiles = files.filter((file) => {
+        if (list.includes(file.filename)) {
+          return false;
+        } else {
+          list.push(file.filename);
+          return true;
+        }
+      });
+      return [pathname, filteredFiles];
+    });
+    return keys;
+  });
+
   const unmergedChanges =
     hasStatus && !untracked?.length && !deleted?.length && !modified?.length;
+
+  const openFile = (file) => {
+    const path = settings?.pwd?.replace("~", settings?.base);
+    const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}"`;
+    cmd(command);
+  };
 
   return (
     <Div
@@ -134,218 +203,111 @@ export const Status = ({
           </Div>
           <Text
             css={`
-              margin-bottom: 16px;
+              margin-bottom: 32px;
             `}
           >
             {shortStatus}
           </Text>
-          {unmergedChanges ? (
+
+          {fileStatus?.map(([pathname, files]) => (
             <Div
               css={`
-                ${flex("space-between")}
-                padding: 32px;
-                background-color: rgba(0, 0, 0, 0.2);
-                border-radius: 16px;
-                button {
-                  margin-left: 8px;
-                  min-width: max-content;
-                }
-              `}
-            >
-              <Text bold>There are uncommitted changes.</Text>
-              <Button onClick={completeMerge}>Complete Merge</Button>
-            </Div>
-          ) : null}
-          {untracked?.map((item) => (
-            <Div
-              css={`
-                ${flex("space-between")}
-                padding: 2px 0;
+                margin-bottom: 16px;
               `}
             >
               <Div
                 css={`
-                  ${flex("left")}
-                  flex-grow: 1;
-                  width: 100%;
-                  overflow: hidden;
-                  p {
-                    width: 100%;
+                  ${flex("left")} svg {
+                    margin-right: 8px;
                   }
-                  svg {
-                    margin-right: 16px;
-                  }
+                  margin-bottom: 8px;
                 `}
-                onClick={() => copyItem(item)}
               >
-                <FileDotted size={24} color={colors.lightBlue} weight="fill" />
-                <Text left-ellipsis>{item}</Text>
+                <Folder size={24} color="white" weight="fill" />
+                <Text bold>{pathname}</Text>
               </Div>
               <Div
                 css={`
-                  ${flex("right")}
-                  p {
-                    margin-right: 4px;
-                  }
+                  margin-left: 0;
                 `}
               >
-                <Div
-                  css={`
-                    width: 100px;
-                    ${flex("right")}
-                    padding: 0 8px;
-                    border-radius: 30px;
-                    ${shadows.lg}
-                    margin: 0 8px;
-                    font-weight: bold;
-                  `}
-                >
-                  <Text>{status?.fileCount?.[item]}</Text>
-                  <PlusCircle size={16} color={colors.green} weight="fill" />
-                </Div>
+                {files?.map((file) => {
+                  const netChange = file.adds - file.deletes;
+                  return (
+                    <Div
+                      css={`
+                        ${flex("space-between")}
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.5);
+                          cursor: pointer;
+                        }
+                      `}
+                      key={file.filename}
+                      onClick={() => openFile(file.pathname)}
+                    >
+                      <Div
+                        css={`
+                          ${flex("left")}
+                          svg {
+                            margin-right: 8px;
+                          }
+                        `}
+                      >
+                        {file.type === "untracked" ? (
+                          <FileDotted
+                            size={24}
+                            color={colors.lightBlue}
+                            weight="fill"
+                          />
+                        ) : file.type === "deleted" ? (
+                          <FileX size={24} color={colors.red} weight="fill" />
+                        ) : file.type === "modified" ? (
+                          <FileArrowUp
+                            size={24}
+                            color={colors.green}
+                            weight="fill"
+                          />
+                        ) : (
+                          <Question
+                            size={24}
+                            color={colors.lightBlue}
+                            weight="fill"
+                          />
+                        )}
+                        <Text>{file.filename}</Text>
+                      </Div>
+                      <Div
+                        css={`
+                          ${flex("right")}
+                          svg {
+                            margin-right: 16px;
+                          }
+                          p {
+                            width: 80px;
+                          }
+                        `}
+                      >
+                        {netChange >= 0 ? (
+                          <PlusCircle
+                            size={24}
+                            color={colors.green}
+                            weight="fill"
+                          />
+                        ) : (
+                          <MinusCircle
+                            size={24}
+                            color={colors.green}
+                            weight="fill"
+                          />
+                        )}
+                        <Text>{Math.abs(netChange)}</Text>
+                      </Div>
+                    </Div>
+                  );
+                })}
               </Div>
             </Div>
           ))}
-
-          {deleted?.map((item) => {
-            const netChange =
-              status?.files?.[item]?.adds - status?.files?.[item]?.deletes;
-            return (
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 2px 0;
-                `}
-              >
-                <Div
-                  css={`
-                    ${flex("left")}
-                    flex-grow: 1;
-                    width: 100%;
-                    overflow: hidden;
-                    p {
-                      width: 100%;
-                    }
-                    svg {
-                      margin-right: 16px;
-                    }
-                  `}
-                >
-                  <Button
-                    icon
-                    small
-                    onClick={() => copyItem(item)}
-                    css={`
-                      margin: 0;
-                      padding: 0;
-                    `}
-                  >
-                    <FileX size={24} color={colors.red} weight="fill" />
-                  </Button>
-                  <Text left-ellipsis>{item}</Text>
-                </Div>
-                <Div
-                  css={`
-                    ${flex("right")}
-                    p {
-                      margin-right: 4px;
-                    }
-                  `}
-                >
-                  <Div
-                    css={`
-                      min-width: 50px;
-                      ${flex("left")}
-                      padding: 0 8px;
-                      border-radius: 30px;
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                      svg {
-                        margin-right: 8px;
-                      }
-                    `}
-                  >
-                    {netChange >= 0 ? (
-                      <PlusCircle
-                        size={16}
-                        color={colors.green}
-                        weight="fill"
-                      />
-                    ) : (
-                      <MinusCircle size={16} color={colors.red} weight="fill" />
-                    )}
-                    <Text>{Math.abs(netChange)}</Text>
-                  </Div>
-                </Div>
-              </Div>
-            );
-          })}
-
-          {modified?.map((item) => {
-            const netChange =
-              status?.files?.[item]?.adds - status?.files?.[item]?.deletes;
-            return (
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 2px 0;
-                `}
-              >
-                <Div
-                  css={`
-                    ${flex("left")}
-                    flex-grow: 1;
-                    width: 100%;
-                    overflow: hidden;
-                    p {
-                      width: 100%;
-                    }
-                    svg {
-                      margin-right: 16px;
-                    }
-                  `}
-                >
-                  <FileArrowUp size={24} color={colors.green} weight="fill" />
-                  <Text left-ellipsis>{item}</Text>
-                </Div>
-                <Div
-                  css={`
-                    ${flex("right")}
-                    svg {
-                      margin-left: 8px;
-                    }
-                  `}
-                >
-                  <Div
-                    css={`
-                      min-width: 50px;
-                      ${flex("left")}
-                      padding: 0 8px;
-                      border-radius: 30px;
-                      ${shadows.lg}
-                      margin: 0 8px;
-                      font-weight: bold;
-                      svg {
-                        margin-right: 8px;
-                      }
-                    `}
-                  >
-                    {netChange >= 0 ? (
-                      <PlusCircle
-                        size={16}
-                        color={colors.green}
-                        weight="fill"
-                      />
-                    ) : (
-                      <MinusCircle size={16} color={colors.red} weight="fill" />
-                    )}
-                    <Text>{Math.abs(netChange)}</Text>
-                  </Div>
-                </Div>
-              </Div>
-            );
-          })}
         </>
       ) : (
         <Div
