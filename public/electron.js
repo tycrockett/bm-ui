@@ -67,7 +67,9 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
       output.includes("\x1Bc") ||
       output.includes("\u001b[2J") ||
       output.includes("\x1b[2J") ||
-      output.includes("\x1b[H")
+      output.includes("\x1b[H") ||
+      output.includes("\x1b[3J") ||
+      output.includes("\x1b[2J\x1b[0;0H")
     ) {
       childProcesses[child.pid].output = [];
     } else {

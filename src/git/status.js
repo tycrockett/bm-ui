@@ -9,6 +9,8 @@ import {
   GitPullRequest,
   Folder,
   Question,
+  File,
+  FilePlus,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
@@ -16,6 +18,7 @@ import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
 import { useMemo } from "react";
+import { css } from "@emotion/css";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -152,6 +155,7 @@ export const Status = ({
     const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}"`;
     cmd(command);
   };
+  console.log(status);
 
   return (
     <Div
@@ -228,7 +232,10 @@ export const Status = ({
               </Div>
               <Div
                 css={`
-                  margin-left: 0;
+                  padding: 8px;
+                  padding-left: 16px;
+                  margin-left: 12px;
+                  border-left: 2px solid ${colors.lightBlue};
                 `}
               >
                 {files?.map((file) => {
@@ -237,6 +244,8 @@ export const Status = ({
                     <Div
                       css={`
                         ${flex("space-between")}
+                        padding: 4px;
+                        border-radius: 8px;
                         :hover {
                           background-color: rgba(0, 0, 0, 0.5);
                           cursor: pointer;
@@ -254,7 +263,7 @@ export const Status = ({
                         `}
                       >
                         {file.type === "untracked" ? (
-                          <FileDotted
+                          <FilePlus
                             size={24}
                             color={colors.lightBlue}
                             weight="fill"
@@ -280,27 +289,32 @@ export const Status = ({
                         css={`
                           ${flex("right")}
                           svg {
-                            margin-right: 16px;
+                            margin-right: 8px;
                           }
                           p {
-                            width: 80px;
+                            min-width: 50px;
+                            font-weight: bold;
                           }
                         `}
                       >
-                        {netChange >= 0 ? (
-                          <PlusCircle
-                            size={24}
-                            color={colors.green}
-                            weight="fill"
-                          />
-                        ) : (
-                          <MinusCircle
-                            size={24}
-                            color={colors.green}
-                            weight="fill"
-                          />
+                        {file.type === "untracked" ? null : (
+                          <>
+                            {netChange >= 0 ? (
+                              <PlusCircle
+                                size={24}
+                                color={colors.green}
+                                weight="fill"
+                              />
+                            ) : (
+                              <MinusCircle
+                                size={24}
+                                color={colors.green}
+                                weight="fill"
+                              />
+                            )}
+                            <Text>{Math.abs(netChange)}</Text>
+                          </>
                         )}
-                        <Text>{Math.abs(netChange)}</Text>
                       </Div>
                     </Div>
                   );
