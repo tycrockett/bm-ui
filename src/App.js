@@ -84,6 +84,7 @@ const App = () => {
               path,
               port,
               pid,
+              isClosing: false,
             },
           ],
         };
@@ -96,9 +97,7 @@ const App = () => {
   useInterval(updatePort, 5000);
 
   useEffect(() => {
-    if (store.lastCommand?.startsWith("kill-pid")) {
-      updatePort();
-    }
+    updatePort();
   }, [store.lastCommand]);
 
   useEffect(() => {

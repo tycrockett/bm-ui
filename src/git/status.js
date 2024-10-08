@@ -155,17 +155,17 @@ export const Status = ({
     const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}"`;
     cmd(command);
   };
-  console.log(status);
 
   return (
     <Div
       css={`
-        margin-bottom: 32px;
         flex-grow: 1;
-        height: 100%;
+        margin-bottom: 32px;
         width: 100%;
         box-sizing: border-box;
         overflow-y: auto;
+        border: 1px solid blue;
+        max-height: calc(100vh - 415px);
         ${styles.scrollbar}
       `}
     >

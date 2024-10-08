@@ -347,8 +347,7 @@ export const Git = () => {
   useKeyboard({ keydown });
   const box = positionRef?.current?.getBoundingClientRect();
 
-  const readTerminal = async (pid) => {
-    console.log("KILL", pid);
+  const killMainPID = async (pid) => {
     await process.kill(pid);
     methods.set("lastCommand", `kill-pid-${new Date().toISOString()}`);
   };
@@ -357,7 +356,7 @@ export const Git = () => {
 
   const processes = Object.values(terminal?.processes?.children || {})?.filter(
     (item) =>
-      new Date(item?.createdAt) < Date.now() - 5000 &&
+      new Date(item?.createdAt) < Date.now() - 1000 &&
       item?.pwd === settings?.pwd
   );
 
@@ -388,6 +387,7 @@ export const Git = () => {
     <Div
       ref={positionRef}
       css={`
+        ${flex("column")}
         padding: 0 16px;
         margin: 8px 0;
       `}
@@ -574,7 +574,7 @@ export const Git = () => {
                     ${flex("right")}
                     cursor: pointer;
                   `}
-                  onClick={() => readTerminal(port.pid)}
+                  onClick={() => killMainPID(port.pid)}
                 >
                   <Div
                     css={`
@@ -597,8 +597,7 @@ export const Git = () => {
           css={`
             height: calc(100vh - ${box?.top + 96}px);
             ${flex("start column")}
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
             box-sizing: border-box;
           `}
         >
@@ -608,6 +607,7 @@ export const Git = () => {
               width: 100%;
               box-sizing: border-box;
               margin-bottom: 16px;
+              margin: 8px 0;
               select {
                 width: 200px;
                 padding: 12px 8px;
@@ -692,20 +692,19 @@ export const Git = () => {
             <Div
               css={`
                 ${flex("center")}
-                border: 1px solid ${colors.darkIndigo};
+                border: 4px solid ${colors.darkIndigo};
                 border-radius: 50%;
-                padding: 4px;
+                padding: 8px;
                 margin: 4px;
                 cursor: pointer;
                 transition: background-color 0.2s ease;
                 background-color: ${colors.darkIndigo};
-                width: 32px;
-                height: 32px;
+                width: 40px;
+                height: 40px;
                 box-sizing: border-box;
                 ${tab === "git"
                   ? `background-color: ${colors.lightIndigo};`
                   : ""}
-                outline-offset: 2px;
                 :hover {
                   outline: 2px solid ${colors.lightIndigo};
                   ${shadows.md}
@@ -722,20 +721,19 @@ export const Git = () => {
             <Div
               css={`
                 ${flex("center")}
-                border: 1px solid ${colors.darkIndigo};
+                border: 4px solid ${colors.darkIndigo};
                 border-radius: 50%;
-                padding: 4px;
+                padding: 8px;
                 margin: 4px;
                 cursor: pointer;
                 transition: background-color 0.2s ease;
                 background-color: ${colors.darkIndigo};
-                width: 32px;
-                height: 32px;
+                width: 40px;
+                height: 40px;
                 box-sizing: border-box;
                 ${tab === "terminal"
                   ? `background-color: ${colors.lightIndigo};`
                   : ""}
-                outline-offset: 2px;
                 :hover {
                   outline: 2px solid ${colors.lightIndigo};
                   ${shadows.md}
@@ -756,7 +754,13 @@ export const Git = () => {
             </Div>
           </Div>
           {tab === "git" ? (
-            <>
+            <Div
+              css={`
+                ${flex("column")}
+                width: 100%;
+                flex-grow: 1;
+              `}
+            >
               <CmdList
                 list={list}
                 index={index}
@@ -804,17 +808,17 @@ export const Git = () => {
                 lastCommand={lastCommand}
                 pwd={settings?.pwd}
               />
-            </>
+            </Div>
           ) : tab === "terminal" ? (
             <Div
               css={`
                 ${flex("space-between column")}
-                width: calc(100% - 32px);
+                width: calc(100% - 8px);
               `}
             >
               <Div
                 css={`
-                  ${flex("left")}
+                  ${flex("left end")}
                   margin-bottom: 8px;
                   border-bottom: 3px solid ${colors.darkIndigo};
                   gap: 8px;
@@ -880,19 +884,22 @@ export const Git = () => {
                     ${scrollbar.style}
                   `}
                 >
-                  <Button
-                    icon
-                    sm
-                    css={`
-                      position: absolute;
-                      top: 8px;
-                      right: 8px;
-                    `}
-                    disabled={!terminal?.processes?.pid}
-                    onClick={() => readTerminal(terminal?.processes?.pid)}
-                  >
-                    <X size={24} />
-                  </Button>
+                  {!!terminal?.processes?.pid ? (
+                    <Button
+                      icon
+                      sm
+                      css={`
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                      `}
+                      onClick={() =>
+                        terminal.processes.kill(terminal?.processes?.pid)
+                      }
+                    >
+                      <X size={24} />
+                    </Button>
+                  ) : null}
                   {terminal.list.map((item, idx) => (
                     <pre
                       onClick={() => handleTerminalItem(item, idx)}

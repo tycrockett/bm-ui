@@ -1,5 +1,5 @@
 const path = require("path");
-
+const psTree = require("ps-tree");
 const { app, BrowserWindow, ipcMain } = require("electron");
 const isDev = require("electron-is-dev");
 const { spawn } = require("child_process");
@@ -36,6 +36,26 @@ function createWindow() {
 
 let processes = {};
 
+ipcMain.on("kill", (event, pid) => {
+  console.log(pid);
+  psTree(pid, (err, children) => {
+    console.log(children);
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    // Kill all child processes
+    [pid].concat(children.map((p) => p.PID)).forEach((tpid) => {
+      try {
+        process.kill(tpid);
+      } catch (e) {
+        console.error(`Failed to kill process ${tpid}: ${e.message}`);
+      }
+    });
+  });
+});
+
 // Function to handle spawning a child process
 ipcMain.on("spawn", (event, { pwd, command }) => {
   // Spawn the child process
@@ -48,7 +68,12 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
     ...childProcesses,
     [child.pid]: {
       createdAt: new Date().toISOString(),
-      output: [],
+      output: [
+        {
+          type: "input",
+          message: command,
+        },
+      ],
       pid: child.pid,
       command,
       pwd,
@@ -56,6 +81,7 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
   };
 
   event.reply("start-spawn", child.pid);
+  event.reply("pids", childProcesses);
 
   child.stdout.on("data", (data) => {
     const value = {
@@ -92,14 +118,31 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
 
   // Handle process close
   child.on("close", (code) => {
+    const hasProcess = child.pid in processes;
     delete processes[child.pid];
     delete childProcesses[child.pid];
-    event.reply("pids", childProcesses);
-    event.reply("message", {
-      type: "close",
-      pid: child.pid,
-      message: `closed process ${child.pid}`,
-    });
+    if (hasProcess) {
+      event.reply("pids", childProcesses);
+      event.reply("close", {
+        type: "close",
+        pid: child.pid,
+        message: `closed process ${child.pid}`,
+      });
+    }
+  });
+
+  child.on("exit", (code) => {
+    const hasProcess = child.pid in processes;
+    delete processes[child.pid];
+    delete childProcesses[child.pid];
+    if (hasProcess) {
+      event.reply("pids", childProcesses);
+      event.reply("close", {
+        type: "close",
+        pid: child.pid,
+        message: `closed process ${child.pid}`,
+      });
+    }
   });
 });
 
