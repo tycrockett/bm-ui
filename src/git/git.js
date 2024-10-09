@@ -874,7 +874,6 @@ export const Git = () => {
                 <Div
                   css={`
                     flex-grow: 1;
-
                     background-color: #121212;
                     border-radius: 8px;
                     overflow: hidden;
@@ -901,7 +900,7 @@ export const Git = () => {
                       <X size={24} />
                     </Button>
                   ) : null}
-                  {terminal.list.map((item, idx) => (
+                  {terminal.list.slice(-10).map((item, idx) => (
                     <pre
                       onClick={() => handleTerminalItem(item, idx)}
                       className={css`

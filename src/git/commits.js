@@ -9,6 +9,7 @@ import { animation, flex, styles } from "../shared/utils";
 import { logCommits } from "./utils";
 import { cmd } from "../node/node-exports";
 import { StoreContext } from "../context/store";
+import { Collapse } from "../shared/Collapse";
 
 export const Commits = ({
   currentBranch,
@@ -57,9 +58,11 @@ export const Commits = ({
   const metaBranch = repo?.branches?.[currentBranch];
 
   return (
-    <Div
+    <Collapse
+      isOpen={false}
       css={`
         ${animation("fadeIn", ".2s ease")}
+        ${flex("column")}
         background: ${colors.indigoGradient};
         padding: 16px 0;
         border-radius: 8px;
@@ -136,7 +139,7 @@ export const Commits = ({
       </Div>
       <Div
         css={`
-          max-height: 40vh;
+          flex-grow: 1;
           transition: height 0.5s ease;
           overflow-y: auto;
           overflow-x: hidden;
@@ -245,6 +248,6 @@ export const Commits = ({
           </Div>
         ))}
       </Div>
-    </Div>
+    </Collapse>
   );
 };

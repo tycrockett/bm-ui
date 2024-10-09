@@ -19,6 +19,7 @@ import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
 import { useMemo } from "react";
 import { css } from "@emotion/css";
+import { Collapse } from "../shared/Collapse";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -157,14 +158,16 @@ export const Status = ({
   };
 
   return (
-    <Div
+    <Collapse
+      isOpen={false}
       css={`
-        flex-grow: 4;
+        flex-grow: 1;
         flex-shrink: 1;
         margin-bottom: 16px;
         width: 100%;
         box-sizing: border-box;
         overflow-y: auto;
+        min-height: 50%;
         ${styles.scrollbar}
       `}
     >
@@ -336,6 +339,6 @@ export const Status = ({
           </Text>
         </Div>
       )}
-    </Div>
+    </Collapse>
   );
 };
