@@ -17,12 +17,14 @@ import {
 } from "./utils";
 import {
   ArrowElbowRightDown,
+  CaretDown,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
   Terminal,
   Tree,
+  Warning,
   X,
 } from "phosphor-react";
 import { css } from "@emotion/css";
@@ -38,6 +40,7 @@ import { useOutsideClick } from "../shared/use-outside-click";
 import { useTerminal } from "../terminal/useTerminal";
 import Ansi from "ansi-to-react";
 import { scrollbar } from "../shared/styles";
+import { set } from "lodash";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -78,7 +81,9 @@ export const Git = () => {
   const [branches, setBranches] = useState({});
   const [status, setStatus] = useState({});
   const [branchOptions, setBranchOptions] = useState(false);
+  const [displayActions, setDisplayActions] = useState(false);
   const branchRef = useOutsideClick(() => setBranchOptions(false));
+  const actionsRef = useOutsideClick(() => setDisplayActions(false));
 
   const [tab, setTab] = useState("git");
 
@@ -360,24 +365,72 @@ export const Git = () => {
       item?.pwd === settings?.pwd
   );
 
-  const handleTerminalItem = (item) => {
-    if (item?.message?.includes("[eslint]")) {
-      const split = item?.message?.split("\n")?.filter((item) => item);
-      let index = split.findIndex((item) => item.includes("[eslint]"));
-      const file = split[index + 1];
-      const lineData = split[index + 2];
-      const line = lineData
-        ?.split(" ")
-        .filter((item) => item)?.[1]
-        ?.split(":")
-        ?.slice(0, 2)
-        ?.join(":");
+  const [terminalActions, setTerminalActions] = useState([]);
 
-      const path = settings?.pwd?.replace("~", settings?.base);
-      const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}:${line}"`;
-      execCmd(command);
-    }
+  const handleTerminalAction = (item) => {
+    execCmd(item?.cmd);
+    setDisplayActions(false);
   };
+
+  const handleTerminalItem = (terminals) => {
+    const fileMatch =
+      /([a-zA-Z]:\\|\.{1,2}\/|\/)?([\w\s-]+[\/\\])*[\w\s-]+\.\w+/g;
+    let processActions = {};
+    for (const terminal of terminals) {
+      const item = terminal?.output?.at(-1);
+      if (!item) {
+        return;
+      }
+      if (item?.message?.includes("[eslint]")) {
+        const split = item?.message?.split("\n")?.filter((item) => item);
+        const firstIndex = split.findIndex((item) => item.includes("[eslint]"));
+
+        let indices = [];
+        for (let i = firstIndex + 1; i < split.length; i++) {
+          if (fileMatch.test(split[i])) {
+            indices.push(i);
+          }
+        }
+
+        let paths = [];
+        const path = settings?.pwd?.replace("~", settings?.base);
+        for (let i = 0; i < indices.length; i++) {
+          const file = split[indices[i]];
+          for (let j = indices[i]; j < split.length; j++) {
+            if (split[j].includes("Line")) {
+              const ss = split[j].split(" ").slice(5);
+              const s = split[j].split(" ")?.[3];
+              const line = s.split(":")?.[0];
+              const column = s.split(":")?.[1];
+              const label = `${file}:${line}:${column}`;
+              paths.push({
+                type: "eslint",
+                label,
+                description: ss.join(" "),
+                cmd: `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}:${line}"`,
+              });
+            }
+          }
+        }
+        processActions = {
+          ...processActions,
+          [terminal.pid]: {
+            command: terminal.command,
+            actions: paths,
+          },
+        };
+      }
+    }
+    setTerminalActions(processActions);
+  };
+
+  useEffect(() => {
+    const relevantTerminals = Object.values(terminal.processes.children).filter(
+      (process) => process.pwd === settings.pwd
+    );
+    console.log(relevantTerminals);
+    handleTerminalItem(relevantTerminals);
+  }, [terminal.processes.children, settings.pwd]);
 
   useEffect(() => {
     terminalRef?.current?.scrollIntoView({ behavior: "smooth" });
@@ -753,6 +806,112 @@ export const Git = () => {
               />
             </Div>
           </Div>
+          {Object.keys(terminalActions)?.length ? (
+            <Div
+              css={`
+                position: relative;
+                ${flex("space-between")}
+                border-radius: 8px;
+                border: 1px solid ${colors.darkIndigo};
+                background-color: rgba(0, 0, 0, 0.2);
+                width: calc(100% - 32px);
+                padding: 8px 16px;
+                margin: 8px 0;
+                :hover {
+                  background-color: ${colors.darkIndigo};
+                  cursor: pointer;
+                }
+              `}
+              onClick={() => setDisplayActions(true)}
+            >
+              <Div
+                css={`
+                  ${flex("left")}
+                  svg {
+                    margin-right: 16px;
+                  }
+                `}
+              >
+                <Warning size={24} color="yellow" />
+                <Text>Detected Terminal Actions</Text>
+              </Div>
+              <CaretDown size={24} color="white" />
+              {displayActions ? (
+                <Div
+                  ref={actionsRef}
+                  css={`
+                    position: absolute;
+                    max-height: 40vh;
+                    overflow: hidden;
+                    overflow-y: auto;
+                    top: calc(100% + 8px);
+                    left: 0;
+                    width: 100%;
+                    background-color: ${colors.darkIndigo};
+                    border-radius: 8px;
+                    ${shadows.lg}
+                    cursor: default;
+                    padding: 8px 0;
+                  `}
+                >
+                  {Object.keys(terminalActions)?.map((item) => {
+                    return (
+                      <Div>
+                        <Text
+                          bold
+                          css={`
+                            padding: 8px;
+                          `}
+                        >
+                          {item} - {terminalActions?.[item]?.command}
+                        </Text>
+                        {terminalActions?.[item]?.actions?.map((action) => (
+                          <Div
+                            css={`
+                              ${flex("left start")}
+                              padding: 8px;
+                              margin-left: 8px;
+                              padding-left: 8px;
+                              border-left: 1px solid white;
+                              :hover {
+                                background-color: rgba(0, 0, 0, 0.3);
+                                cursor: pointer;
+                              }
+                            `}
+                            onClick={() => handleTerminalAction(action)}
+                          >
+                            {action?.type === "eslint" ? (
+                              <Text
+                                css={`
+                                  color: yellow;
+                                  font-weight: bold;
+                                  margin-right: 8px;
+                                `}
+                              >
+                                ESLINT:
+                              </Text>
+                            ) : null}
+                            <Div>
+                              <Text>{action.label}</Text>
+                              <pre
+                                className={css`
+                                  word-break: break-word;
+                                  white-space: pre-wrap;
+                                  color: white;
+                                `}
+                              >
+                                <Ansi>{action.description}</Ansi>
+                              </pre>
+                            </Div>
+                          </Div>
+                        ))}
+                      </Div>
+                    );
+                  })}
+                </Div>
+              ) : null}
+            </Div>
+          ) : null}
           {tab === "git" ? (
             <Div
               css={`
@@ -879,7 +1038,7 @@ export const Git = () => {
                     overflow: hidden;
                     overflow-y: auto;
                     padding: 16px;
-                    max-height: calc(100vh - 350px);
+                    max-height: calc(100vh - 400px);
                     min-height: 8px;
                     ${scrollbar.style}
                   `}
@@ -909,6 +1068,8 @@ export const Git = () => {
                         margin: -4px -8px;
                         :hover {
                           background-color: rgba(0, 0, 0, 0.3);
+                          outline: 3px solid ${colors.lightPurple};
+                          outline-offset: -3px;
                         }
                         cursor: default;
                         word-break: break-word;
