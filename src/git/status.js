@@ -367,7 +367,7 @@ export const Status = ({
                   padding: 8px 0;
                 `}
               >
-                No Changes Detected.
+                nothing to commit, working tree clean.
               </Text>
               <Text
                 bold
