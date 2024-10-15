@@ -14,12 +14,21 @@ export const CmdList = ({
   return (
     <Div
       css={`
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
         ${flex("start column")}
-        ${!hasCmd ? `display: none; max-height: 0;` : `height: auto;`}
+        ${!hasCmd || !list?.length
+          ? `display: none; max-height: 0;`
+          : `height: auto;`}
         border-radius: 16px;
-        padding: 16px 0;
+        padding: 16px;
         width: 100%;
         transition: height 0.5s ease;
+        background-color: ${colors.blue};
+        z-index: 1000;
+        ${shadows.md}
       `}
     >
       <Div
@@ -82,6 +91,7 @@ export const CmdList = ({
                     background-color: ${colors.lightIndigo};
                     margin-right: 16px;
                     cursor: pointer;
+                    border: 1px solid transparent;
                     :hover {
                       transition: background-color 0.2s ease, border 0.2s ease;
                       background-color: ${colors.lightIndigo};

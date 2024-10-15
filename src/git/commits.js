@@ -1,6 +1,12 @@
 import { css } from "@emotion/css";
 import { format } from "date-fns";
-import { CopySimple, GitCommit, Trash } from "phosphor-react";
+import {
+  CaretDown,
+  CaretUp,
+  CopySimple,
+  GitCommit,
+  Trash,
+} from "phosphor-react";
 import { useCallback, useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useAsyncValue } from "../hooks/use-async-value";
@@ -118,18 +124,33 @@ export const Commits = ({
           padding: 8px 16px;
         `}
       >
-        <Text
+        <Div
           css={`
+            ${flex("left")}
+            svg {
+              margin-left: 8px;
+            }
+            border-bottom: 1px solid transparent;
             cursor: pointer;
             :hover {
-              text-decoration: underline;
+              border-bottom: 1px solid #777;
             }
-            color: #777;
           `}
-          onClick={() => setHash(hash ? "" : "all")}
         >
-          expand files
-        </Text>
+          <Text
+            css={`
+              color: #777;
+            `}
+            onClick={() => setHash(hash === "all" ? "" : "all")}
+          >
+            {hash === "all" ? "collapse files" : "expand files"}
+          </Text>
+          {hash === "all" ? (
+            <CaretUp color="#777" />
+          ) : (
+            <CaretDown color="#777" />
+          )}
+        </Div>
 
         {metaBranch?.createdAt ? (
           <Text>
@@ -154,14 +175,14 @@ export const Commits = ({
                 ${animation("fadeIn", ".2s ease")}
                 ${flex("space-between")}
                 border-top: 1px solid ${colors.dark};
-                padding: 4px 16px;
-                margin-top: 8px;
+                padding: 8px 16px;
                 transition: background-color 0.2s ease;
                 cursor: pointer;
                 :hover {
                   background-color: rgba(0, 0, 0, 0.3);
                 }
               `}
+              onClick={() => setHash(hash === key ? "" : key)}
             >
               <Div
                 css={`

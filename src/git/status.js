@@ -11,13 +11,17 @@ import {
   Question,
   File,
   FilePlus,
+  Placeholder,
+  GitDiff,
+  NoteBlank,
+  Command,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
 import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { css } from "@emotion/css";
 import { Collapse } from "../shared/Collapse";
 
@@ -48,12 +52,19 @@ export const Status = ({
   parentBranch,
   completeMerge,
 }) => {
+  const [refreshedAt, setRefreshedAt] = useState(null);
+  const refresh = () => setRefreshedAt(new Date()?.toISOString());
+
+  useEffect(() => {
+    refresh();
+  }, [status?.lastUpdate]);
+
   const shortStatus = useAsyncValue(
     async () =>
       await cmd(
         `git diff ${parentBranch}...${currentBranch || ""} --stat | tail -n1 `
       ),
-    [status?.lastUpdate]
+    [refreshedAt]
   );
   const hasStatus =
     !!status?.modified?.length ||
@@ -62,7 +73,7 @@ export const Status = ({
 
   const { animation: shake } = useAnimation(
     { animation: animation("shake", ".4s ease"), timing: 500 },
-    [status?.lastUpdate]
+    [refreshedAt]
   );
 
   const copyItem = (value) => {
@@ -202,9 +213,7 @@ export const Status = ({
                 margin-bottom: 8px;
               `}
             >
-              {status?.lastUpdate
-                ? format(new Date(status?.lastUpdate), "h:mm a")
-                : ""}
+              {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
             </Text>
           </Div>
           <Text
@@ -328,15 +337,49 @@ export const Status = ({
       ) : (
         <Div
           css={`
-            ${flex("space-between")}
+            margin: 24px 0;
           `}
         >
-          <Text bold>No changes detected.</Text>
-          <Text bold>
-            {status?.lastUpdate
-              ? format(new Date(status?.lastUpdate), "h:mm a")
-              : ""}
-          </Text>
+          <Div
+            css={`
+              ${flex("left")}
+              margin: auto;
+              width: 100%;
+              height: 150px;
+              border-radius: 16px;
+              background-color: ${colors.darkIndigo};
+              padding: 32px;
+              box-sizing: border-box;
+              ${shadows.md}
+            `}
+          >
+            <NoteBlank size={120} color={colors.light} />
+            <Div
+              css={`
+                flex-grow: 1;
+                margin-left: 16px;
+              `}
+            >
+              <Text
+                css={`
+                  border-radius: 8px;
+                  font-weight: bold;
+                  padding: 8px 0;
+                `}
+              >
+                No Changes Detected.
+              </Text>
+              <Text
+                bold
+                css={`
+                  color: ${colors.light};
+                `}
+              >
+                {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
+              </Text>
+            </Div>
+            <Button onClick={refresh}>Refresh</Button>
+          </Div>
         </Div>
       )}
     </Collapse>

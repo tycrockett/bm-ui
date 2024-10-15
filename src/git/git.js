@@ -18,10 +18,13 @@ import {
 import {
   ArrowElbowRightDown,
   CaretDown,
+  CaretUp,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
+  Minus,
+  Plus,
   Terminal,
   Tree,
   Warning,
@@ -41,6 +44,7 @@ import { useTerminal } from "../terminal/useTerminal";
 import Ansi from "ansi-to-react";
 import { scrollbar } from "../shared/styles";
 import { set } from "lodash";
+import { Collapse } from "../shared/Collapse";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -366,6 +370,7 @@ export const Git = () => {
   );
 
   const [terminalActions, setTerminalActions] = useState([]);
+  const [listMax, setListMax] = useState(-3);
 
   const handleTerminalAction = (item) => {
     execCmd(item?.cmd);
@@ -419,6 +424,16 @@ export const Git = () => {
             actions: paths,
           },
         };
+      } else if (item?.message?.includes("ERROR in")) {
+        const split = item?.message?.split("\n")?.filter((item) => item);
+        const firstIndex = split.findIndex((item) => item.includes("ERROR in"));
+
+        // let indices = [];
+        // for (let i = firstIndex + 1; i < split.length; i++) {
+        //   if (fileMatch.test(split[i])) {
+        //     indices.push(i);
+        //   }
+        // }
       }
     }
     setTerminalActions(processActions);
@@ -428,13 +443,12 @@ export const Git = () => {
     const relevantTerminals = Object.values(terminal.processes.children).filter(
       (process) => process.pwd === settings.pwd
     );
-    console.log(relevantTerminals);
     handleTerminalItem(relevantTerminals);
   }, [terminal.processes.children, settings.pwd]);
 
   useEffect(() => {
     terminalRef?.current?.scrollIntoView({ behavior: "smooth" });
-  }, [terminal.list?.length]);
+  }, [terminal.list?.length, listMax]);
 
   return (
     <Div
@@ -682,7 +696,12 @@ export const Git = () => {
               }
             `}
           >
-            <form onSubmit={handleCmd}>
+            <form
+              onSubmit={handleCmd}
+              className={css`
+                position: relative;
+              `}
+            >
               {loading ? <Loader /> : null}
               <Div
                 css={`
@@ -740,6 +759,17 @@ export const Git = () => {
                   </Button>
                 ) : null}
               </Div>
+              <CmdList
+                list={list}
+                index={index}
+                cmd={cmd}
+                handleCmd={handleCmd}
+                setCmd={(value) => {
+                  setCmd(`${value} `);
+                  ref?.current?.focus();
+                }}
+                checkoutList={checkoutList}
+              />
             </form>
 
             <Div
@@ -852,6 +882,7 @@ export const Git = () => {
                     ${shadows.lg}
                     cursor: default;
                     padding: 8px 0;
+                    z-index: 10000;
                   `}
                 >
                   {Object.keys(terminalActions)?.map((item) => {
@@ -921,17 +952,6 @@ export const Git = () => {
                 flex-grow: 1;
               `}
             >
-              <CmdList
-                list={list}
-                index={index}
-                cmd={cmd}
-                handleCmd={handleCmd}
-                setCmd={(value) => {
-                  setCmd(`${value} `);
-                  ref?.current?.focus();
-                }}
-                checkoutList={checkoutList}
-              />
               <Text
                 css={`
                   margin-bottom: 8px;
@@ -1044,47 +1064,77 @@ export const Git = () => {
                   `}
                 >
                   {!!terminal?.processes?.pid ? (
-                    <Button
-                      icon
-                      sm
+                    <Div
                       css={`
+                        ${flex("right")}
+                        background-color: rgba(0, 0, 0, 0.6);
                         position: absolute;
                         top: 8px;
                         right: 8px;
-                      `}
-                      onClick={() =>
-                        terminal.processes.kill(terminal?.processes?.pid)
-                      }
-                    >
-                      <X size={24} />
-                    </Button>
-                  ) : null}
-                  {terminal.list.slice(-10).map((item, idx) => (
-                    <pre
-                      onClick={() => handleTerminalItem(item, idx)}
-                      className={css`
+                        padding: 8px 16px;
                         border-radius: 8px;
-                        padding: 4px 8px;
-                        margin: -4px -8px;
-                        :hover {
-                          background-color: rgba(0, 0, 0, 0.3);
-                          outline: 3px solid ${colors.lightPurple};
-                          outline-offset: -3px;
-                        }
-                        cursor: default;
-                        word-break: break-word;
-                        white-space: pre-wrap;
-                        color: white;
-                        ${item?.type === "error"
-                          ? "color: #FF8888;"
-                          : item?.type === "close"
-                          ? "color: purple;"
-                          : ""}
+                        gap: 16px;
                       `}
                     >
-                      <Ansi>{item?.message}</Ansi>
-                    </pre>
-                  ))}
+                      <Text
+                        css={`
+                          color: white;
+                          margin-right: 8px;
+                        `}
+                      >
+                        {Math.abs(listMax)} / {terminal.list.length}
+                      </Text>
+                      <Button icon sm onClick={() => setListMax((l) => -3)}>
+                        <Minus size={24} />
+                      </Button>
+                      <Button
+                        icon
+                        sm
+                        onClick={() =>
+                          setListMax((l) => terminal.list.length * -1)
+                        }
+                      >
+                        <Plus size={24} />
+                      </Button>
+                      <Button
+                        icon
+                        sm
+                        onClick={() =>
+                          terminal.processes.kill(terminal?.processes?.pid)
+                        }
+                      >
+                        <X size={24} />
+                      </Button>
+                    </Div>
+                  ) : null}
+                  <Collapse isOpen={true}>
+                    {terminal.list.slice(listMax).map((item, idx) => (
+                      <pre
+                        onClick={() => handleTerminalItem(item, idx)}
+                        className={css`
+                          border-radius: 8px;
+                          padding: 4px 8px;
+                          margin: -4px -8px;
+                          :hover {
+                            background-color: rgba(255, 255, 255, 0.3);
+                            outline-offset: -3px;
+                          }
+                          cursor: default;
+                          word-break: break-word;
+                          white-space: pre-wrap;
+                          color: white;
+                          ${item?.type === "error"
+                            ? "color: #FF8888;"
+                            : item?.type === "close"
+                            ? "color: purple;"
+                            : ""}
+                        `}
+                      >
+                        <Ansi>{item?.message}</Ansi>
+                      </pre>
+                    ))}
+                  </Collapse>
+
                   <div ref={terminalRef} />
                 </Div>
               </Div>
