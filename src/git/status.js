@@ -350,10 +350,17 @@ export const Status = ({
               background-color: ${colors.darkIndigo};
               padding: 32px;
               box-sizing: border-box;
-              ${shadows.md}
+              transition: background-color 0.2s ease;
+              user-select: none;
+              :hover {
+                cursor: pointer;
+                background-color: ${colors.darkIndigo}cc;
+                ${shadows.md}
+              }
             `}
+            onClick={refresh}
           >
-            <NoteBlank size={120} color={colors.light} />
+            <NoteBlank size={80} color={colors.light} />
             <Div
               css={`
                 flex-grow: 1;
@@ -364,7 +371,13 @@ export const Status = ({
                 css={`
                   border-radius: 8px;
                   font-weight: bold;
-                  padding: 8px 0;
+                `}
+              >
+                On branch {currentBranch}
+              </Text>
+              <Text
+                css={`
+                  border-radius: 8px;
                 `}
               >
                 nothing to commit, working tree clean.
@@ -373,12 +386,13 @@ export const Status = ({
                 bold
                 css={`
                   color: ${colors.light};
+                  padding-top: 8px;
                 `}
               >
                 {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
               </Text>
             </Div>
-            <Button onClick={refresh}>Refresh</Button>
+            {/* <Button onClick={refresh}>Refresh</Button> */}
           </Div>
         </Div>
       )}
