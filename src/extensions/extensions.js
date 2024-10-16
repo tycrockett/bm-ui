@@ -210,13 +210,26 @@ const defaultCommands = [
       await update(command.options);
     },
   },
+
+  {
+    name: "Push",
+    command: "push",
+    args: "",
+    flags: "-f --force",
+    description:
+      "if no remote branch exists, set the upstream branch.\ngit push",
+    function: async ({ command, context }) => {
+      await push(command.options);
+    },
+  },
+
   {
     name: "Add + Commit + Push",
     command: ".",
     args: "{description}",
     flags: "",
     description:
-      "- Adds all unstaged files \n- Commits all files with a {description} message \n- Pushes everything if a remote branch is detected.",
+      "1. Adds all unstaged files \n2. Commits all files with a {description} message \n3. Pushes everything if a remote branch is detected.",
     function: async ({ command, context }) => {
       const description = command.args
         .filter((v) => !v.startsWith("-"))
@@ -230,7 +243,7 @@ const defaultCommands = [
     args: "{name}",
     flags: "",
     description:
-      "Pulls current branch if a remote branch exists and then creates a new branch with the current branch set as it's parent.",
+      "1. Pulls current branch if a remote branch exists\n2. Creates new {name} branch\n3. Sets the current branch as {name}'s parent.",
     function: async ({ command, context }) => {
       await createBranch(command.args[0], command.options);
       context.methods.setRepos({
@@ -268,7 +281,7 @@ const defaultCommands = [
     args: "",
     flags: "-r --remote",
     description:
-      "Delete the current branch. Adding the -r flag it will delete the remote branch.",
+      "Delete the current branch.\n\n-r --remote: Deletes the remote branch as well.",
     function: async ({ command, context }) => {
       await deleteBranch(command.options);
       let nextBranches =
@@ -285,18 +298,6 @@ const defaultCommands = [
           });
         } catch {}
       }
-    },
-  },
-
-  {
-    name: "Push",
-    command: "push",
-    args: "",
-    flags: "-f --force",
-    description:
-      "Do a git push or if no remote branch exists it will automatically set the upstream branch",
-    function: async ({ command, context }) => {
-      await push(command.options);
     },
   },
 
@@ -395,7 +396,7 @@ const defaultCommands = [
     args: "{relativeFilepath}",
     flags: "",
     description:
-      "Checks out a file from the parent branch (thereby removing any file changes in the branch)",
+      "git checkout {relativeFilepath} from the parent branch\n\n(removes {relativeFilepath} changes in the branch)",
     function: async ({ command, context }) => {
       await handleFile(command.args[0], command.args[1], command.options);
     },
