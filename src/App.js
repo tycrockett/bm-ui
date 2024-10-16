@@ -35,6 +35,10 @@ const App = () => {
   } = context;
   const setMode = (mode) => set("mode", mode);
 
+  const { ports = {} } = store;
+
+  const basePath = store?.settings?.pwd?.replace("~", store?.settings?.base);
+
   const [dropdown, setDropdown] = useState(false);
 
   const dirRef = useOutsideClick(
@@ -44,6 +48,15 @@ const App = () => {
   const settingsRef = useOutsideClick(
     () => dropdown === "settings" && setDropdown("")
   );
+
+  const portsRef = useOutsideClick(() => setDisplayPorts(false));
+
+  const [displayPorts, setDisplayPorts] = useState(false);
+
+  const killMainPID = async (pid) => {
+    await process.kill(pid);
+    set("lastCommand", `kill-pid-${new Date().toISOString()}`);
+  };
 
   const { settings, mode = "finder" } = store;
   const actions = {
@@ -265,7 +278,7 @@ const App = () => {
                   right: 0;
                   background-color: ${colors.darkIndigo};
                   z-index: 1000;
-                  border-radius: 16px;
+                  border-radius: 8px;
                   overflow: hidden;
                   padding: 8px 0;
                   ${shadows.lg}
@@ -352,6 +365,66 @@ const App = () => {
             ) : null}
           </Div>
 
+          {ports?.[basePath]?.length ? (
+            <Div
+              css={`
+                position: relative;
+                border-radius: 16px;
+                background-color: ${colors.darkIndigo};
+                padding: 8px;
+                padding-right: 12px;
+                margin-right: 8px;
+                ${flex("right")}
+                cursor: pointer;
+              `}
+              onClick={() => setDisplayPorts(true)}
+            >
+              <Div
+                css={`
+                  border-radius: 50%;
+                  width: 6px;
+                  height: 6px;
+                  background-color: ${colors.lightGreen};
+                  margin-right: 8px;
+                  border: 3px solid ${colors.green};
+                `}
+              />
+              <Text bold>{ports?.[basePath]?.length}</Text>
+              {displayPorts ? (
+                <Div
+                  css={`
+                    position: absolute;
+                    top: calc(100% + 8px);
+                    right: 0;
+                    width: 300px;
+                    background-color: ${colors.darkIndigo};
+                    border-radius: 8px;
+                    z-index: 100000;
+                    overflow: auto;
+                    max-height: 45vh;
+                    padding: 8px 0;
+                  `}
+                  ref={portsRef}
+                >
+                  {ports?.[basePath]?.map((port) => (
+                    <Div
+                      css={`
+                        padding: 8px 16px;
+                        ${flex("space-between")}
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.3);
+                        }
+                      `}
+                      onClick={() => killMainPID(port.pid)}
+                    >
+                      <Text>{port.pid}</Text>
+                      <Text bold>{port.port}</Text>
+                    </Div>
+                  ))}
+                </Div>
+              ) : null}
+            </Div>
+          ) : null}
           <Div
             css={`
               position: relative;
@@ -374,7 +447,7 @@ const App = () => {
                   width: 250px;
                   background-color: ${colors.darkIndigo};
                   z-index: 1000;
-                  border-radius: 16px;
+                  border-radius: 8px;
                   overflow: hidden;
                   padding: 8px 0;
                   cursor: pointer;
@@ -401,8 +474,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>G</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      G
+                    </Text>
                   </Div>
                 </Div>
                 <Div
@@ -424,8 +503,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>F</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      F
+                    </Text>
                   </Div>
                 </Div>
                 <Div
@@ -447,8 +532,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>D</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      D
+                    </Text>
                   </Div>
                 </Div>
                 <Div
@@ -470,8 +561,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>D</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      D
+                    </Text>
                   </Div>
                 </Div>
 
@@ -494,8 +591,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>S</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      S
+                    </Text>
                   </Div>
                 </Div>
                 <Div
@@ -517,8 +620,14 @@ const App = () => {
                       }
                     `}
                   >
-                    <Command color="white" size={16} />
-                    <Text>+</Text>
+                    <Command color={colors.light} size={16} />
+                    <Text
+                      css={`
+                        color: ${colors.light};
+                      `}
+                    >
+                      +
+                    </Text>
                   </Div>
                 </Div>
               </Div>

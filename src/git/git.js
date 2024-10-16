@@ -43,7 +43,6 @@ import { useOutsideClick } from "../shared/use-outside-click";
 import { useTerminal } from "../terminal/useTerminal";
 import Ansi from "ansi-to-react";
 import { scrollbar } from "../shared/styles";
-import { set } from "lodash";
 import { Collapse } from "../shared/Collapse";
 
 const fs = window.require("fs");
@@ -57,7 +56,6 @@ export const Git = () => {
     store: {
       extensions = [],
       settings = {},
-      ports = {},
       repos = {},
       logs = [],
       lastCommand = "",
@@ -86,6 +84,7 @@ export const Git = () => {
   const [status, setStatus] = useState({});
   const [branchOptions, setBranchOptions] = useState(false);
   const [displayActions, setDisplayActions] = useState(false);
+
   const branchRef = useOutsideClick(() => setBranchOptions(false));
   const actionsRef = useOutsideClick(() => setDisplayActions(false));
 
@@ -140,6 +139,10 @@ export const Git = () => {
     event?.preventDefault();
 
     setCmd("");
+    if (executingCommand.startsWith("/help")) {
+      return;
+    }
+
     setLoading(true);
     const lastCommand = `${executingCommand}-${new Date().toISOString()}`;
 
@@ -231,14 +234,25 @@ export const Git = () => {
   }, [settings.pwd]);
 
   const list = useMemo(() => {
-    if (!cmd) {
+    let inputCmd = cmd;
+    if (!inputCmd) {
       return commands;
-    } else if (cmd === "*") {
-      return commands;
+    } else if (inputCmd?.startsWith("/help")) {
+      if (inputCmd === "/help") {
+        return commands;
+      } else {
+        return commands.filter(
+          (item) =>
+            item?.command?.includes(inputCmd.replace("/help ", "")) ||
+            item?.name
+              ?.toLowerCase()
+              ?.includes(inputCmd.toLowerCase().replace("/help ", ""))
+        );
+      }
     }
-    let value = cmd;
-    if (cmd.includes(" ")) {
-      const [command] = cmd.split(" ");
+    let value = inputCmd;
+    if (inputCmd.includes(" ")) {
+      const [command] = inputCmd.split(" ");
       value = command;
     }
 
@@ -332,7 +346,7 @@ export const Git = () => {
     } else if (captured === "+Escape") {
       setCmd("");
     } else if (captured === "+Space") {
-      if (!cmd.includes(" ")) {
+      if (!cmd.startsWith("/help") && !cmd.includes(" ")) {
         const command = list[index]?.command;
         setCmd(command);
       }
@@ -355,13 +369,6 @@ export const Git = () => {
 
   useKeyboard({ keydown });
   const box = positionRef?.current?.getBoundingClientRect();
-
-  const killMainPID = async (pid) => {
-    await process.kill(pid);
-    methods.set("lastCommand", `kill-pid-${new Date().toISOString()}`);
-  };
-
-  const basePath = settings?.pwd?.replace("~", settings?.base);
 
   const processes = Object.values(terminal?.processes?.children || {})?.filter(
     (item) =>
@@ -526,7 +533,7 @@ export const Git = () => {
                 left: 0;
                 width: 300px;
                 background-color: ${colors.darkIndigo};
-                border-radius: 16px;
+                border-radius: 8px;
                 z-index: 100000;
                 overflow: auto;
                 overflow-x: hidden;
@@ -631,32 +638,62 @@ export const Git = () => {
             ${animation("fadeIn", ".35s ease")}
           `}
         >
-          {ports?.[basePath]?.length
-            ? ports?.[basePath]?.map((port) => (
-                <Div
-                  css={`
-                    border-radius: 16px;
-                    background-color: ${colors.darkIndigo};
-                    padding: 8px;
-                    ${flex("right")}
-                    cursor: pointer;
-                  `}
-                  onClick={() => killMainPID(port.pid)}
-                >
-                  <Div
-                    css={`
-                      border-radius: 50%;
-                      width: 6px;
-                      height: 6px;
-                      background-color: ${colors.lightGreen};
-                      margin-right: 8px;
-                      border: 3px solid ${colors.green};
-                    `}
-                  />
-                  <Text bold>{port.port}</Text>
-                </Div>
-              ))
-            : null}
+          <Div
+            css={`
+              ${flex("center")}
+              border: 4px solid ${colors.darkIndigo};
+              border-radius: 50%;
+              padding: 8px;
+              margin: 4px;
+              cursor: pointer;
+              transition: background-color 0.2s ease;
+              background-color: ${colors.darkIndigo};
+              width: 40px;
+              height: 40px;
+              box-sizing: border-box;
+              ${tab === "git" ? `background-color: ${colors.lightIndigo};` : ""}
+              :hover {
+                outline: 2px solid ${colors.lightIndigo};
+                ${shadows.md}
+              }
+              svg {
+                min-width: 32px;
+              }
+              ${shakeTree}
+            `}
+            onClick={() => setTab("git")}
+          >
+            <Tree size={24} color="white" weight="bold" className={css``} />
+          </Div>
+          <Div
+            css={`
+              ${flex("center")}
+              border: 4px solid ${colors.darkIndigo};
+              border-radius: 50%;
+              padding: 8px;
+              margin: 4px;
+              cursor: pointer;
+              transition: background-color 0.2s ease;
+              background-color: ${colors.darkIndigo};
+              width: 40px;
+              height: 40px;
+              box-sizing: border-box;
+              ${tab === "terminal"
+                ? `background-color: ${colors.lightIndigo};`
+                : ""}
+              :hover {
+                outline: 2px solid ${colors.lightIndigo};
+                ${shadows.md}
+              }
+              svg {
+                min-width: 24px;
+              }
+              ${shakeTree}
+            `}
+            onClick={() => setTab("terminal")}
+          >
+            <Terminal size={24} color="white" weight="bold" className={css``} />
+          </Div>
         </Div>
       </Div>
       {settings?.pwd in repos ? (
@@ -730,6 +767,7 @@ export const Git = () => {
                   value={cmd}
                   onChange={(e) => setCmd(e.target.value)}
                   ref={ref}
+                  placeholder={loading ? "" : "/help"}
                 />
                 {!loading ? (
                   <Button
@@ -771,70 +809,6 @@ export const Git = () => {
                 checkoutList={checkoutList}
               />
             </form>
-
-            <Div
-              css={`
-                ${flex("center")}
-                border: 4px solid ${colors.darkIndigo};
-                border-radius: 50%;
-                padding: 8px;
-                margin: 4px;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-                background-color: ${colors.darkIndigo};
-                width: 40px;
-                height: 40px;
-                box-sizing: border-box;
-                ${tab === "git"
-                  ? `background-color: ${colors.lightIndigo};`
-                  : ""}
-                :hover {
-                  outline: 2px solid ${colors.lightIndigo};
-                  ${shadows.md}
-                }
-                svg {
-                  min-width: 32px;
-                }
-                ${shakeTree}
-              `}
-              onClick={() => setTab("git")}
-            >
-              <Tree size={24} color="white" weight="bold" className={css``} />
-            </Div>
-            <Div
-              css={`
-                ${flex("center")}
-                border: 4px solid ${colors.darkIndigo};
-                border-radius: 50%;
-                padding: 8px;
-                margin: 4px;
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-                background-color: ${colors.darkIndigo};
-                width: 40px;
-                height: 40px;
-                box-sizing: border-box;
-                ${tab === "terminal"
-                  ? `background-color: ${colors.lightIndigo};`
-                  : ""}
-                :hover {
-                  outline: 2px solid ${colors.lightIndigo};
-                  ${shadows.md}
-                }
-                svg {
-                  min-width: 24px;
-                }
-                ${shakeTree}
-              `}
-              onClick={() => setTab("terminal")}
-            >
-              <Terminal
-                size={24}
-                color="white"
-                weight="bold"
-                className={css``}
-              />
-            </Div>
           </Div>
           {Object.keys(terminalActions)?.length ? (
             <Div

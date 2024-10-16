@@ -1,3 +1,4 @@
+import { css } from "@emotion/css";
 import { colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 
@@ -9,24 +10,23 @@ export const CmdList = ({
   handleCmd,
   checkoutList,
 }) => {
-  const hasCmd = !!cmd && !cmd.startsWith(">");
-
   return (
     <Div
       css={`
+        box-sizing: border-box;
         position: absolute;
         top: calc(100% + 8px);
         left: 0;
         right: 0;
         ${flex("start column")}
-        ${!hasCmd || !list?.length
+        ${!cmd || !list?.length
           ? `display: none; max-height: 0;`
           : `height: auto;`}
         border-radius: 16px;
         padding: 16px;
         width: 100%;
         transition: height 0.5s ease;
-        background-color: ${colors.blue};
+        background-color: ${colors.darkIndigo};
         z-index: 1000;
         ${shadows.md}
       `}
@@ -130,7 +130,15 @@ export const CmdList = ({
                 margin: 16px;
               `}
             >
-              {list[0]?.description}
+              <pre
+                className={css`
+                  word-break: break-word;
+                  white-space: pre-wrap;
+                  color: white;
+                `}
+              >
+                {list[0]?.description}
+              </pre>
             </Text>
             {list[0]?.command === "checkout" ||
             list[0]?.command === "parent" ? (

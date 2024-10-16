@@ -15,6 +15,7 @@ import {
   GitDiff,
   NoteBlank,
   Command,
+  Tree,
 } from "phosphor-react";
 import { toast } from "react-toastify";
 import { useAnimation } from "../hooks/use-animation";
@@ -183,7 +184,13 @@ export const Status = ({
       `}
     >
       {hasStatus ? (
-        <>
+        <Div
+          css={`
+            border-radius: 8px;
+            background-color: ${colors.darkIndigo};
+            padding: 16px;
+          `}
+        >
           <Div
             css={`
               ${flex("space-between")}
@@ -218,7 +225,7 @@ export const Status = ({
           </Div>
           <Text
             css={`
-              margin-bottom: 32px;
+              margin-bottom: 16px;
             `}
           >
             {shortStatus}
@@ -238,15 +245,15 @@ export const Status = ({
                   margin-bottom: 8px;
                 `}
               >
-                <Folder size={24} color="white" weight="fill" />
-                <Text bold>{pathname}</Text>
+                <Folder size={24} color="#fbfbbc" weight="fill" />
+                <Text bold>.../{pathname.split("/").at(-1)}</Text>
               </Div>
               <Div
                 css={`
-                  padding: 8px;
+                  padding: 0;
                   padding-left: 16px;
                   margin-left: 12px;
-                  border-left: 2px solid ${colors.lightBlue};
+                  border-left: 2px solid ${colors.light};
                 `}
               >
                 {files?.map((file) => {
@@ -255,8 +262,8 @@ export const Status = ({
                     <Div
                       css={`
                         ${flex("space-between")}
-                        padding: 4px;
                         border-radius: 8px;
+                        padding: 2px 0;
                         :hover {
                           background-color: rgba(0, 0, 0, 0.5);
                           cursor: pointer;
@@ -310,6 +317,7 @@ export const Status = ({
                       >
                         {file.type === "untracked" ? null : (
                           <>
+                            <Text>{Math.abs(netChange)}</Text>
                             {netChange >= 0 ? (
                               <PlusCircle
                                 size={24}
@@ -323,7 +331,6 @@ export const Status = ({
                                 weight="fill"
                               />
                             )}
-                            <Text>{Math.abs(netChange)}</Text>
                           </>
                         )}
                       </Div>
@@ -333,7 +340,7 @@ export const Status = ({
               </Div>
             </Div>
           ))}
-        </>
+        </Div>
       ) : (
         <Div
           css={`
@@ -342,7 +349,7 @@ export const Status = ({
         >
           <Div
             css={`
-              ${flex("left")}
+              ${flex("left start")}
               margin: auto;
               width: 100%;
               height: 150px;
@@ -360,11 +367,11 @@ export const Status = ({
             `}
             onClick={refresh}
           >
-            <NoteBlank size={80} color={colors.light} />
+            <Tree size={80} color={colors.light} />
             <Div
               css={`
                 flex-grow: 1;
-                margin-left: 16px;
+                margin: 16px;
               `}
             >
               <Text
@@ -382,16 +389,16 @@ export const Status = ({
               >
                 nothing to commit, working tree clean.
               </Text>
-              <Text
-                bold
-                css={`
-                  color: ${colors.light};
-                  padding-top: 8px;
-                `}
-              >
-                {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
-              </Text>
             </Div>
+            <Text
+              bold
+              css={`
+                color: ${colors.light};
+                margin: 16px 0;
+              `}
+            >
+              {refreshedAt ? format(new Date(refreshedAt), "h:mm.ss a") : ""}
+            </Text>
             {/* <Button onClick={refresh}>Refresh</Button> */}
           </Div>
         </Div>

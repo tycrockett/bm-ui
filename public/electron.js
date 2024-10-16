@@ -60,8 +60,9 @@ ipcMain.on("kill", (event, pid) => {
 ipcMain.on("spawn", (event, { pwd, command }) => {
   // Spawn the child process
   const child = spawn("zsh", [
+    "-l",
     "-c",
-    `source ~/.zshrc && cd ${pwd} && ` + command,
+    `source ~/.zshrc && cd ${pwd} && ${command}`,
   ]);
   processes[child.pid] = child;
   childProcesses = {

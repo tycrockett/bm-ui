@@ -50,7 +50,7 @@ export const Extensions = () => {
             <Div
               css={`
                 box-sizing: border-box;
-                border-radius: 16px;
+                border-radius: 8px;
                 background-color: ${colors.darkIndigo};
                 padding: 8px 16px;
                 margin: 4px;
@@ -205,7 +205,7 @@ const defaultCommands = [
     args: "",
     flags: "",
     description:
-      "Pulls parent origin and then automatically merges the parent branch into the current branch.",
+      "Pulls parent origin and automatically merges the parent branch into the current branch.",
     function: async ({ command, context }) => {
       await update(command.options);
     },
@@ -216,7 +216,7 @@ const defaultCommands = [
     args: "{description}",
     flags: "",
     description:
-      "Adds all unstaged files, commits all files with a description message and then pushes everything if a remote branch exists.",
+      "- Adds all unstaged files \n- Commits all files with a {description} message \n- Pushes everything if a remote branch is detected.",
     function: async ({ command, context }) => {
       const description = command.args
         .filter((v) => !v.startsWith("-"))
@@ -263,16 +263,15 @@ const defaultCommands = [
   },
 
   {
-    name: "Branches",
-    command: "branches",
+    name: "Prune",
+    command: "prune",
     args: "",
-    flags: "-p --prune --open-remote -or",
+    flags: "-b --branches",
     description:
-      "--prune removes all branches without a remote branch. --open-remote opens all branches with a remove branch.",
+      "--branches: deletes all local branches without a detected remote branch.",
     function: async ({ command, context }) => {
       const flags = command?.options?.flags;
-      if (flags.includes("--prune") || flags.includes("-p")) {
-        console.log(command?.branches);
+      if (flags.includes("--branches") || flags.includes("-b")) {
         await pruneLocalBranches(command?.branches, command?.options);
       }
     },
@@ -351,7 +350,7 @@ const defaultCommands = [
     args: "{branchName}",
     flags: "--local",
     description:
-      "Renames local active branch and attempts to rename the remote branch. --local: will stop attempts to rename the remote branch.",
+      "- Renames local active branch \n- Attempts to rename the remote branch. \n\n--local: will stop attempts to rename the remote branch.\n--remote: will only attempt to rename remote branch.",
     function: async ({ command, context }) => {
       await renameBranch(command.args[0], command.options);
       let next = { ...context.store?.repos };
@@ -373,7 +372,7 @@ const defaultCommands = [
     command: "fetch",
     args: "",
     flags: "",
-    description: "Does a git fetch -p",
+    description: "git fetch -p",
     function: async ({ command, context }) => {
       await fetch();
     },
