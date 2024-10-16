@@ -973,7 +973,6 @@ export const Git = () => {
               <Div
                 css={`
                   ${flex("left end")}
-                  margin-bottom: 8px;
                   border-bottom: 3px solid ${colors.darkIndigo};
                   gap: 8px;
                   width: 100%;
@@ -1028,11 +1027,17 @@ export const Git = () => {
                   css={`
                     flex-grow: 1;
                     background-color: #121212;
-                    border-radius: 8px;
+                    border-radius: 16px;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                    border-left: 3px solid ${colors.darkIndigo};
+                    border-right: 3px solid ${colors.darkIndigo};
+                    border-bottom: 3px solid ${colors.darkIndigo};
                     overflow: hidden;
                     overflow-y: auto;
                     padding: 16px;
-                    max-height: calc(100vh - 400px);
+                    padding-top: 64px;
+                    height: calc(100vh - 400px);
                     min-height: 8px;
                     ${scrollbar.style}
                   `}
@@ -1090,8 +1095,9 @@ export const Git = () => {
                           padding: 4px 8px;
                           margin: -4px -8px;
                           :hover {
-                            background-color: rgba(255, 255, 255, 0.3);
+                            background-color: rgba(255, 255, 255, 0.05);
                             outline-offset: -3px;
+                            outline: 1px solid white;
                           }
                           cursor: default;
                           word-break: break-word;

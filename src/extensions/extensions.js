@@ -205,7 +205,7 @@ const defaultCommands = [
     args: "",
     flags: "",
     description:
-      "Pulls parent origin and automatically merges the parent branch into the current branch.",
+      "Pulls parent origin and merges the parent branch into the current branch.",
     function: async ({ command, context }) => {
       await update(command.options);
     },
