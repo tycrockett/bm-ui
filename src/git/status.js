@@ -61,12 +61,18 @@ export const Status = ({
   }, [status?.lastUpdate]);
 
   const shortStatus = useAsyncValue(
+    async () => await cmd(`git diff --shortstat`),
+    [refreshedAt]
+  );
+
+  const asdf = useAsyncValue(
     async () =>
       await cmd(
-        `git diff ${parentBranch}...${currentBranch || ""} --stat | tail -n1 `
+        `git status --porcelain | grep -v '??' | awk '{print $1}' | sort | uniq -c`
       ),
     [refreshedAt]
   );
+
   const hasStatus =
     !!status?.modified?.length ||
     !!status?.deleted?.length ||

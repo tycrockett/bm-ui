@@ -263,21 +263,6 @@ const defaultCommands = [
   },
 
   {
-    name: "Prune",
-    command: "prune",
-    args: "",
-    flags: "-b --branches",
-    description:
-      "--branches: deletes all local branches without a detected remote branch.",
-    function: async ({ command, context }) => {
-      const flags = command?.options?.flags;
-      if (flags.includes("--branches") || flags.includes("-b")) {
-        await pruneLocalBranches(command?.branches, command?.options);
-      }
-    },
-  },
-
-  {
     name: "Delete",
     command: "delete",
     args: "",
@@ -302,6 +287,7 @@ const defaultCommands = [
       }
     },
   },
+
   {
     name: "Push",
     command: "push",
@@ -313,6 +299,22 @@ const defaultCommands = [
       await push(command.options);
     },
   },
+
+  {
+    name: "Prune",
+    command: "prune",
+    args: "",
+    flags: "-b --branches",
+    description:
+      "--branches: deletes all local branches without a detected remote branch.",
+    function: async ({ command, context }) => {
+      const flags = command?.options?.flags;
+      if (flags.includes("--branches") || flags.includes("-b")) {
+        await pruneLocalBranches(command?.branches, command?.options);
+      }
+    },
+  },
+
   {
     name: "Clear",
     command: "clear",
