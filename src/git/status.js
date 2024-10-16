@@ -65,14 +65,6 @@ export const Status = ({
     [refreshedAt]
   );
 
-  const asdf = useAsyncValue(
-    async () =>
-      await cmd(
-        `git status --porcelain | grep -v '??' | awk '{print $1}' | sort | uniq -c`
-      ),
-    [refreshedAt]
-  );
-
   const hasStatus =
     !!status?.modified?.length ||
     !!status?.deleted?.length ||
@@ -263,7 +255,6 @@ export const Status = ({
                 `}
               >
                 {files?.map((file) => {
-                  const netChange = file.adds - file.deletes;
                   return (
                     <Div
                       css={`
@@ -313,9 +304,10 @@ export const Status = ({
                         css={`
                           ${flex("right")}
                           svg {
-                            margin-right: 8px;
+                            margin-left: 8px;
                           }
                           p {
+                            text-align: right;
                             min-width: 50px;
                             font-weight: bold;
                           }
@@ -323,20 +315,26 @@ export const Status = ({
                       >
                         {file.type === "untracked" ? null : (
                           <>
-                            <Text>{Math.abs(netChange)}</Text>
-                            {netChange >= 0 ? (
-                              <PlusCircle
-                                size={24}
-                                color={colors.green}
-                                weight="fill"
-                              />
-                            ) : (
-                              <MinusCircle
-                                size={24}
-                                color={colors.green}
-                                weight="fill"
-                              />
-                            )}
+                            {file.adds >= 0 ? (
+                              <>
+                                <Text>{file.adds}</Text>
+                                <PlusCircle
+                                  size={24}
+                                  color={colors.green}
+                                  weight="fill"
+                                />
+                              </>
+                            ) : null}
+                            {file.deletes ? (
+                              <>
+                                <Text>{file.deletes}</Text>
+                                <MinusCircle
+                                  size={24}
+                                  color={colors.red}
+                                  weight="fill"
+                                />
+                              </>
+                            ) : null}
                           </>
                         )}
                       </Div>
@@ -363,15 +361,14 @@ export const Status = ({
               background-color: ${colors.darkIndigo};
               padding: 32px;
               box-sizing: border-box;
-              transition: background-color 0.2s ease;
               user-select: none;
               :hover {
-                cursor: pointer;
-                background-color: ${colors.darkIndigo}cc;
-                ${shadows.md}
+                cursor: default;
+              }
+              svg {
+                ${shake}
               }
             `}
-            onClick={refresh}
           >
             <Tree size={80} color={colors.light} />
             <Div
