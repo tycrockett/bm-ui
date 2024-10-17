@@ -229,7 +229,6 @@ const App = () => {
         <Div
           css={`
             ${flex("left")}
-            margin-bottom: 16px;
           `}
         >
           <Button
@@ -237,7 +236,7 @@ const App = () => {
             disabled={settings?.pwd === "~"}
             onClick={goBack}
             css={`
-              margin-right: 16px;
+              margin-right: 8px;
               padding: 16px;
             `}
           >
@@ -425,6 +424,20 @@ const App = () => {
               ) : null}
             </Div>
           ) : null}
+          <Button
+            icon
+            disabled={settings?.pwd === "~"}
+            css={`
+              margin-right: 8px;
+              padding: 16px;
+            `}
+            onClick={() =>
+              cmd('open -n -b "com.microsoft.VSCode" --args "$PWD"')
+            }
+          >
+            <ArrowSquareOut weight="bold" />
+          </Button>
+
           <Div
             css={`
               position: relative;

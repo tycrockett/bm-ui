@@ -348,7 +348,7 @@ export const Status = ({
       ) : (
         <Div
           css={`
-            margin: 24px 0;
+            margin: 8px 0;
           `}
         >
           <Div

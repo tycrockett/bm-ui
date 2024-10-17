@@ -1,5 +1,5 @@
 import { useDebounce } from "./use-debounce";
-import { useEvents } from "./use-events";
+import { useEvent } from "./use-event";
 
 const getCapturedKeys = (event) => {
   const { code, metaKey, altKey, ctrlKey, shiftKey } = event;
@@ -10,26 +10,30 @@ const getCapturedKeys = (event) => {
     shift: shiftKey,
   }).reduce((prev, [key, value]) => {
     if (value && prev) {
-      return prev + '+' + key;
+      return prev + "+" + key;
     } else if (value) {
       return prev + key;
     } else {
       return prev;
     }
-  }, '');
-  if (code.includes('Meta') || code.includes('Alt') || code.includes('Ctrl') || code.includes('Shift')) {
+  }, "");
+  if (
+    code.includes("Meta") ||
+    code.includes("Alt") ||
+    code.includes("Ctrl") ||
+    code.includes("Shift")
+  ) {
     return keys;
   } else {
-    return keys + '+' + code;
+    return keys + "+" + code;
   }
-}
+};
 
 export const useKeyboard = ({
   keydown = null,
   keyup = null,
-  options = { useCapture: false }
+  options = { useCapture: false },
 } = {}) => {
-
   const handleKeydown = (event) => {
     if (keydown !== null) {
       const capturedKeys = getCapturedKeys(event);
@@ -46,11 +50,8 @@ export const useKeyboard = ({
 
   const debounced_handleKeyup = useDebounce(handleKeyup, 10);
 
-  useEvents(document, {
-    'keydown': [handleKeydown, options.useCapture],
-    'keyup': [debounced_handleKeyup, options.useCapture]
-  });
+  useEvent("keydown", handleKeydown, options);
+  useEvent("keyup", debounced_handleKeyup, options);
 
   return {};
-
-}
+};

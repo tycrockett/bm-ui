@@ -1,6 +1,8 @@
 import { useContext, useMemo } from "react";
 import { StoreContext } from "../context/store";
-import { Div, Text } from "../shared";
+import { colors, Div, Text } from "../shared";
+import { flex } from "../shared/utils";
+import { List, Note } from "phosphor-react";
 
 export const Logs = () => {
   const context = useContext(StoreContext);
@@ -20,19 +22,26 @@ export const Logs = () => {
       `}
     >
       {!list?.length ? (
-        <Text
-          bold
+        <Div
           css={`
             margin: 32px 0;
+            padding: 32px;
+            border-radius: 16px;
+            background-color: ${colors.darkIndigo};
+            ${flex("left")}
+            svg {
+              margin-right: 16px;
+            }
           `}
         >
-          Looks like there are no logs to view.
-        </Text>
+          <Note size={64} color={colors.light} />
+          <Text bold>Looks like there are no logs to view.</Text>
+        </Div>
       ) : (
         list?.map((item) => (
           <Div
             css={`
-              background-color: rgba(0, 0, 0, 0.2);
+              background-color: ${colors.darkIndigo};
               border-radius: 8px;
               padding: 16px;
               margin: 8px 0;

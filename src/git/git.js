@@ -18,12 +18,12 @@ import {
 import {
   ArrowElbowRightDown,
   CaretDown,
-  CaretUp,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
   Minus,
+  NoteBlank,
   Plus,
   Terminal,
   Tree,
@@ -44,6 +44,9 @@ import { useTerminal } from "../terminal/useTerminal";
 import Ansi from "ansi-to-react";
 import { scrollbar } from "../shared/styles";
 import { Collapse } from "../shared/Collapse";
+import { useEvent } from "../hooks/use-event";
+import { useStateSync } from "../hooks/use-state-sync";
+import { Tooltip } from "../shared/Tooltip";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -87,10 +90,40 @@ export const Git = () => {
 
   const branchRef = useOutsideClick(() => setBranchOptions(false));
   const actionsRef = useOutsideClick(() => setDisplayActions(false));
+  const notesRef = useRef();
+
+  useEvent(
+    "input",
+    () => {
+      notesRef.current.style.height = "auto";
+      notesRef.current.style.height = `${
+        notesRef?.current?.scrollHeight + 8
+      }px`;
+    },
+    { element: notesRef.current }
+  );
 
   const [tab, setTab] = useState("git");
 
   const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
+
+  const [notes, setNotes] = useStateSync(repo?.notes || "");
+
+  const blurNotes = () => {
+    context.methods.setRepos({
+      ...context.store?.repos,
+      [context.store?.settings?.pwd]: {
+        ...context.store?.repos?.[context.store?.settings?.pwd],
+        branches: {
+          ...branches,
+          [branches?.current]: {
+            ...(branches?.[branches?.current] || {}),
+            notes,
+          },
+        },
+      },
+    });
+  };
 
   const parentBranch =
     repos?.[settings?.pwd]?.branches?.[branches?.current]?.parentBranch ||
@@ -336,33 +369,44 @@ export const Git = () => {
     } catch {}
   };
   const keydown = async (captured, event) => {
-    if (captured === "+Tab") {
-      event.preventDefault();
-      let nextIndex = index + 1;
-      if (nextIndex >= list.length) {
-        nextIndex = 0;
-      }
-      setIndex(nextIndex);
-    } else if (captured === "+Escape") {
-      setCmd("");
-    } else if (captured === "+Space") {
-      if (!cmd.startsWith("/help") && !cmd.includes(" ")) {
-        const command = list[index]?.command;
-        setCmd(command);
-      }
-    } else {
-      const entries = Object.entries(actions);
-      const entry = entries?.find(([_, item]) => item?.shortkey === captured);
-
-      if (entry?.length) {
-        const [key, item] = entry;
-        if (item?.type === "git") {
-          event.preventDefault();
-          event.stopPropagation();
-          handleGit(key, item?.list);
+    if (captured === "meta+KeyN") {
+      setTab("notes");
+      setTimeout(() => {
+        notesRef?.current?.focus();
+      }, 100);
+    } else if (captured === "meta+KeyG") {
+      setTab("git");
+    } else if (captured === "meta+shift+KeyT") {
+      setTab("terminal");
+    } else if (tab !== "notes") {
+      if (captured === "+Tab") {
+        event.preventDefault();
+        let nextIndex = index + 1;
+        if (nextIndex >= list.length) {
+          nextIndex = 0;
+        }
+        setIndex(nextIndex);
+      } else if (captured === "+Escape") {
+        setCmd("");
+      } else if (captured === "+Space") {
+        if (!cmd.startsWith("/help") && !cmd.includes(" ")) {
+          const command = list[index]?.command;
+          setCmd(command);
         }
       } else {
-        ref.current.focus();
+        const entries = Object.entries(actions);
+        const entry = entries?.find(([_, item]) => item?.shortkey === captured);
+
+        if (entry?.length) {
+          const [key, item] = entry;
+          if (item?.type === "git") {
+            event.preventDefault();
+            event.stopPropagation();
+            handleGit(key, item?.list);
+          }
+        } else {
+          ref.current.focus();
+        }
       }
     }
   };
@@ -463,7 +507,7 @@ export const Git = () => {
       css={`
         ${flex("column")}
         padding: 0 16px;
-        margin: 8px 0;
+        margin: 0;
       `}
     >
       <Div
@@ -473,11 +517,126 @@ export const Git = () => {
       >
         <Div
           css={`
+            ${flex("left")}
+            ${animation("fadeIn", ".35s ease")}
+          `}
+        >
+          <Tooltip label="Git Command">
+            <Div
+              css={`
+                ${flex("center")}
+                border: 4px solid ${colors.darkIndigo};
+                border-radius: 50%;
+                padding: 8px;
+                margin: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                background-color: ${colors.darkIndigo};
+                width: 40px;
+                height: 40px;
+                box-sizing: border-box;
+                ${tab === "git"
+                  ? `background-color: ${colors.lightIndigo};`
+                  : ""}
+                :hover {
+                  outline: 2px solid ${colors.lightIndigo};
+                  ${shadows.md}
+                }
+                svg {
+                  min-width: 32px;
+                }
+                ${shakeTree}
+              `}
+              onClick={() => setTab("git")}
+            >
+              <Tree size={24} color="white" weight="bold" />
+            </Div>
+          </Tooltip>
+          <Tooltip label="Terminal">
+            <Div
+              css={`
+                ${flex("center")}
+                border: 4px solid ${colors.darkIndigo};
+                border-radius: 50%;
+                padding: 8px;
+                margin: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                background-color: ${colors.darkIndigo};
+                width: 40px;
+                height: 40px;
+                box-sizing: border-box;
+                ${tab === "terminal"
+                  ? `background-color: ${colors.lightIndigo};`
+                  : ""}
+                :hover {
+                  outline: 2px solid ${colors.lightIndigo};
+                  ${shadows.md}
+                }
+                svg {
+                  min-width: 24px;
+                }
+                ${shakeTree}
+              `}
+              onClick={() => setTab("terminal")}
+            >
+              <Terminal size={24} color="white" weight="bold" />
+            </Div>
+          </Tooltip>
+          <Tooltip label="Branch Notes">
+            <Div
+              css={`
+                position: relative;
+                ${flex("center")}
+                border: 4px solid ${colors.darkIndigo};
+                border-radius: 50%;
+                padding: 8px;
+                margin: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+                background-color: ${colors.darkIndigo};
+                width: 40px;
+                height: 40px;
+                box-sizing: border-box;
+                ${tab === "notes"
+                  ? `background-color: ${colors.lightIndigo};`
+                  : ""}
+                :hover {
+                  outline: 2px solid ${colors.lightIndigo};
+                  ${shadows.md}
+                }
+                svg {
+                  min-width: 24px;
+                }
+                ${shakeTree}
+              `}
+              onClick={() => setTab("notes")}
+            >
+              {repo?.notes ? (
+                <Div
+                  css={`
+                    position: absolute;
+                    top: -2px;
+                    right: -2px;
+                    background-color: ${colors.red};
+                    border-radius: 50%;
+                    width: 8px;
+                    height: 8px;
+                  `}
+                />
+              ) : null}
+              <NoteBlank size={24} color="white" weight="bold" />
+            </Div>
+          </Tooltip>
+        </Div>
+        <Div
+          css={`
             position: relative;
             ${flex("left")}
             margin: 16px 0;
             width: max-content;
             height: 32px;
+            margin-right: 8px;
           `}
           onClick={(e) => {
             setBranchOptions(true);
@@ -530,7 +689,7 @@ export const Git = () => {
                 position: absolute;
                 pointer-events: all;
                 top: calc(100% + 16px);
-                left: 0;
+                right: 0;
                 width: 300px;
                 background-color: ${colors.darkIndigo};
                 border-radius: 8px;
@@ -632,69 +791,6 @@ export const Git = () => {
             </Div>
           ) : null}
         </Div>
-        <Div
-          css={`
-            ${flex("right")}
-            ${animation("fadeIn", ".35s ease")}
-          `}
-        >
-          <Div
-            css={`
-              ${flex("center")}
-              border: 4px solid ${colors.darkIndigo};
-              border-radius: 50%;
-              padding: 8px;
-              margin: 4px;
-              cursor: pointer;
-              transition: background-color 0.2s ease;
-              background-color: ${colors.darkIndigo};
-              width: 40px;
-              height: 40px;
-              box-sizing: border-box;
-              ${tab === "git" ? `background-color: ${colors.lightIndigo};` : ""}
-              :hover {
-                outline: 2px solid ${colors.lightIndigo};
-                ${shadows.md}
-              }
-              svg {
-                min-width: 32px;
-              }
-              ${shakeTree}
-            `}
-            onClick={() => setTab("git")}
-          >
-            <Tree size={24} color="white" weight="bold" className={css``} />
-          </Div>
-          <Div
-            css={`
-              ${flex("center")}
-              border: 4px solid ${colors.darkIndigo};
-              border-radius: 50%;
-              padding: 8px;
-              margin: 4px;
-              cursor: pointer;
-              transition: background-color 0.2s ease;
-              background-color: ${colors.darkIndigo};
-              width: 40px;
-              height: 40px;
-              box-sizing: border-box;
-              ${tab === "terminal"
-                ? `background-color: ${colors.lightIndigo};`
-                : ""}
-              :hover {
-                outline: 2px solid ${colors.lightIndigo};
-                ${shadows.md}
-              }
-              svg {
-                min-width: 24px;
-              }
-              ${shakeTree}
-            `}
-            onClick={() => setTab("terminal")}
-          >
-            <Terminal size={24} color="white" weight="bold" className={css``} />
-          </Div>
-        </Div>
       </Div>
       {settings?.pwd in repos ? (
         <Div
@@ -705,111 +801,113 @@ export const Git = () => {
             box-sizing: border-box;
           `}
         >
-          <Div
-            css={`
-              ${flex("left")}
-              width: 100%;
-              box-sizing: border-box;
-              margin-bottom: 16px;
-              margin: 8px 0;
-              select {
-                width: 200px;
-                padding: 12px 8px;
-                border-radius: 8px;
-                outline: none;
-                cursor: pointer;
-              }
-              form {
-                position: relative;
-                flex-grow: 1;
-                margin-right: 8px;
-                input {
-                  width: calc(100% - 24px);
-                  transition: background-color 0.25s ease;
+          {tab !== "notes" ? (
+            <Div
+              css={`
+                ${flex("left")}
+                width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 16px;
+                margin: 8px 0;
+                select {
+                  width: 200px;
+                  padding: 12px 8px;
+                  border-radius: 8px;
+                  outline: none;
+                  cursor: pointer;
                 }
-              }
-              svg {
-                min-width: 32px;
-              }
-            `}
-          >
-            <form
-              onSubmit={handleCmd}
-              className={css`
-                position: relative;
+                form {
+                  position: relative;
+                  flex-grow: 1;
+                  margin-right: 8px;
+                  input {
+                    width: calc(100% - 24px);
+                    transition: background-color 0.25s ease;
+                  }
+                }
+                svg {
+                  min-width: 32px;
+                }
               `}
             >
-              {loading ? <Loader /> : null}
-              <Div
-                css={`
+              <form
+                onSubmit={handleCmd}
+                className={css`
                   position: relative;
-                  transition: opacity 0.2s ease;
-                  opacity: 0.3;
-                  :focus-within {
-                    opacity: 0.8;
-                  }
-                  border: 1px solid ${colors.darkIndigo};
-                  ${shadows.lg}
-                  ${loading
-                    ? `
+                `}
+              >
+                {loading ? <Loader /> : null}
+                <Div
+                  css={`
+                    position: relative;
+                    transition: opacity 0.2s ease;
+                    opacity: 0.3;
+                    :focus-within {
+                      opacity: 0.8;
+                    }
+                    border: 1px solid ${colors.darkIndigo};
+                    ${shadows.lg}
+                    ${loading
+                      ? `
                     background-color: white;
                     padding-right: 0;
                   `
-                    : `
+                      : `
                     background-color: white;
                     padding-right: 32px;
                   `}
                   border-radius: 8px;
-                `}
-              >
-                <Input
-                  disabled={loading}
-                  value={cmd}
-                  onChange={(e) => setCmd(e.target.value)}
-                  ref={ref}
-                  placeholder={loading ? "" : "/help"}
-                />
-                {!loading ? (
-                  <Button
-                    dark
-                    icon
-                    sm
-                    css={`
-                      position: absolute;
-                      top: 0;
-                      right: 0;
-                      transition: color 0.2s ease;
-                      transition: background-color 0.2s ease;
-                      color: ${colors.darkIndigo};
-                      border-radius: 50%;
-                      background-color: ${colors.darkIndigo};
-                      color: white;
-                      border: none;
-                      margin: 8px;
-                      :hover {
-                        background: ${colors.lightIndigo};
+                  `}
+                >
+                  <Input
+                    disabled={loading}
+                    value={cmd}
+                    onChange={(e) => setCmd(e.target.value)}
+                    ref={ref}
+                    placeholder={loading ? "" : "/help"}
+                  />
+                  {!loading ? (
+                    <Button
+                      dark
+                      icon
+                      sm
+                      css={`
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        transition: color 0.2s ease;
+                        transition: background-color 0.2s ease;
+                        color: ${colors.darkIndigo};
+                        border-radius: 50%;
+                        background-color: ${colors.darkIndigo};
                         color: white;
-                      }
-                    `}
-                    onClick={handleCmd}
-                  >
-                    <ArrowElbowRightDown weight="bold" />
-                  </Button>
-                ) : null}
-              </Div>
-              <CmdList
-                list={list}
-                index={index}
-                cmd={cmd}
-                handleCmd={handleCmd}
-                setCmd={(value) => {
-                  setCmd(`${value} `);
-                  ref?.current?.focus();
-                }}
-                checkoutList={checkoutList}
-              />
-            </form>
-          </Div>
+                        border: none;
+                        margin: 8px;
+                        :hover {
+                          background: ${colors.lightIndigo};
+                          color: white;
+                        }
+                      `}
+                      onClick={handleCmd}
+                    >
+                      <ArrowElbowRightDown weight="bold" />
+                    </Button>
+                  ) : null}
+                </Div>
+                <CmdList
+                  list={list}
+                  index={index}
+                  cmd={cmd}
+                  handleCmd={handleCmd}
+                  setCmd={(value) => {
+                    setCmd(`${value} `);
+                    ref?.current?.focus();
+                  }}
+                  checkoutList={checkoutList}
+                />
+              </form>
+            </Div>
+          ) : null}
           {Object.keys(terminalActions)?.length ? (
             <Div
               css={`
@@ -935,18 +1033,6 @@ export const Git = () => {
               >
                 {repo?.description}
               </Text>
-              {repo?.notes?.length ? (
-                <Div
-                  css={`
-                    padding: 8px 0;
-                    padding-bottom: 16px;
-                  `}
-                >
-                  {repo?.notes?.map((item) => (
-                    <Text>{item}</Text>
-                  ))}
-                </Div>
-              ) : null}
 
               <Status
                 status={status}
@@ -1026,7 +1112,7 @@ export const Git = () => {
                 <Div
                   css={`
                     flex-grow: 1;
-                    background-color: #121212;
+                    background-color: ${colors.darkIndigo};
                     border-radius: 16px;
                     border-top-left-radius: 0;
                     border-top-right-radius: 0;
@@ -1118,6 +1204,33 @@ export const Git = () => {
                   <div ref={terminalRef} />
                 </Div>
               </Div>
+            </Div>
+          ) : tab === "notes" ? (
+            <Div
+              css={`
+                width: 100%;
+                border-radius: 8px;
+                box-sizing: border-box;
+                margin-top: 8px;
+              `}
+            >
+              <textarea
+                ref={notesRef}
+                className={css`
+                  box-sizing: border-box;
+                  width: calc(100% - 8px);
+                  padding: 8px;
+                  border-radius: 8px;
+                  outline: none;
+                  background-color: ${colors.darkIndigo};
+                  color: white;
+                  max-height: calc(100vh - 400px);
+                  resize: none;
+                `}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                onBlur={blurNotes}
+              />
             </Div>
           ) : null}
         </Div>

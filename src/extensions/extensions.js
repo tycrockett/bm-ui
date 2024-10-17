@@ -43,29 +43,28 @@ export const Extensions = () => {
       <Div
         css={`
           margin-top: 16px;
+          background-color: ${colors.darkIndigo};
+          border-radius: 16px;
+          padding: 8px 0;
+          box-sizing: border-box;
+          overflow: hidden;
         `}
       >
         {extensions?.map((cmd) =>
           cmd?.hideExtension ? null : (
             <Div
               css={`
-                box-sizing: border-box;
-                border-radius: 8px;
                 background-color: ${colors.darkIndigo};
                 padding: 8px 16px;
-                margin: 4px;
-                min-width: max-content;
                 :hover {
-                  background-color: ${colors.lightIndigo};
+                  background-color: rgba(0, 0, 0, 0.5);
                   transition: background-color 0.2s ease;
                   cursor: pointer;
                 }
               `}
               onClick={() => setExtension(cmd)}
             >
-              <Text h3 bold>
-                {cmd?.name}
-              </Text>
+              <Text bold>{cmd?.name}</Text>
             </Div>
           )
         )}
@@ -430,9 +429,9 @@ const defaultCommands = [
   {
     name: "Note",
     command: "note",
-    args: "{note}",
+    args: '"{note}"',
     flags: "",
-    description: "Adds a note to the current branch which can be viewed later.",
+    description: "Adds a quick-note to the current branch.",
     function: async ({ command, context }) => {
       const branchName = command.options?.currentBranch;
       const branches =

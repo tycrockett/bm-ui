@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDeepCompareEffect } from "use-deep-compare";
 
-export const useStateSync = (valueFn, deps = []) => {
+export const useStateSync = (valueFn, deps = [valueFn]) => {
   const getSyncValue = () => {
     let syncValue = valueFn;
     if (typeof valueFn === "function") {
