@@ -935,7 +935,10 @@ export const Git = () => {
                 `}
               >
                 <Warning size={24} color="yellow" />
-                <Text>Detected Terminal Actions</Text>
+                <Text>
+                  Detected Terminal Actions (
+                  {Object.values(terminalActions)[0]?.actions?.length})
+                </Text>
               </Div>
               <CaretDown size={24} color="white" />
               {displayActions ? (
