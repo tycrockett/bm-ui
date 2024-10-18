@@ -5,6 +5,7 @@ import { shadows } from "./utils";
 import { useEvent } from "../hooks/use-event";
 import { Portal } from "./Portal";
 import { Text } from "./text";
+import { css } from "@emotion/css";
 
 export const tooltipTheme = {
   default: `
@@ -53,7 +54,17 @@ export const Tooltip = ({ label = "", popper: popperProps = {}, children }) => {
       {cloneElement(child, { ref: setAnchor })}
       {open ? (
         <Portal>
-          <div ref={setTooltip} style={styles.popper} {...attributes.popper}>
+          <div
+            ref={setTooltip}
+            className={css`
+              background-color: ${colors.darkIndigo};
+              ${shadows.lg}
+              border-radius: 8px;
+              padding: 8px;
+            `}
+            style={styles.popper}
+            {...attributes.popper}
+          >
             <Text label>{label}</Text>
           </div>
         </Portal>
