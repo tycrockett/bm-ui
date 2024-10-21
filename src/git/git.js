@@ -40,6 +40,7 @@ import { useStateSync } from "../hooks/use-state-sync";
 import { Tooltip } from "../shared/Tooltip";
 import { TerminalCommand } from "./TerminalCommand";
 import { useActions } from "../hooks/useActions";
+import { Shortkey } from "../Shortkey";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -99,7 +100,7 @@ export const Git = () => {
     { element: notesRef.current }
   );
 
-  const [tab, setTab] = useState("git");
+  const [tab, setTab] = useState("command");
 
   const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
 
@@ -198,7 +199,7 @@ export const Git = () => {
     };
 
     try {
-      if (executingCommand.startsWith("git")) {
+      if (executingCommand.startsWith("command")) {
         await execCmd(executingCommand);
       } else {
         await commandDetails.function({
@@ -359,7 +360,7 @@ export const Git = () => {
   };
 
   const keydown = async (captured, event) => {
-    if (tab === "git") {
+    if (tab === "command") {
       if (captured === "+Tab") {
         event.preventDefault();
         let nextIndex = index + 1;
@@ -405,7 +406,7 @@ export const Git = () => {
             ${animation("fadeIn", ".35s ease")}
           `}
         >
-          <Tooltip label="Git Command">
+          <Tooltip label="Git Command" shortkey="navigate-git-command">
             <Div
               css={`
                 ${flex("center")}
@@ -419,7 +420,7 @@ export const Git = () => {
                 width: 40px;
                 height: 40px;
                 box-sizing: border-box;
-                ${tab === "git"
+                ${tab === "command"
                   ? `background-color: ${colors.lightIndigo};`
                   : ""}
                 :hover {
@@ -431,12 +432,12 @@ export const Git = () => {
                 }
                 ${shakeTree}
               `}
-              onClick={() => setTab("git")}
+              onClick={() => setTab("command")}
             >
               <Tree size={24} color="white" weight="bold" />
             </Div>
           </Tooltip>
-          <Tooltip label="Terminal">
+          <Tooltip label="Terminal" shortkey="open-internal-terminal">
             <Div
               css={`
                 position: relative;
@@ -481,7 +482,7 @@ export const Git = () => {
               <Terminal size={24} color="white" weight="bold" />
             </Div>
           </Tooltip>
-          <Tooltip label="Branch Notes">
+          <Tooltip label="Branch Notes" shortkey="open-branch-notes">
             <Div
               css={`
                 position: relative;
@@ -639,17 +640,7 @@ export const Git = () => {
                     ? `Open Remote - ${branches?.current}`
                     : `Create Remote - ${branches?.current}`}
                 </Text>
-                <Div
-                  css={`
-                    ${flex("right")}
-                    svg {
-                      min-width: 16px;
-                    }
-                  `}
-                >
-                  <Command color="white" size={16} />
-                  <Text>R</Text>
-                </Div>
+                <Shortkey type="open-github" />
               </Div>
               <hr
                 className={css`
@@ -699,7 +690,7 @@ export const Git = () => {
             box-sizing: border-box;
           `}
         >
-          {tab === "git" ? (
+          {tab === "command" ? (
             <Div
               css={`
                 ${flex("left")}
@@ -806,7 +797,7 @@ export const Git = () => {
               </form>
             </Div>
           ) : null}
-          {tab === "git" ? (
+          {tab === "command" ? (
             <Div
               css={`
                 ${flex("column")}

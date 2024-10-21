@@ -4,6 +4,7 @@ import {
   BookmarkSimple,
   CaretDown,
   Command,
+  DotsThreeVertical,
   Gear,
   X,
 } from "phosphor-react";
@@ -23,6 +24,7 @@ import { useOutsideClick } from "./shared/use-outside-click";
 import { useInterval } from "./hooks/useInterval";
 import { Tooltip } from "./shared/Tooltip";
 import { useActions } from "./hooks/useActions";
+import { Shortkey } from "./Shortkey";
 
 const header = `
   padding: 8px 16px;
@@ -431,7 +433,6 @@ const App = () => {
             icon
             disabled={settings?.pwd === "~"}
             css={`
-              margin-right: 8px;
               padding: 16px;
             `}
             onClick={() =>
@@ -451,7 +452,7 @@ const App = () => {
               icon
               onClick={() => setDropdown(dropdown ? "" : "settings")}
             >
-              <Gear weight="bold" />
+              <DotsThreeVertical weight="bold" />
             </Button>
 
             {dropdown === "settings" ? (
@@ -482,23 +483,7 @@ const App = () => {
                   onClick={() => setMode("git")}
                 >
                   <Text>Git Command</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      G
-                    </Text>
-                  </Div>
+                  <Shortkey type="navigate-git" />
                 </Div>
                 <Div
                   css={`
@@ -511,23 +496,7 @@ const App = () => {
                   onClick={() => setMode("finder")}
                 >
                   <Text>Finder</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      F
-                    </Text>
-                  </Div>
+                  <Shortkey type="navigate-finder" />
                 </Div>
                 <Div
                   css={`
@@ -540,23 +509,7 @@ const App = () => {
                   onClick={() => setMode("logs")}
                 >
                   <Text>Logs</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      D
-                    </Text>
-                  </Div>
+                  <Shortkey type="navigate-logs" />
                 </Div>
                 <Div
                   css={`
@@ -569,23 +522,7 @@ const App = () => {
                   onClick={() => setMode("extensions")}
                 >
                   <Text>Extensions</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      D
-                    </Text>
-                  </Div>
+                  <Shortkey type="navigate-extensions" />
                 </Div>
 
                 <Div
@@ -599,23 +536,7 @@ const App = () => {
                   onClick={() => setMode("settings")}
                 >
                   <Text>Settings</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      S
-                    </Text>
-                  </Div>
+                  <Shortkey type="navigate-settings" />
                 </Div>
                 <Div
                   css={`
@@ -628,23 +549,7 @@ const App = () => {
                   onClick={() => setMode("settings")}
                 >
                   <Text>Create Bookmark</Text>
-                  <Div
-                    css={`
-                      ${flex("right")}
-                      svg {
-                        min-width: 16px;
-                      }
-                    `}
-                  >
-                    <Command color={colors.light} size={16} />
-                    <Text
-                      css={`
-                        color: ${colors.light};
-                      `}
-                    >
-                      +
-                    </Text>
-                  </Div>
+                  <Shortkey type="create-bookmark" />
                 </Div>
               </Div>
             ) : null}

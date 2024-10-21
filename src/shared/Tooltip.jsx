@@ -1,11 +1,12 @@
 import { Children, cloneElement, useState } from "react";
 import { usePopper } from "react-popper";
 import { colors } from "./styles";
-import { shadows } from "./utils";
+import { flex, shadows } from "./utils";
 import { useEvent } from "../hooks/use-event";
 import { Portal } from "./Portal";
 import { Text } from "./text";
 import { css } from "@emotion/css";
+import { Shortkey } from "../Shortkey";
 
 export const tooltipTheme = {
   default: `
@@ -23,7 +24,12 @@ export const tooltipTheme = {
   `,
 };
 
-export const Tooltip = ({ label = "", popper: popperProps = {}, children }) => {
+export const Tooltip = ({
+  label = "",
+  popper: popperProps = {},
+  shortkey = "",
+  children,
+}) => {
   // We only want one child for the tooltip
   const child = Children.only(children);
   const [anchor, setAnchor] = useState(null);
@@ -61,11 +67,14 @@ export const Tooltip = ({ label = "", popper: popperProps = {}, children }) => {
               ${shadows.lg}
               border-radius: 8px;
               padding: 8px;
+              ${flex("left")}
+              gap: 16px;
             `}
             style={styles.popper}
             {...attributes.popper}
           >
             <Text label>{label}</Text>
+            {shortkey ? <Shortkey type={shortkey} /> : null}
           </div>
         </Portal>
       ) : null}

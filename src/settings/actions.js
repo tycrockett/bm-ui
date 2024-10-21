@@ -392,9 +392,13 @@ const navigate = {
   modeFinder: "mode.finder",
   modeExtensions: "mode.extensions",
   modeSettings: "mode.settings",
-  modeGit: "mode.git.git",
+  modeGit: "mode.git",
+  modeLogs: "mode.logs",
+
+  gitCommand: "mode.git.command",
   gitTerminal: "mode.git.terminal",
   gitNotes: "mode.git.notes",
+
   externalGithub: "external.github",
   externalVSCode: "external.vscode",
 };
@@ -420,7 +424,17 @@ export const defaultActions = {
     list: [
       {
         type: "navigate",
-        payload: navigate?.modeGit,
+        payload: navigate?.gitCommand,
+      },
+    ],
+  },
+  "navigate-git-command": {
+    name: "View Git Command",
+    shortkey: "meta+KeyG",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.gitCommand,
       },
     ],
   },
@@ -434,6 +448,16 @@ export const defaultActions = {
       },
     ],
   },
+  "navigate-logs": {
+    name: "View Logs",
+    shortkey: "meta+KeyL",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.modeLogs,
+      },
+    ],
+  },
   "navigate-settings": {
     name: "View Settings",
     shortkey: "meta+KeyS",
@@ -441,16 +465,6 @@ export const defaultActions = {
       {
         type: "navigate",
         payload: navigate?.modeSettings,
-      },
-    ],
-  },
-  "open-github": {
-    name: "Open branch in github",
-    shortkey: "meta+KeyR",
-    list: [
-      {
-        type: "navigate",
-        payload: navigate?.externalGithub,
       },
     ],
   },
@@ -471,6 +485,16 @@ export const defaultActions = {
       {
         type: "navigate",
         payload: navigate?.gitNotes,
+      },
+    ],
+  },
+  "open-github": {
+    name: "Open branch in github",
+    shortkey: "meta+KeyR",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.externalGithub,
       },
     ],
   },
