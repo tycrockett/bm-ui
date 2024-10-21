@@ -1,5 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { StoreContext } from "../context/store";
+import { useEffect, useRef } from "react";
 const { ipcRenderer } = window.require("electron");
 
 export const useProcesses = (props) => {
@@ -15,7 +14,6 @@ export const useProcesses = (props) => {
   };
 
   useEffect(() => {
-    console.log("listen");
     ipcRenderer.on("pids", (event, data) => methods.current?.setChildren(data));
     ipcRenderer.on("start-spawn", (event, pid) =>
       methods.current?.initiateFeed(pid)
@@ -27,7 +25,6 @@ export const useProcesses = (props) => {
     ipcRenderer.on("clear", (event, data) => methods.current?.clearPid(data));
     ipcRenderer.send("get-pids");
     return () => {
-      console.log("Clear");
       ipcRenderer.removeAllListeners("message");
       ipcRenderer.removeAllListeners("pids");
       ipcRenderer.removeAllListeners("start-spawn");

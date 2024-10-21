@@ -239,10 +239,10 @@ const defaultCommands = [
   {
     name: "New",
     command: "new",
-    args: "{name}",
-    flags: "",
+    args: "{branch}",
+    flags: "-p --parent | --disable-pull",
     description:
-      "1. Pulls current branch if a remote branch exists\n2. Creates new {name} branch\n3. Sets the current branch as {name}'s parent.",
+      "1. git checkout default branch (-p skips this step)\n2. git pull, if a remote branch exists (--disable-pull skips this step)\n3. git branch {branch}\n4. git checkout {branch}\n------------------------------------------\n\nNOTE 1: Unlike git, BMUI uses a 'parent' branch to know which branch to automatically pull and merge when using the 'update' command. BMUI will use the 'defaultBranch' unless you use the -p flag. -p will set the 'parent' branch to whatever branch you have currently checked out.\n\nNOTE 2: If there are any uncommitted changes on the branch you're currently on, it will first *clear them and re-apply them after creation. \n\n*See 'clear' command",
     function: async ({ command, context }) => {
       await createBranch(command.args[0], command.options);
       context.methods.setRepos({
@@ -265,7 +265,7 @@ const defaultCommands = [
   {
     name: "Checkout",
     command: "checkout",
-    args: "{name}",
+    args: "{branch}",
     flags: "-s --stash",
     description: "Checkout a branch.",
     function: async ({ command }) => {

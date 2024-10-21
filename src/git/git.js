@@ -753,7 +753,7 @@ export const Git = () => {
                     value={cmd}
                     onChange={(e) => setCmd(e.target.value)}
                     ref={ref}
-                    placeholder={loading ? "" : "/ for commands list"}
+                    placeholder={loading ? "" : "/ for augmented git list"}
                   />
                   {!loading ? (
                     <Button

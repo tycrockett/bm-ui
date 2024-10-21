@@ -1,23 +1,43 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { StoreContext } from "../context/store";
+import { useRef, useState } from "react";
 import { useProcesses } from "./useProcesses";
 import { v4 as uuid } from "uuid";
 
-const initialFeed = {
-  name: "",
-  pids: [],
-  output: [],
-};
 export const useTerminal = (props) => {
+  const isInitial = useRef(true);
+
   const { store, feeds, feedUpdatedAt, setFeedUpdatedAt, methods } = props;
-  // const [updatedAt, setFeedUpdatedAt] = useState(null);
+  const [children, _setChildren] = useState({});
 
-  const [children, setChildren] = useState({});
+  const initiateFeedFromChildren = (data) => {
+    for (const [pid, child] of Object.entries(data || {})) {
+      const feedId = uuid();
+      if (
+        feeds?.current?.selected === "" &&
+        child?.pwd === store?.settings?.pwd
+      ) {
+        feeds.current.selected = feedId;
+      }
+      methods.mergeFeed({
+        list: {
+          [child?.pwd]: {
+            [feedId]: {
+              name: child?.command,
+              pids: [pid],
+              output: child?.output,
+            },
+          },
+        },
+      });
+    }
+  };
 
-  // useEffect(() => {
-  //   const feedId = Object.keys(feeds.current?.[store?.settings?.pwd] || {})[0];
-  //   setFeedId();
-  // }, [store?.settings?.pwd]);
+  const setChildren = (data) => {
+    _setChildren(data);
+    if (isInitial.current && !Object.keys(feeds?.current?.list)?.length) {
+      initiateFeedFromChildren(data);
+      isInitial.current = false;
+    }
+  };
 
   const initiateFeed = (data) => {
     setFeedUpdatedAt(new Date().toISOString());

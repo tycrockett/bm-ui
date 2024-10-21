@@ -1,5 +1,21 @@
 import { useEffect } from "react";
 
+function extractLocalhostURL(text) {
+  try {
+    const regex = /http:\/\/localhost:\d+/; // Regular expression to match localhost URL with port
+    const match = text.match(regex); // Search for the localhost URL
+    return match ? match[0] : null; // Return the URL if found, otherwise return null
+  } catch {
+    return "";
+  }
+}
+
+function removeANSI(text) {
+  // Regular expression to match ANSI escape sequences
+  const ansiRegex = /\u001b\[[0-9;]*[a-zA-Z]/g;
+  return text.replace(ansiRegex, "");
+}
+
 export const useTerminalActions = (value) => {
   const { store, feeds, feedUpdatedAt, methods } = value;
 
@@ -12,7 +28,6 @@ export const useTerminalActions = (value) => {
       /([a-zA-Z]:\\|\.{1,2}\/|\/)?([\w\s-]+[\/\\])*[\w\s-]+\.\w+/g;
     let processActions = {};
     for (const [pid, terminal] of pwdFeeds) {
-      console.log(terminal);
       const item = terminal?.output?.at(-1);
       if (!item) {
         return;

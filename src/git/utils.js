@@ -30,16 +30,19 @@ export const checkoutBranch = async (branch, options = {}) => {
 };
 
 export const createBranch = async (name, options = {}) => {
-  const { flags = "" } = options;
+  const { flags = "", defaultBranch = "" } = options;
   if (name) {
     try {
       const hasStatus = !!(await cmd(`git status --porcelain`));
       if (hasStatus) {
-        await cmd(`git stash`);
+        await clearBranch();
+      }
+      if (!flags.includes("-p") && !flags.includes("--parent")) {
+        await cmd(`git checkout ${defaultBranch}`);
       }
       const currentBranch = await getCurrentBranch();
       const hasRemote = await hasRemoteBranch(currentBranch);
-      if (hasRemote) {
+      if (hasRemote && !flags.includes("--disable-pull")) {
         await cmd(`git pull origin ${currentBranch}`);
       }
       await cmd(`git checkout -b ${name}`);

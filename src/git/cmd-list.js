@@ -149,26 +149,29 @@ export const CmdList = ({
                 {list[index]?.command}
               </Text>
             </Div>
-            <Text
-              css={`
-                margin: 16px;
-              `}
-            >
-              <pre
-                className={css`
-                  word-break: break-word;
-                  white-space: pre-wrap;
-                  color: white;
+            {cmd.startsWith("/") ? (
+              <Text
+                css={`
+                  margin: 16px;
                 `}
               >
-                {list[index]?.description}
-              </pre>
-            </Text>
+                <pre
+                  className={css`
+                    word-break: break-word;
+                    white-space: pre-wrap;
+                    color: white;
+                  `}
+                >
+                  {list[index]?.description}
+                </pre>
+              </Text>
+            ) : null}
             {list[index]?.command === "checkout" ||
             list[index]?.command === "parent" ? (
               <Div
                 css={`
                   ${flex("left wrap")}
+                  margin-top: 16px;
                 `}
               >
                 {checkoutList?.map((item, idx) => (

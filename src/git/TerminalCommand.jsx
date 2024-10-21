@@ -275,6 +275,7 @@ export const TerminalCommand = () => {
                   ? "color: purple;"
                   : ""}
               `}
+              onClick={() => navigator.clipboard.writeText(item?.message)}
             >
               <Ansi>{item?.message}</Ansi>
             </pre>
