@@ -6,7 +6,18 @@ import { css } from "@emotion/css";
 import Ansi from "ansi-to-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { StoreContext } from "../context/store";
-import { CaretDown, Plus, Warning, X } from "phosphor-react";
+import {
+  ArrowFatLineDown,
+  ArrowsOut,
+  ArrowSquareOut,
+  CaretDown,
+  Function,
+  Ghost,
+  Plus,
+  SignOut,
+  Warning,
+  X,
+} from "phosphor-react";
 import { scrollbar } from "../shared/styles";
 import { useOutsideClick } from "../shared/use-outside-click";
 import { cmd as execCmd } from "../node/node-exports";
@@ -92,35 +103,26 @@ export const TerminalCommand = () => {
                 overflow-y: auto;
                 top: calc(100% + 8px);
                 left: 0;
-                width: 100%;
+                width: calc(100% - 24px);
                 background-color: ${colors.darkIndigo};
+                border: 1px solid ${colors.lightBlue};
                 border-radius: 8px;
                 ${shadows.lg}
                 cursor: default;
-                padding: 8px 0;
+                padding: 8px 8px;
                 z-index: 10000;
               `}
             >
               {Object.keys(store?.terminal?.actions)?.map((item) => {
                 return (
                   <Div key={item}>
-                    <Text
-                      bold
-                      css={`
-                        padding: 8px;
-                      `}
-                    >
-                      {store?.terminal?.actions?.[item]?.command}
-                    </Text>
                     {store?.terminal?.actions?.[item]?.actions?.map(
                       (action) => (
                         <Div
                           css={`
-                            ${flex("left start")}
+                            ${flex("left")}
                             padding: 8px;
-                            margin-left: 8px;
-                            padding-left: 8px;
-                            border-left: 1px solid white;
+                            border-radius: 8px;
                             :hover {
                               background-color: rgba(0, 0, 0, 0.3);
                               cursor: pointer;
@@ -128,18 +130,32 @@ export const TerminalCommand = () => {
                           `}
                           onClick={() => handleTerminalAction(action)}
                         >
-                          {action?.type === "eslint" ? (
-                            <Text
-                              css={`
-                                color: yellow;
-                                font-weight: bold;
-                                margin-right: 8px;
-                              `}
-                            >
-                              ESLINT:
-                            </Text>
-                          ) : null}
-                          <Div>
+                          <Div
+                            css={`
+                              ${flex("center column")}
+                              border-radius: 8px;
+                              padding: 8px;
+                              gap: 8px;
+                            `}
+                          >
+                            {action?.type === "eslint" ? (
+                              <Text
+                                css={`
+                                  color: yellow;
+                                  font-weight: bold;
+                                  margin-right: 8px;
+                                `}
+                              >
+                                ESLINT
+                              </Text>
+                            ) : null}
+                          </Div>
+                          <Div
+                            css={`
+                              padding: 8px;
+                              border-left: 1px solid white;
+                            `}
+                          >
                             <Text>{action.label}</Text>
                             <pre
                               className={css`

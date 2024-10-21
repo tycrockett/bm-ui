@@ -649,33 +649,41 @@ export const Git = () => {
                 `}
               />
               {branches?.list?.map((item) => (
-                <Div
-                  css={``}
-                  onClick={(e) => {
-                    handleCheckout(item);
-                    setBranchOptions(false);
-                  }}
+                <Tooltip
+                  label={
+                    item === repos?.[settings?.pwd]?.defaultBranch
+                      ? "Default Branch"
+                      : ""
+                  }
                 >
-                  <Text
-                    css={`
-                      ${item === branches?.current
-                        ? `color: ${colors.lightGreen};`
-                        : ""}
-                    `}
-                  >
-                    {item}
-                  </Text>
-                  <Button
-                    icon
-                    sm
+                  <Div
                     onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(item);
+                      handleCheckout(item);
+                      setBranchOptions(false);
                     }}
                   >
-                    <Copy />
-                  </Button>
-                </Div>
+                    <Text
+                      bold
+                      css={`
+                        ${item === branches?.current
+                          ? `color: ${colors.lightGreen};`
+                          : ""}
+                      `}
+                    >
+                      {item}
+                    </Text>
+                    <Button
+                      icon
+                      sm
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(item);
+                      }}
+                    >
+                      <Copy />
+                    </Button>
+                  </Div>
+                </Tooltip>
               ))}
             </Div>
           ) : null}

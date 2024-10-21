@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { useStyles } from "./utils";
 
 export const textStyles = {
@@ -36,7 +37,11 @@ export const textStyles = {
   `,
 };
 
-export const Text = ({ children, ...rest }) => {
+export const Text = forwardRef(({ children, ...rest }, ref) => {
   const props = useStyles(textStyles, rest);
-  return <p {...props}>{children}</p>;
-};
+  return (
+    <p {...props} ref={ref}>
+      {children}
+    </p>
+  );
+});

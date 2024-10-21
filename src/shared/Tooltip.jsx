@@ -63,12 +63,14 @@ export const Tooltip = ({
           <div
             ref={setTooltip}
             className={css`
-              background-color: ${colors.darkIndigo};
+              background-color: ${colors.darkIndigo}ee;
               ${shadows.lg}
+              border: 1px solid black;
               border-radius: 8px;
               padding: 8px;
               ${flex("left")}
               gap: 16px;
+              z-index: 10000000000000;
             `}
             style={styles.popper}
             {...attributes.popper}
