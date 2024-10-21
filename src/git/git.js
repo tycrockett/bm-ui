@@ -17,18 +17,13 @@ import {
 } from "./utils";
 import {
   ArrowElbowRightDown,
-  CaretDown,
   CloudCheck,
   CloudSlash,
   Command,
   Copy,
-  Minus,
   NoteBlank,
-  Plus,
   Terminal,
   Tree,
-  Warning,
-  X,
 } from "phosphor-react";
 import { css } from "@emotion/css";
 import { useAnimation } from "../hooks/use-animation";
@@ -40,10 +35,6 @@ import { Loader } from "../shared/loader";
 import { defaultActions } from "../settings/actions";
 import { useOutsideClick } from "../shared/use-outside-click";
 
-import { useTerminal } from "../terminal/useTerminal";
-import Ansi from "ansi-to-react";
-import { scrollbar } from "../shared/styles";
-import { Collapse } from "../shared/Collapse";
 import { useEvent } from "../hooks/use-event";
 import { useStateSync } from "../hooks/use-state-sync";
 import { Tooltip } from "../shared/Tooltip";
