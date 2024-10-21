@@ -47,13 +47,14 @@ import { Collapse } from "../shared/Collapse";
 import { useEvent } from "../hooks/use-event";
 import { useStateSync } from "../hooks/use-state-sync";
 import { Tooltip } from "../shared/Tooltip";
+import { TerminalCommand } from "./TerminalCommand";
+import { useActions } from "../hooks/useActions";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
 const parse = require("parse-gitignore");
 
 export const Git = () => {
-  const terminalRef = useRef();
   const context = useContext(StoreContext);
   const {
     store: {
@@ -62,11 +63,13 @@ export const Git = () => {
       repos = {},
       logs = [],
       lastCommand = "",
+      terminal = {},
+      action,
     },
     methods,
   } = context;
 
-  const terminal = useTerminal();
+  const terminalActions = {};
 
   const commands = extensions
     .filter((item) => item?.executionType === "command")
@@ -95,10 +98,12 @@ export const Git = () => {
   useEvent(
     "input",
     () => {
-      notesRef.current.style.height = "auto";
-      notesRef.current.style.height = `${
-        notesRef?.current?.scrollHeight + 8
-      }px`;
+      if (notesRef?.current) {
+        notesRef.current.style.height = "auto";
+        notesRef.current.style.height = `${
+          notesRef?.current?.scrollHeight + 8
+        }px`;
+      }
     },
     { element: notesRef.current }
   );
@@ -172,7 +177,7 @@ export const Git = () => {
     event?.preventDefault();
 
     setCmd("");
-    if (executingCommand.startsWith("/help")) {
+    if (executingCommand.startsWith("/")) {
       return;
     }
 
@@ -185,17 +190,6 @@ export const Git = () => {
 
     const commandDetails = list[index];
     const [value, ...args] = executingCommand.split(" ");
-
-    if (!commandDetails) {
-      terminal.onSubmit(cmd);
-      setLoading(false);
-      setTab("terminal");
-      methods.set("lastCommand", lastCommand);
-      return;
-    }
-    if (tab === "terminal") {
-      setTab("git");
-    }
 
     const options = {
       parentBranch,
@@ -270,16 +264,16 @@ export const Git = () => {
     let inputCmd = cmd;
     if (!inputCmd) {
       return commands;
-    } else if (inputCmd?.startsWith("/help")) {
-      if (inputCmd === "/help") {
+    } else if (inputCmd?.startsWith("/")) {
+      if (inputCmd === "/") {
         return commands;
       } else {
         return commands.filter(
           (item) =>
-            item?.command?.includes(inputCmd.replace("/help ", "")) ||
+            item?.command?.includes(inputCmd.replace("/", "")) ||
             item?.name
               ?.toLowerCase()
-              ?.includes(inputCmd.toLowerCase().replace("/help ", ""))
+              ?.includes(inputCmd.toLowerCase().replace("/", ""))
         );
       }
     }
@@ -319,16 +313,6 @@ export const Git = () => {
     });
   }, [cmd]);
 
-  useEffect(() => {
-    if (cmd) {
-      if (list[index]) {
-        setTab("git");
-      } else {
-        setTab("terminal");
-      }
-    }
-  }, [cmd]);
-
   const handleRemote = async () => {
     if (branches.hasRemote) {
       openRemote({
@@ -349,18 +333,32 @@ export const Git = () => {
     }
   };
 
-  const handleGit = (key, list) => {
-    if (key === "open-github") {
-      if (branches.hasRemote) {
-        openRemote({
-          flags: cmd,
-          currentBranch: branches?.current,
-        });
-      } else {
-        toast.error(`No remote branch detected.`);
-      }
+  const handleGithub = () => {
+    if (branches.hasRemote) {
+      openRemote({
+        flags: cmd,
+        currentBranch: branches?.current,
+      });
+    } else {
+      toast.error(`No remote branch detected.`);
     }
   };
+
+  useActions({
+    navigate: (payload) => {
+      const split = payload.split(".");
+      if (split[0] === "mode" && split.length === 3) {
+        setTab(split[2]);
+        if (split[2]) {
+          setTimeout(() => {
+            notesRef?.current?.focus();
+          }, 100);
+        }
+      } else if (payload === "external.github") {
+        handleGithub();
+      }
+    },
+  });
 
   const handleCheckout = async (branch) => {
     try {
@@ -368,17 +366,9 @@ export const Git = () => {
       refreshGit();
     } catch {}
   };
+
   const keydown = async (captured, event) => {
-    if (captured === "meta+KeyN") {
-      setTab("notes");
-      setTimeout(() => {
-        notesRef?.current?.focus();
-      }, 100);
-    } else if (captured === "meta+KeyG") {
-      setTab("git");
-    } else if (captured === "meta+shift+KeyT") {
-      setTab("terminal");
-    } else if (tab !== "notes") {
+    if (tab === "git") {
       if (captured === "+Tab") {
         event.preventDefault();
         let nextIndex = index + 1;
@@ -389,117 +379,20 @@ export const Git = () => {
       } else if (captured === "+Escape") {
         setCmd("");
       } else if (captured === "+Space") {
-        if (!cmd.startsWith("/help") && !cmd.includes(" ")) {
+        if (!cmd.startsWith("/") && !cmd.includes(" ")) {
           const command = list[index]?.command;
-          setCmd(command);
-        }
-      } else {
-        const entries = Object.entries(actions);
-        const entry = entries?.find(([_, item]) => item?.shortkey === captured);
-
-        if (entry?.length) {
-          const [key, item] = entry;
-          if (item?.type === "git") {
-            event.preventDefault();
-            event.stopPropagation();
-            handleGit(key, item?.list);
+          if (command) {
+            setCmd(command);
           }
-        } else {
-          ref.current.focus();
         }
+      } else if (!captured.includes("meta")) {
+        ref?.current?.focus();
       }
     }
   };
 
   useKeyboard({ keydown });
   const box = positionRef?.current?.getBoundingClientRect();
-
-  const processes = Object.values(terminal?.processes?.children || {})?.filter(
-    (item) =>
-      new Date(item?.createdAt) < Date.now() - 1000 &&
-      item?.pwd === settings?.pwd
-  );
-
-  const [terminalActions, setTerminalActions] = useState([]);
-  const [listMax, setListMax] = useState(-3);
-
-  const handleTerminalAction = (item) => {
-    execCmd(item?.cmd);
-    setDisplayActions(false);
-  };
-
-  const handleTerminalItem = (terminals) => {
-    const fileMatch =
-      /([a-zA-Z]:\\|\.{1,2}\/|\/)?([\w\s-]+[\/\\])*[\w\s-]+\.\w+/g;
-    let processActions = {};
-    for (const terminal of terminals) {
-      const item = terminal?.output?.at(-1);
-      if (!item) {
-        return;
-      }
-      if (item?.message?.includes("[eslint]")) {
-        const split = item?.message?.split("\n")?.filter((item) => item);
-        const firstIndex = split.findIndex((item) => item.includes("[eslint]"));
-
-        let indices = [];
-        for (let i = firstIndex + 1; i < split.length; i++) {
-          if (fileMatch.test(split[i])) {
-            indices.push(i);
-          }
-        }
-
-        let paths = [];
-        const path = settings?.pwd?.replace("~", settings?.base);
-        for (let i = 0; i < indices.length; i++) {
-          const file = split[indices[i]];
-          for (let j = indices[i]; j < split.length; j++) {
-            if (split[j].includes("Line")) {
-              const ss = split[j].split(" ").slice(5);
-              const s = split[j].split(" ")?.[3];
-              const line = s.split(":")?.[0];
-              const column = s.split(":")?.[1];
-              const label = `${file}:${line}:${column}`;
-              paths.push({
-                type: "eslint",
-                label,
-                description: ss.join(" "),
-                cmd: `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}:${line}"`,
-              });
-            }
-          }
-        }
-        processActions = {
-          ...processActions,
-          [terminal.pid]: {
-            command: terminal.command,
-            actions: paths,
-          },
-        };
-      } else if (item?.message?.includes("ERROR in")) {
-        const split = item?.message?.split("\n")?.filter((item) => item);
-        const firstIndex = split.findIndex((item) => item.includes("ERROR in"));
-
-        // let indices = [];
-        // for (let i = firstIndex + 1; i < split.length; i++) {
-        //   if (fileMatch.test(split[i])) {
-        //     indices.push(i);
-        //   }
-        // }
-      }
-    }
-    setTerminalActions(processActions);
-  };
-
-  useEffect(() => {
-    const relevantTerminals = Object.values(terminal.processes.children).filter(
-      (process) => process.pwd === settings.pwd
-    );
-    handleTerminalItem(relevantTerminals);
-  }, [terminal.processes.children, settings.pwd]);
-
-  useEffect(() => {
-    terminalRef?.current?.scrollIntoView({ behavior: "smooth" });
-  }, [terminal.list?.length, listMax]);
 
   return (
     <Div
@@ -555,6 +448,7 @@ export const Git = () => {
           <Tooltip label="Terminal">
             <Div
               css={`
+                position: relative;
                 ${flex("center")}
                 border: 4px solid ${colors.darkIndigo};
                 border-radius: 50%;
@@ -580,6 +474,19 @@ export const Git = () => {
               `}
               onClick={() => setTab("terminal")}
             >
+              {terminal?.count > 0 ? (
+                <Div
+                  css={`
+                    position: absolute;
+                    top: -2px;
+                    right: -2px;
+                    background-color: ${colors.red};
+                    border-radius: 50%;
+                    width: 8px;
+                    height: 8px;
+                  `}
+                />
+              ) : null}
               <Terminal size={24} color="white" weight="bold" />
             </Div>
           </Tooltip>
@@ -618,7 +525,7 @@ export const Git = () => {
                     position: absolute;
                     top: -2px;
                     right: -2px;
-                    background-color: ${colors.red};
+                    background-color: white;
                     border-radius: 50%;
                     width: 8px;
                     height: 8px;
@@ -801,7 +708,7 @@ export const Git = () => {
             box-sizing: border-box;
           `}
         >
-          {tab !== "notes" ? (
+          {tab === "git" ? (
             <Div
               css={`
                 ${flex("left")}
@@ -864,7 +771,7 @@ export const Git = () => {
                     value={cmd}
                     onChange={(e) => setCmd(e.target.value)}
                     ref={ref}
-                    placeholder={loading ? "" : "/help"}
+                    placeholder={loading ? "" : "/ for commands list"}
                   />
                   {!loading ? (
                     <Button
@@ -908,116 +815,6 @@ export const Git = () => {
               </form>
             </Div>
           ) : null}
-          {Object.keys(terminalActions)?.length ? (
-            <Div
-              css={`
-                position: relative;
-                ${flex("space-between")}
-                border-radius: 8px;
-                border: 1px solid ${colors.darkIndigo};
-                background-color: rgba(0, 0, 0, 0.2);
-                width: calc(100% - 32px);
-                padding: 8px 16px;
-                margin: 8px 0;
-                :hover {
-                  background-color: ${colors.darkIndigo};
-                  cursor: pointer;
-                }
-              `}
-              onClick={() => setDisplayActions(true)}
-            >
-              <Div
-                css={`
-                  ${flex("left")}
-                  svg {
-                    margin-right: 16px;
-                  }
-                `}
-              >
-                <Warning size={24} color="yellow" />
-                <Text>
-                  Detected Terminal Actions (
-                  {Object.values(terminalActions)[0]?.actions?.length})
-                </Text>
-              </Div>
-              <CaretDown size={24} color="white" />
-              {displayActions ? (
-                <Div
-                  ref={actionsRef}
-                  css={`
-                    position: absolute;
-                    max-height: 40vh;
-                    overflow: hidden;
-                    overflow-y: auto;
-                    top: calc(100% + 8px);
-                    left: 0;
-                    width: 100%;
-                    background-color: ${colors.darkIndigo};
-                    border-radius: 8px;
-                    ${shadows.lg}
-                    cursor: default;
-                    padding: 8px 0;
-                    z-index: 10000;
-                  `}
-                >
-                  {Object.keys(terminalActions)?.map((item) => {
-                    return (
-                      <Div>
-                        <Text
-                          bold
-                          css={`
-                            padding: 8px;
-                          `}
-                        >
-                          {item} - {terminalActions?.[item]?.command}
-                        </Text>
-                        {terminalActions?.[item]?.actions?.map((action) => (
-                          <Div
-                            css={`
-                              ${flex("left start")}
-                              padding: 8px;
-                              margin-left: 8px;
-                              padding-left: 8px;
-                              border-left: 1px solid white;
-                              :hover {
-                                background-color: rgba(0, 0, 0, 0.3);
-                                cursor: pointer;
-                              }
-                            `}
-                            onClick={() => handleTerminalAction(action)}
-                          >
-                            {action?.type === "eslint" ? (
-                              <Text
-                                css={`
-                                  color: yellow;
-                                  font-weight: bold;
-                                  margin-right: 8px;
-                                `}
-                              >
-                                ESLINT:
-                              </Text>
-                            ) : null}
-                            <Div>
-                              <Text>{action.label}</Text>
-                              <pre
-                                className={css`
-                                  word-break: break-word;
-                                  white-space: pre-wrap;
-                                  color: white;
-                                `}
-                              >
-                                <Ansi>{action.description}</Ansi>
-                              </pre>
-                            </Div>
-                          </Div>
-                        ))}
-                      </Div>
-                    );
-                  })}
-                </Div>
-              ) : null}
-            </Div>
-          ) : null}
           {tab === "git" ? (
             <Div
               css={`
@@ -1053,161 +850,7 @@ export const Git = () => {
               />
             </Div>
           ) : tab === "terminal" ? (
-            <Div
-              css={`
-                ${flex("space-between column")}
-                width: calc(100% - 8px);
-              `}
-            >
-              <Div
-                css={`
-                  ${flex("left end")}
-                  border-bottom: 3px solid ${colors.darkIndigo};
-                  gap: 8px;
-                  width: 100%;
-                `}
-              >
-                <Div
-                  css={`
-                    width: 32px;
-                    height: 16px;
-                    padding: 8px;
-                    border-radius: 8px;
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                    cursor: pointer;
-                    background-color: ${colors.darkIndigo};
-                    ${!terminal?.processes?.pid
-                      ? `${shadows.md}
-                      border-bottom: 2px solid ${colors.darkIndigo};
-                    `
-                      : `border-bottom: none; margin-bottom: 2px;`}
-                  `}
-                  onClick={() => terminal?.processes?.setPid("")}
-                />
-                {processes?.map((item) => (
-                  <Text
-                    css={`
-                      padding: 8px;
-                      border-radius: 8px;
-                      border-bottom-left-radius: 0;
-                      border-bottom-right-radius: 0;
-                      cursor: pointer;
-                      background-color: ${colors.darkIndigo};
-                      ${terminal?.processes?.pid === item?.pid
-                        ? `${shadows.md}
-                        border-bottom: 2px solid ${colors.darkIndigo};
-                      `
-                        : `border-bottom: none; margin-bottom: 2px;`}
-                    `}
-                    onClick={() => terminal?.processes?.setPid(item?.pid)}
-                  >
-                    {item?.command}
-                  </Text>
-                ))}
-              </Div>
-              <Div
-                css={`
-                  position: relative;
-                  width: 100%;
-                `}
-              >
-                <Div
-                  css={`
-                    flex-grow: 1;
-                    background-color: ${colors.darkIndigo};
-                    border-radius: 16px;
-                    border-top-left-radius: 0;
-                    border-top-right-radius: 0;
-                    border-left: 3px solid ${colors.darkIndigo};
-                    border-right: 3px solid ${colors.darkIndigo};
-                    border-bottom: 3px solid ${colors.darkIndigo};
-                    overflow: hidden;
-                    overflow-y: auto;
-                    padding: 16px;
-                    padding-top: 64px;
-                    height: calc(100vh - 400px);
-                    min-height: 8px;
-                    ${scrollbar.style}
-                  `}
-                >
-                  {!!terminal?.processes?.pid ? (
-                    <Div
-                      css={`
-                        ${flex("right")}
-                        background-color: rgba(0, 0, 0, 0.6);
-                        position: absolute;
-                        top: 8px;
-                        right: 8px;
-                        padding: 8px 16px;
-                        border-radius: 8px;
-                        gap: 16px;
-                      `}
-                    >
-                      <Text
-                        css={`
-                          color: white;
-                          margin-right: 8px;
-                        `}
-                      >
-                        {Math.abs(listMax)} / {terminal.list.length}
-                      </Text>
-                      <Button icon sm onClick={() => setListMax((l) => -3)}>
-                        <Minus size={24} />
-                      </Button>
-                      <Button
-                        icon
-                        sm
-                        onClick={() =>
-                          setListMax((l) => terminal.list.length * -1)
-                        }
-                      >
-                        <Plus size={24} />
-                      </Button>
-                      <Button
-                        icon
-                        sm
-                        onClick={() =>
-                          terminal.processes.kill(terminal?.processes?.pid)
-                        }
-                      >
-                        <X size={24} />
-                      </Button>
-                    </Div>
-                  ) : null}
-                  <Collapse isOpen={true}>
-                    {terminal.list.slice(listMax).map((item, idx) => (
-                      <pre
-                        onClick={() => handleTerminalItem(item, idx)}
-                        className={css`
-                          border-radius: 8px;
-                          padding: 4px 8px;
-                          margin: -4px -8px;
-                          :hover {
-                            background-color: rgba(255, 255, 255, 0.05);
-                            outline-offset: -3px;
-                            outline: 1px solid white;
-                          }
-                          cursor: default;
-                          word-break: break-word;
-                          white-space: pre-wrap;
-                          color: white;
-                          ${item?.type === "error"
-                            ? "color: #FF8888;"
-                            : item?.type === "close"
-                            ? "color: purple;"
-                            : ""}
-                        `}
-                      >
-                        <Ansi>{item?.message}</Ansi>
-                      </pre>
-                    ))}
-                  </Collapse>
-
-                  <div ref={terminalRef} />
-                </Div>
-              </Div>
-            </Div>
+            <TerminalCommand />
           ) : tab === "notes" ? (
             <Div
               css={`
@@ -1229,6 +872,7 @@ export const Git = () => {
                   color: white;
                   max-height: calc(100vh - 400px);
                   resize: none;
+                  font-size: 14px;
                 `}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

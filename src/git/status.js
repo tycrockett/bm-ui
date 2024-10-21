@@ -1,20 +1,14 @@
-import { Button, colors, Div, Text } from "../shared";
-import { animation, flex, shadows, styles } from "../shared/utils";
+import { colors, Div, Text } from "../shared";
+import { animation, flex, styles } from "../shared/utils";
 import {
   FileX,
   PlusCircle,
-  FileDotted,
   FileArrowUp,
   MinusCircle,
   GitPullRequest,
   Folder,
   Question,
-  File,
   FilePlus,
-  Placeholder,
-  GitDiff,
-  NoteBlank,
-  Command,
   Tree,
 } from "phosphor-react";
 import { toast } from "react-toastify";
@@ -23,7 +17,6 @@ import { format } from "date-fns";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
 import { useEffect, useMemo, useState } from "react";
-import { css } from "@emotion/css";
 import { Collapse } from "../shared/Collapse";
 
 const dedupe = (arr) => [...new Set(arr)];

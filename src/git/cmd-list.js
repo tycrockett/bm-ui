@@ -1,6 +1,7 @@
 import { css } from "@emotion/css";
 import { colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
+import { Info } from "phosphor-react";
 
 export const CmdList = ({
   list,
@@ -31,6 +32,25 @@ export const CmdList = ({
         ${shadows.md}
       `}
     >
+      {cmd.startsWith("/") ? (
+        <Div
+          css={`
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            width: calc(100% - 16px);
+            ${flex("left")}
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 8px;
+            border-radius: 8px;
+            gap: 8px;
+          `}
+        >
+          <Info color={colors.lightBlue} weight="bold" size={24} />
+          <Text>
+            Tab through commands or type them out to read more about them.
+          </Text>
+        </Div>
+      ) : null}
       <Div
         css={`
           width: 100%;
@@ -39,38 +59,42 @@ export const CmdList = ({
           flex-grow: 1;
         `}
       >
-        {list?.length > 1 ? (
-          list.map((item, idx) => (
-            <Div
-              css={`
-                min-width: max-content;
-                background-color: rgba(0, 0, 0, 0.2);
-                padding: 4px 8px;
-                border-radius: 16px;
-                margin-right: 8px;
-                margin-bottom: 8px;
-                cursor: pointer;
-                border: 2px solid transparent;
-                transition: background-color 0.2s ease;
-                :hover {
-                  background-color: ${colors.lightIndigo};
-                }
-                ${idx === index && !!cmd
-                  ? `
+        {(list === 1 && cmd.startsWith("/")) || list?.length > 1
+          ? list.map((item, idx) => (
+              <Div
+                css={`
+                  min-width: max-content;
+                  background-color: rgba(0, 0, 0, 0.2);
+                  padding: 4px 8px;
+                  border-radius: 16px;
+                  margin-right: 8px;
+                  margin-bottom: 8px;
+                  cursor: pointer;
+                  border: 2px solid transparent;
+                  transition: background-color 0.2s ease;
+                  :hover {
+                    background-color: ${colors.lightIndigo};
+                  }
+                  ${idx === index && !!cmd
+                    ? `
                       padding: 4px 8px;
                       background-color: ${colors.lightIndigo};
                     `
-                  : ""}
-              `}
-              onClick={() => setCmd(item.command)}
-            >
-              <Text>{item.name}</Text>
-            </Div>
-          ))
-        ) : (
+                    : ""}
+                `}
+                onClick={() => setCmd(item.command)}
+              >
+                <Text>{item.name}</Text>
+              </Div>
+            ))
+          : null}
+        {list?.length === 1 || (list?.length > 1 && cmd.startsWith("/")) ? (
           <Div
             css={`
               width: 100%;
+              ${list?.length > 1 && cmd.startsWith("/")
+                ? `padding-top: 16px; border-top: 1px solid ${colors.lightIndigo};`
+                : ""}
             `}
           >
             <Div
@@ -100,7 +124,7 @@ export const CmdList = ({
                   `}
                   onClick={handleCmd}
                 >
-                  {list[0]?.name}
+                  {list[index]?.name}
                 </Text>
                 <Text bold>{list[0]?.args}</Text>
                 <Text
@@ -109,7 +133,7 @@ export const CmdList = ({
                     margin-left: 16px;
                   `}
                 >
-                  {list[0]?.flags}
+                  {list[index]?.flags}
                 </Text>
               </Div>
               <Text
@@ -122,7 +146,7 @@ export const CmdList = ({
                   margin-right: 32px;
                 `}
               >
-                {list[0]?.command}
+                {list[index]?.command}
               </Text>
             </Div>
             <Text
@@ -137,11 +161,11 @@ export const CmdList = ({
                   color: white;
                 `}
               >
-                {list[0]?.description}
+                {list[index]?.description}
               </pre>
             </Text>
-            {list[0]?.command === "checkout" ||
-            list[0]?.command === "parent" ? (
+            {list[index]?.command === "checkout" ||
+            list[index]?.command === "parent" ? (
               <Div
                 css={`
                   ${flex("left wrap")}
@@ -165,7 +189,7 @@ export const CmdList = ({
                         background-color: ${colors.lightIndigo};
                       }
                     `}
-                    onClick={() => setCmd(`${list[0]?.command} ${item}`)}
+                    onClick={() => setCmd(`${list[index]?.command} ${item}`)}
                   >
                     {item}
                   </Text>
@@ -173,7 +197,7 @@ export const CmdList = ({
               </Div>
             ) : null}
           </Div>
-        )}
+        ) : null}
       </Div>
     </Div>
   );

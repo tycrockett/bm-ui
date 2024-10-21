@@ -1,6 +1,9 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { getFilesInDirectory, read, write } from "../node/fs-utils";
 import { cmd } from "../node/node-exports";
+import { useTerminalActions } from "./use-terminal-actions";
+import { merge } from "lodash";
+import { useTerminal } from "../terminal/useTerminal";
 
 // "open -n -b "com.microsoft.VSCode" --args "$PWD""
 
@@ -33,6 +36,12 @@ export const StoreContext = React.createContext();
 export const StoreProvider = (props) => {
   const [data, dispatchStore] = useReducer(reducer, initialState);
   const [cachePath, setCachePath] = useState("");
+  const [feedUpdatedAt, setFeedUpdatedAt] = useState(null);
+
+  const feeds = useRef({
+    selected: "",
+    list: {},
+  });
 
   const updateStore = (key, value) => {
     dispatchStore({
@@ -97,8 +106,7 @@ export const StoreProvider = (props) => {
       setCachePath(cachePath);
       let data = read(cachePath);
       data = { ...data, base, pwd: data.pwd || "~", cacheKey };
-      const isDirectoryGit = await checkGit(data);
-      setStore("settings", { ...data, isDirectoryGit });
+      setStore("settings", { ...data });
       const path = data.pwd.replace("~", base);
       if (path) {
         process.chdir(path);
@@ -114,6 +122,16 @@ export const StoreProvider = (props) => {
 
   const directory = { change: changeDirectory, checkGit };
 
+  const mergeFeed = (updates) => {
+    const next = merge({}, feeds.current, updates);
+    feeds.current = next;
+    setFeedUpdatedAt(new Date().toISOString());
+  };
+
+  const setFeed = (feed, updates) => {
+    feeds.current = {};
+  };
+
   const methods = {
     directory,
     setSettings,
@@ -122,14 +140,24 @@ export const StoreProvider = (props) => {
     update: updateStore,
     executeCommand: cmd,
     clipboard: navigator.clipboard,
+    mergeFeed,
   };
 
   const store = data;
 
-  const value = { store, methods };
+  const value = {
+    store,
+    feeds,
+    setFeedUpdatedAt,
+    feedUpdatedAt,
+    methods,
+  };
+
+  const terminal = useTerminal(value);
+  useTerminalActions(value);
 
   return (
-    <StoreContext.Provider value={value}>
+    <StoreContext.Provider value={{ ...value, terminal }}>
       {props.children}
     </StoreContext.Provider>
   );

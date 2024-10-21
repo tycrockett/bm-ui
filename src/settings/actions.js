@@ -1,10 +1,9 @@
 import {
-  FileJs,
-  Gear,
-  GitBranch,
-  Monitor,
+  NavigationArrow,
   Plus,
-  Square,
+  PlusCircle,
+  Terminal,
+  TrashSimple,
   X,
 } from "phosphor-react";
 import { useEffect, useState } from "react";
@@ -13,6 +12,7 @@ import { flex, styles } from "../shared/utils";
 import uuid4 from "uuid4";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { Select } from "../shared/select";
+import { isEqual } from "lodash";
 
 const splice = (array, idx, deleteCount, ...items) => {
   let next = [...array];
@@ -25,8 +25,6 @@ export const Actions = ({ settings, setSettings }) => {
     ...defaultActions,
     ...(settings?.actions || {}),
   };
-
-  const shortkeys = Object.keys(actions).map(({ shortkey }) => shortkey);
 
   const [actionKey, setActionKey] = useState("");
   const [action, setAction] = useState(null);
@@ -47,12 +45,29 @@ export const Actions = ({ settings, setSettings }) => {
 
   const saveAction = () => {
     const key = actionKey === "create-action" ? uuid4() : actionKey;
+    let actions = {
+      ...(settings?.actions || {}),
+      [key]: action,
+    };
+    actions = Object.entries(actions).reduce((acc, [key, value]) => {
+      if (isEqual(value, defaultActions[key])) {
+        return acc;
+      }
+      return {
+        ...acc,
+        [key]: value,
+      };
+    }, {});
+    setSettings({ ...settings, actions });
+    closeAction();
+  };
+
+  const removeAction = () => {
+    const nextActions = { ...actions };
+    delete nextActions[actionKey];
     setSettings({
       ...settings,
-      actions: {
-        ...(actions || {}),
-        [key]: action,
-      },
+      actions: nextActions,
     });
     closeAction();
   };
@@ -94,46 +109,47 @@ export const Actions = ({ settings, setSettings }) => {
       {Object.entries(actions)?.map(([key, item]) => (
         <Div
           css={`
-            ${flex("space-between")}
-            padding: 8px 16px;
+            padding: 2px 16px;
             margin: 0 -16px;
             ${styles.hover}
-            svg {
-              margin-right: 16px;
-              color: white;
-              width: 32px;
-            }
           `}
-          onClick={() => setActionKey(key)}
         >
-          {item?.type === "bm" ? (
-            <Gear size={24} />
-          ) : item?.type === "js" ? (
-            <FileJs size={24} />
-          ) : item?.type === "action" ? (
-            <Monitor size={24} />
-          ) : item?.type === "git" ? (
-            <GitBranch size={24} />
-          ) : (
-            <Square size={24} />
-          )}
           <Div
             css={`
-              flex-grow: 1;
+              ${flex("space-between")}
+              gap: 8px;
+              svg {
+                color: white;
+              }
             `}
+            onClick={() => setActionKey(key)}
           >
-            <Text>{item.name}</Text>
+            {item?.list?.[0]?.type === "navigate" ? (
+              <NavigationArrow />
+            ) : item?.list?.[0]?.type === "create" ? (
+              <PlusCircle />
+            ) : item?.list?.[0]?.type === "execute-command" ? (
+              <Terminal />
+            ) : null}
+            <Div
+              css={`
+                flex-grow: 1;
+              `}
+            >
+              <Text>{item.name}</Text>
+            </Div>
+
+            <Text
+              css={`
+                color: ${colors.lightBlue};
+                background-color: rgba(0, 0, 0, 0.2);
+                padding: 4px 8px;
+                border-radius: 16px;
+              `}
+            >
+              {item.shortkey}
+            </Text>
           </Div>
-          <Text
-            css={`
-              color: ${colors.lightBlue};
-              background-color: rgba(0, 0, 0, 0.2);
-              padding: 4px 8px;
-              border-radius: 16px;
-            `}
-          >
-            {item.shortkey}
-          </Text>
         </Div>
       ))}
       {!!actionKey ? (
@@ -167,7 +183,6 @@ export const Actions = ({ settings, setSettings }) => {
               css={`
                 width: 50%;
               `}
-              disabled={action?.type !== "action"}
               value={action?.name || ""}
               onChange={(e) => setAction({ ...action, name: e.target.value })}
             />
@@ -192,60 +207,53 @@ export const Actions = ({ settings, setSettings }) => {
               onBlur={() => setFocus(false)}
             />
           </Div>
-          {action?.type !== "action" ? (
+
+          <Div
+            css={`
+              margin-top: 8px;
+            `}
+          >
             <Div
               css={`
-                ${flex("right")}
-                margin-top: 16px;
+                ${flex("space-between")}
+                margin-top: 4px;
               `}
             >
-              <Button secondary onClick={closeAction}>
-                Close
+              <Text h3 bold>
+                Actions
+              </Text>
+              <Button
+                icon
+                onClick={() =>
+                  setAction({
+                    ...action,
+                    list: [...(action.list || []), { type: "execute-command" }],
+                  })
+                }
+              >
+                <Plus />
               </Button>
             </Div>
-          ) : (
             <Div
               css={`
-                margin-top: 8px;
+                max-height: 45vh;
+                overflow: auto;
               `}
             >
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  margin-top: 4px;
-                `}
-              >
-                <Text h3 bold>
-                  Actions
-                </Text>
-                <Button
-                  icon
-                  onClick={() =>
-                    setAction({
-                      ...action,
-                      list: [
-                        ...(action.list || []),
-                        { type: "execute-command" },
-                      ],
-                    })
-                  }
+              {action?.list?.map((item, idx) => (
+                <Div
+                  css={`
+                    ${flex("left start")}
+                    margin: 4px 0;
+                    padding: 16px;
+                    background-color: rgba(0, 0, 0, 0.2);
+                    border-radius: 8px;
+                  `}
                 >
-                  <Plus />
-                </Button>
-              </Div>
-              <Div
-                css={`
-                  max-height: 45vh;
-                  overflow: auto;
-                `}
-              >
-                {action?.list?.map((item, idx) => (
                   <Div
                     css={`
-                      margin: 4px 0;
-                      padding: 16px;
-                      background-color: rgba(0, 0, 0, 0.2);
-                      border-radius: 8px;
+                      flex-grow: 1;
+                      margin-right: 8px;
                     `}
                   >
                     <Div
@@ -267,6 +275,8 @@ export const Actions = ({ settings, setSettings }) => {
                         }
                       >
                         <option value="execute-command">Execute Command</option>
+                        <option value="navigate">Navigate</option>
+                        <option value="create">Create</option>
                       </Select>
                     </Div>
                     {item?.type === "execute-command" ? (
@@ -286,14 +296,77 @@ export const Actions = ({ settings, setSettings }) => {
                           width: calc(100% - 16px);
                         `}
                       />
+                    ) : item?.type === "navigate" ? (
+                      <Select
+                        value={item?.payload}
+                        onChange={(e) =>
+                          setAction({
+                            ...action,
+                            list: splice(action?.list, idx, 1, {
+                              ...item,
+                              payload: e.target.value,
+                            }),
+                          })
+                        }
+                        css={`
+                          width: 100%;
+                          margin-top: 8px;
+                        `}
+                      >
+                        <option value="">N/A</option>
+                        {Object.values(navigate)?.map((value) => (
+                          <option value={value}>{value}</option>
+                        ))}
+                      </Select>
+                    ) : item?.type === "create" ? (
+                      <Select
+                        value={item?.payload}
+                        onChange={(e) =>
+                          setAction({
+                            ...action,
+                            list: splice(action?.list, idx, 1, {
+                              ...item,
+                              payload: e.target.value,
+                            }),
+                          })
+                        }
+                        css={`
+                          width: 100%;
+                          margin-top: 8px;
+                        `}
+                      >
+                        <option value="">N/A</option>
+                        {Object.values(create)?.map((value) => (
+                          <option value={value}>{value}</option>
+                        ))}
+                      </Select>
                     ) : null}
                   </Div>
-                ))}
-              </Div>
+                  <Button
+                    icon
+                    sm
+                    onClick={() => {
+                      const list = action?.list?.filter((_, i) => i !== idx);
+                      setAction({ ...action, list });
+                    }}
+                  >
+                    <X />
+                  </Button>
+                </Div>
+              ))}
+            </Div>
+            <Div
+              css={`
+                ${flex("space-between")}
+                margin-top: 16px;
+              `}
+            >
+              <Button icon sm onClick={removeAction}>
+                <TrashSimple />
+              </Button>
               <Div
                 css={`
                   ${flex("right")}
-                  margin-top: 16px;
                 `}
               >
                 <Button
@@ -308,63 +381,126 @@ export const Actions = ({ settings, setSettings }) => {
                 <Button onClick={saveAction}>Save Action</Button>
               </Div>
             </Div>
-          )}
+          </Div>
         </Modal>
       ) : null}
     </>
   );
 };
 
+const navigate = {
+  modeFinder: "mode.finder",
+  modeExtensions: "mode.extensions",
+  modeSettings: "mode.settings",
+  modeGit: "mode.git.git",
+  gitTerminal: "mode.git.terminal",
+  gitNotes: "mode.git.notes",
+  externalGithub: "external.github",
+  externalVSCode: "external.vscode",
+};
+
+const create = {
+  bookmark: "bookmark",
+};
+
 export const defaultActions = {
-  "mode-finder": {
+  "navigate-finder": {
     name: "View Finder",
-    type: "bm",
     shortkey: "meta+KeyF",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.modeFinder,
+      },
+    ],
   },
-  "mode-git": {
+  "navigate-git": {
     name: "View Git",
-    type: "bm",
     shortkey: "meta+KeyG",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.modeGit,
+      },
+    ],
   },
-  "mode-command-center": {
+  "navigate-extensions": {
     name: "View Extensions",
-    type: "bm",
     shortkey: "meta+KeyD",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.modeExtensions,
+      },
+    ],
   },
-  "mode-settings": {
+  "navigate-settings": {
     name: "View Settings",
-    type: "bm",
     shortkey: "meta+KeyS",
-  },
-  "create-bookmark": {
-    name: "Create bookmark at current directory",
-    type: "bm",
-    shortkey: "meta+Equal",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.modeSettings,
+      },
+    ],
   },
   "open-github": {
     name: "Open branch in github",
-    type: "git",
     shortkey: "meta+KeyR",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.externalGithub,
+      },
+    ],
   },
-  "open-terminal": {
-    name: "Open current directory in terminal",
-    type: "action",
+  "open-internal-terminal": {
+    name: "Open Terminal",
     shortkey: "meta+KeyT",
     list: [
       {
-        type: "execute-command",
-        payload: "open -a terminal .",
+        type: "navigate",
+        payload: navigate?.gitTerminal,
+      },
+    ],
+  },
+  "open-branch-notes": {
+    name: "Open Branch Notes",
+    shortkey: "meta+KeyN",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.gitNotes,
       },
     ],
   },
   "open-vscode": {
-    name: "Open current directory in VS code",
-    type: "action",
-    shortkey: "meta+KeyS",
+    name: "Open VS code",
+    shortkey: "meta+KeyO",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate?.externalVSCode,
+      },
+    ],
+  },
+  "create-bookmark": {
+    name: "Create bookmark",
+    shortkey: "meta+Equal",
+    list: [
+      {
+        type: "create",
+        payload: create.bookmark,
+      },
+    ],
+  },
+  "open-terminal": {
+    name: "Open External Terminal",
+    shortkey: "meta+shift+KeyT",
     list: [
       {
         type: "execute-command",
-        payload: 'open -n -b "com.microsoft.VSCode" --args "$PWD"',
+        payload: "open -a terminal .",
       },
     ],
   },

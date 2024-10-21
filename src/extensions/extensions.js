@@ -204,7 +204,7 @@ const defaultCommands = [
     args: "",
     flags: "",
     description:
-      "Pulls parent origin and merges the parent branch into the current branch.",
+      "1. Checkout parent branch\n2. Pull parent origin\n3. Merges the parent branch into the current branch.",
     function: async ({ command, context }) => {
       await update(command.options);
     },
@@ -350,9 +350,9 @@ const defaultCommands = [
     name: "Rename",
     command: "rename",
     args: "{branchName}",
-    flags: "--local",
+    flags: "--local --remote",
     description:
-      "- Renames local active branch \n- Attempts to rename the remote branch. \n\n--local: will stop attempts to rename the remote branch.\n--remote: will only attempt to rename remote branch.",
+      "- Renames current local branch \n- Attempts to rename the current remote branch. \n\n--local: will only rename the local branch.\n--remote: will only attempt to rename remote branch.",
     function: async ({ command, context }) => {
       await renameBranch(command.args[0], command.options);
       let next = { ...context.store?.repos };

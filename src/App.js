@@ -22,6 +22,7 @@ import { Logs } from "./logs/logs";
 import { useOutsideClick } from "./shared/use-outside-click";
 import { useInterval } from "./hooks/useInterval";
 import { Tooltip } from "./shared/Tooltip";
+import { useActions } from "./hooks/useActions";
 
 const header = `
   padding: 8px 16px;
@@ -36,7 +37,7 @@ const App = () => {
   } = context;
   const setMode = (mode) => set("mode", mode);
 
-  const { ports = {} } = store;
+  const { ports = {}, action } = store;
 
   const basePath = store?.settings?.pwd?.replace("~", store?.settings?.base);
 
@@ -160,15 +161,28 @@ const App = () => {
     setSettings({ ...settings, bookmarks });
   };
 
-  const handleActionList = (list) => {
-    for (const item of list) {
-      const { type, payload } = item;
-      if (type === "execute-command") {
-        console.log(payload);
-        cmd(payload);
+  useActions({
+    "execute-command": (payload) => cmd(payload),
+    navigate: (payload) => {
+      if (payload.startsWith("mode")) {
+        const split = payload.split(".");
+        if (split?.length > 1) {
+          setMode(split[1]);
+        }
+      } else if (payload?.startsWith("external")) {
+        const to = payload.split(".")?.[1] || "";
+        if (to === "vscode") {
+          cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
+        } else if (to === "") {
+        }
       }
-    }
-  };
+    },
+    create: (payload) => {
+      if (payload === "bookmark") {
+        createBookmark();
+      }
+    },
+  });
 
   const keydown = (captured, event) => {
     if (captured.startsWith("meta+Digit")) {
@@ -178,30 +192,16 @@ const App = () => {
         directory.change(path);
       }
     } else {
-      const entries = Object.entries(actions);
-      const entry = entries?.find(([_, item]) => item?.shortkey === captured);
-
-      if (entry?.length) {
-        const [key, item] = entry;
-        if (item?.type === "bm") {
-          event.preventDefault();
-          event.stopPropagation();
-          if (key === "mode-finder") {
-            setMode("finder");
-          } else if (key === "mode-git") {
-            setMode("git");
-          } else if (key === "mode-command-center") {
-            setMode("extensions");
-          } else if (key === "mode-settings") {
-            setMode("settings");
-          } else if (key === "create-bookmark") {
-            createBookmark();
-          }
-        } else if (item?.type === "action") {
-          event.preventDefault();
-          event.stopPropagation();
-          handleActionList(item?.list);
-        }
+      const values = Object.values(actions);
+      const entry = values?.find((item) => item?.shortkey === captured);
+      if (!!entry) {
+        const item = entry;
+        event.preventDefault();
+        event.stopPropagation();
+        set("action", {
+          item,
+          updatedAt: new Date().toISOString(),
+        });
       }
     }
   };
@@ -366,7 +366,7 @@ const App = () => {
           </Div>
 
           {ports?.[basePath]?.length ? (
-            <Tooltip label="Open Ports">
+            <Tooltip label="Active Ports">
               <Div
                 css={`
                   position: relative;

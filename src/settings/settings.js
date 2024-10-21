@@ -12,8 +12,13 @@ export const Settings = () => {
     methods: { setSettings },
   } = useContext(StoreContext);
 
-  const openSettings = () => cmd(`open ~/bm-cache/settings.json`);
-  const openRepos = () => cmd(`open ~/bm-cache/repos.json`);
+  const open = (path) => {
+    const bestPath = path?.replace("~", settings?.base);
+    cmd(`open -n -b "com.microsoft.VSCode" --args "${bestPath}"`);
+  };
+
+  const openSettings = () => open(`~/bm-cache/settings.json`);
+  const openRepos = () => open(`~/bm-cache/repos.json`);
 
   return (
     <Div

@@ -1,17 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { StoreContext } from "../context/store";
 const { ipcRenderer } = window.require("electron");
 
-export const useProcesses = (setList) => {
-  const context = useContext(StoreContext);
-  const [pid, setPid] = useState("");
-  const [children, setChildren] = useState({});
-
-  useEffect(() => {
-    if (pid) {
-      setList(children?.[pid]?.output || []);
-    }
-  }, [pid]);
+export const useProcesses = (props) => {
+  const methods = useRef();
+  methods.current = props;
 
   const spawn = (data) => {
     ipcRenderer.send("spawn", data);
@@ -23,12 +16,15 @@ export const useProcesses = (setList) => {
 
   useEffect(() => {
     console.log("listen");
-    ipcRenderer.on("pids", (event, data) => setChildren(data));
-    ipcRenderer.on("start-spawn", (event, data) => setPid(data));
-    ipcRenderer.on("message", (event, data) => setList((c) => [...c, data]));
-    ipcRenderer.on("close", (event, data) => {
-      setPid((pid) => (pid === data?.pid ? "" : pid));
-    });
+    ipcRenderer.on("pids", (event, data) => methods.current?.setChildren(data));
+    ipcRenderer.on("start-spawn", (event, pid) =>
+      methods.current?.initiateFeed(pid)
+    );
+    ipcRenderer.on("message", (event, data) =>
+      methods.current?.updateFeed(data)
+    );
+    ipcRenderer.on("close", (event, data) => methods.current?.killPid(data));
+    ipcRenderer.on("clear", (event, data) => methods.current?.clearPid(data));
     ipcRenderer.send("get-pids");
     return () => {
       console.log("Clear");
@@ -38,12 +34,5 @@ export const useProcesses = (setList) => {
     };
   }, []);
 
-  const setPid_ = (pid) => {
-    if (!pid) {
-      setList([]);
-    }
-    setPid(pid);
-  };
-
-  return { children, pid, setPid: setPid_, spawn, kill };
+  return { spawn, kill };
 };

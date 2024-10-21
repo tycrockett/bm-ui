@@ -10,8 +10,8 @@ let childProcesses = {};
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 550,
-    height: 600,
+    width: 650,
+    height: 800,
     title: "BM GUI",
     webPreferences: {
       contextIsolation: false,
@@ -64,28 +64,31 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
     "-c",
     `source ~/.zshrc && cd ${pwd} && ${command}`,
   ]);
+  const initialMessage = {
+    pid: child.pid,
+    createdAt: new Date().toISOString(),
+    type: "input",
+    message: command,
+  };
+  event.reply("start-spawn", initialMessage);
   processes[child.pid] = child;
   childProcesses = {
     ...childProcesses,
     [child.pid]: {
       createdAt: new Date().toISOString(),
-      output: [
-        {
-          type: "input",
-          message: command,
-        },
-      ],
+      output: [initialMessage],
       pid: child.pid,
       command,
       pwd,
     },
   };
 
-  event.reply("start-spawn", child.pid);
   event.reply("pids", childProcesses);
 
   child.stdout.on("data", (data) => {
     const value = {
+      pid: child.pid,
+      createdAt: new Date().toISOString(),
       type: "data",
       message: data.toString(),
     };
@@ -99,16 +102,19 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
       output.includes("\x1b[2J\x1b[0;0H")
     ) {
       childProcesses[child.pid].output = [];
+      event.reply("clear", { pid: child.pid });
     } else {
       childProcesses[child.pid].output.push(value);
+      event.reply("message", value);
     }
     event.reply("pids", childProcesses);
-    event.reply("message", value);
   });
 
   // Capture stderr
   child.stderr.on("data", (data) => {
     const value = {
+      pid: child.pid,
+      createdAt: new Date().toISOString(),
       type: "error",
       message: data.toString(),
     };
@@ -118,30 +124,36 @@ ipcMain.on("spawn", (event, { pwd, command }) => {
   });
 
   // Handle process close
-  child.on("close", (code) => {
+  child.on("close", (code, data) => {
     const hasProcess = child.pid in processes;
     delete processes[child.pid];
     delete childProcesses[child.pid];
     if (hasProcess) {
       event.reply("pids", childProcesses);
       event.reply("close", {
+        pid: child.pid,
+        createdAt: new Date().toISOString(),
         type: "close",
         pid: child.pid,
         message: `closed process ${child.pid}`,
+        data,
       });
     }
   });
 
-  child.on("exit", (code) => {
+  child.on("exit", (code, data) => {
     const hasProcess = child.pid in processes;
     delete processes[child.pid];
     delete childProcesses[child.pid];
     if (hasProcess) {
       event.reply("pids", childProcesses);
       event.reply("close", {
-        type: "close",
+        pid: child.pid,
+        createdAt: new Date().toISOString(),
+        type: "exit",
         pid: child.pid,
         message: `closed process ${child.pid}`,
+        data,
       });
     }
   });
