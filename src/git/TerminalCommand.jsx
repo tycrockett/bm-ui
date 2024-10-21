@@ -22,6 +22,8 @@ import { scrollbar } from "../shared/styles";
 import { useOutsideClick } from "../shared/use-outside-click";
 import { cmd as execCmd } from "../node/node-exports";
 
+const fileMatch = /([a-zA-Z]:\\|\.{1,2}\/|\/)?([\w\s-]+[\/\\])*[\w\s-]+\.\w+/g;
+
 export const TerminalCommand = () => {
   const context = useContext(StoreContext);
   const { store, feeds, terminal, methods } = context;
@@ -52,6 +54,41 @@ export const TerminalCommand = () => {
     setDisplayActions(false);
   };
 
+  const handleTerminalItem = (item) => {
+    if (item?.message?.includes("[eslint]")) {
+      const split = item?.message?.split("\n")?.filter((item) => item);
+      const firstIndex = split.findIndex((item) => item.includes("[eslint]"));
+
+      let indices = [];
+      for (let i = firstIndex + 1; i < split.length; i++) {
+        if (fileMatch.test(split[i])) {
+          indices.push(i);
+        }
+      }
+
+      const path = store?.settings?.pwd?.replace("~", store?.settings?.base);
+      for (let i = 0; i < indices.length; i++) {
+        const file = split[indices[i]];
+        for (let j = indices[i]; j < split.length; j++) {
+          if (split[j].includes("Line")) {
+            const ss = split[j].split(" ").slice(5);
+            const s = split[j].split(" ")?.[3];
+            const line = s.split(":")?.[0];
+            const column = s.split(":")?.[1];
+            const label = `${file}:${line}:${column}`;
+            handleTerminalAction({
+              label,
+              type: "eslint",
+              description: ss.join(" "),
+              cmd: `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}:${line}"`,
+            });
+            break;
+          }
+        }
+      }
+    }
+  };
+
   const output =
     feeds?.current?.list?.[store?.settings?.pwd]?.[feeds?.current?.selected]
       ?.output;
@@ -61,7 +98,7 @@ export const TerminalCommand = () => {
         width: 100%;
       `}
     >
-      {Object.keys(store?.terminal?.actions)?.length ? (
+      {/* {Object.keys(store?.terminal?.actions)?.length ? (
         <Div
           css={`
             position: relative;
@@ -176,7 +213,7 @@ export const TerminalCommand = () => {
             </Div>
           ) : null}
         </Div>
-      ) : null}
+      ) : null} */}
       <Div
         css={`
           background-color: ${colors.darkIndigo};
@@ -291,7 +328,7 @@ export const TerminalCommand = () => {
                   ? "color: purple;"
                   : ""}
               `}
-              onClick={() => navigator.clipboard.writeText(item?.message)}
+              onClick={() => handleTerminalItem(item)}
             >
               <Ansi>{item?.message}</Ansi>
             </pre>

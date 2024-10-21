@@ -22,7 +22,7 @@ export const useTerminal = (props) => {
           [child?.pwd]: {
             [feedId]: {
               name: child?.command,
-              pids: [pid],
+              pids: [Number(pid)],
               output: child?.output,
             },
           },

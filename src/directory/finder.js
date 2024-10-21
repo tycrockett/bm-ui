@@ -140,7 +140,9 @@ export const Finder = () => {
               cursor: pointer;
               color: white;
               border: 1px solid transparent;
-              ${!!search && index == idx ? `border: 1px solid white;` : ""}
+              ${!!search && index == idx
+                ? `background-color: ${colors.lightIndigo};`
+                : ""}
               :hover {
                 background-color: rgba(0, 0, 0, 0.5);
               }

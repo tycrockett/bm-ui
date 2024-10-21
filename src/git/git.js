@@ -41,6 +41,7 @@ import { Tooltip } from "../shared/Tooltip";
 import { TerminalCommand } from "./TerminalCommand";
 import { useActions } from "../hooks/useActions";
 import { Shortkey } from "../Shortkey";
+import { Collapse } from "../shared/Collapse";
 
 const fs = window.require("fs");
 const chokidar = window.require("chokidar");
@@ -87,21 +88,22 @@ export const Git = () => {
   const actionsRef = useOutsideClick(() => setDisplayActions(false));
   const notesRef = useRef();
 
-  useEvent(
-    "input",
-    () => {
-      if (notesRef?.current) {
-        notesRef.current.style.height = "auto";
-        notesRef.current.style.height = `${
-          notesRef?.current?.scrollHeight + 8
-        }px`;
-      }
-    },
-    { element: notesRef.current }
-  );
+  const updateNotesTextarea = () => {
+    if (notesRef?.current) {
+      notesRef.current.style.height = "auto";
+      notesRef.current.style.height = `${
+        notesRef?.current?.scrollHeight + 8
+      }px`;
+    }
+  };
+
+  useEvent("input", updateNotesTextarea, { element: notesRef.current });
 
   const [tab, setTab] = useState("command");
 
+  useEffect(() => {
+    updateNotesTextarea();
+  }, [tab]);
   const repo = repos?.[settings?.pwd]?.branches?.[branches?.current];
 
   const [notes, setNotes] = useStateSync(repo?.notes || "");
@@ -698,7 +700,12 @@ export const Git = () => {
             box-sizing: border-box;
           `}
         >
-          {tab === "command" ? (
+          <Collapse
+            isOpen={tab === "command"}
+            css={`
+              width: 100%;
+            `}
+          >
             <Div
               css={`
                 ${flex("left")}
@@ -804,7 +811,7 @@ export const Git = () => {
                 />
               </form>
             </Div>
-          ) : null}
+          </Collapse>
           {tab === "command" ? (
             <Div
               css={`
