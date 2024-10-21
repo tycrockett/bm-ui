@@ -2,6 +2,7 @@ import { css } from "@emotion/css";
 import { colors, Div, Text } from "../shared";
 import { animation, flex, shadows } from "../shared/utils";
 import { Info } from "phosphor-react";
+import { Tooltip } from "../shared/Tooltip";
 
 export const CmdList = ({
   list,
@@ -136,18 +137,21 @@ export const CmdList = ({
                   {list[index]?.flags}
                 </Text>
               </Div>
-              <Text
-                bold
-                css={`
-                  padding: 4px 8px;
-                  border-radius: 30px;
-                  background-color: white;
-                  color: ${colors.darkIndigo};
-                  margin-right: 32px;
-                `}
-              >
-                {list[index]?.command}
-              </Text>
+              <Tooltip label="Typed Command">
+                <Text
+                  bold
+                  css={`
+                    padding: 4px 8px;
+                    border-radius: 30px;
+                    background-color: white;
+                    color: ${colors.darkIndigo};
+                    margin-right: 32px;
+                    cursor: default;
+                  `}
+                >
+                  {list[index]?.command}
+                </Text>
+              </Tooltip>
             </Div>
             {cmd.startsWith("/") ? (
               <Text
