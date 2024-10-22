@@ -32,7 +32,7 @@ const getCapturedKeys = (event) => {
 export const useKeyboard = ({
   keydown = null,
   keyup = null,
-  options = { useCapture: false },
+  options = { capture: null },
 } = {}) => {
   const handleKeydown = (event) => {
     if (keydown !== null) {

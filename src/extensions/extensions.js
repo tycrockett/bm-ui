@@ -224,7 +224,7 @@ const defaultCommands = [
 
   {
     name: "Add + Commit + Push",
-    command: ">",
+    command: ".",
     args: "{description}",
     flags: "",
     description:

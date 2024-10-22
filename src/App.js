@@ -368,79 +368,87 @@ const App = () => {
           </Div>
 
           {ports?.[basePath]?.length ? (
-            <Tooltip label="Active Ports">
-              <Div
-                css={`
-                  position: relative;
-                  border-radius: 16px;
-                  background-color: ${colors.darkIndigo};
-                  padding: 8px;
-                  padding-right: 12px;
-                  margin-right: 8px;
-                  ${flex("right")}
-                  cursor: pointer;
-                `}
-                onClick={() => setDisplayPorts(true)}
-              >
+            <Div
+              css={`
+                position: relative;
+                border-radius: 16px;
+                background-color: ${colors.darkIndigo};
+                padding: 8px;
+                padding-right: 12px;
+                margin-right: 8px;
+
+                cursor: pointer;
+              `}
+              onClick={() => setDisplayPorts(true)}
+            >
+              <Tooltip label="Active Ports">
                 <Div
                   css={`
-                    border-radius: 50%;
-                    width: 6px;
-                    height: 6px;
-                    background-color: ${colors.lightGreen};
-                    margin-right: 8px;
-                    border: 3px solid ${colors.green};
+                    ${flex("right")}
                   `}
-                />
-                <Text bold>{ports?.[basePath]?.length}</Text>
-                {displayPorts ? (
+                >
                   <Div
                     css={`
-                      position: absolute;
-                      top: calc(100% + 8px);
-                      right: 0;
-                      width: 300px;
-                      background-color: ${colors.darkIndigo};
-                      border-radius: 8px;
-                      z-index: 100000;
-                      overflow: auto;
-                      max-height: 45vh;
-                      padding: 8px 0;
+                      border-radius: 50%;
+                      width: 6px;
+                      height: 6px;
+                      background-color: ${colors.lightGreen};
+                      margin-right: 8px;
+                      border: 3px solid ${colors.green};
                     `}
-                    ref={portsRef}
-                  >
-                    {ports?.[basePath]?.map((port) => (
-                      <Div
-                        css={`
-                          padding: 8px 16px;
-                          ${flex("space-between")}
-                          :hover {
-                            background-color: rgba(0, 0, 0, 0.3);
-                          }
-                        `}
-                        onClick={() => killMainPID(port.pid)}
-                      >
-                        <Text>{port.pid}</Text>
-                        <Text bold>{port.port}</Text>
-                      </Div>
-                    ))}
-                  </Div>
-                ) : null}
-              </Div>
-            </Tooltip>
+                  />
+                  <Text bold>{ports?.[basePath]?.length}</Text>
+                </Div>
+              </Tooltip>
+              {displayPorts ? (
+                <Div
+                  css={`
+                    position: absolute;
+                    top: calc(100% + 8px);
+                    right: 0;
+                    width: 300px;
+                    background-color: ${colors.darkIndigo};
+                    border-radius: 8px;
+                    z-index: 100000;
+                    overflow: auto;
+                    max-height: 45vh;
+                    padding: 8px 0;
+                  `}
+                  ref={portsRef}
+                >
+                  {ports?.[basePath]?.map((port) => (
+                    <Div
+                      css={`
+                        padding: 8px 16px;
+                        ${flex("space-between")}
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.3);
+                        }
+                      `}
+                      onClick={() => killMainPID(port.pid)}
+                    >
+                      <Text>{port.pid}</Text>
+                      <Text bold>{port.port}</Text>
+                    </Div>
+                  ))}
+                </Div>
+              ) : null}
+            </Div>
           ) : null}
-          <Button
-            icon
-            disabled={settings?.pwd === "~"}
-            css={`
-              padding: 16px;
-            `}
-            onClick={() =>
-              cmd('open -n -b "com.microsoft.VSCode" --args "$PWD"')
-            }
-          >
-            <ArrowSquareOut weight="bold" />
-          </Button>
+          <Tooltip label="Open directory" shortkey="open-vscode">
+            <Button
+              icon
+              disabled={settings?.pwd === "~"}
+              css={`
+                padding: 16px;
+              `}
+              onClick={() =>
+                cmd('open -n -b "com.microsoft.VSCode" --args "$PWD"')
+              }
+            >
+              <ArrowSquareOut weight="bold" />
+            </Button>
+          </Tooltip>
 
           <Div
             css={`

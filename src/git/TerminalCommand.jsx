@@ -284,10 +284,11 @@ export const TerminalCommand = () => {
           css={`
             width: calc(100% - 32px);
             background: ${colors.darkIndigo};
-            height: calc(100% - 32px);
+            height: calc(100% - 180px);
             overflow-y: auto;
             ${scrollbar.style}
             padding: 16px;
+            border-bottom: 1px solid black;
           `}
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => terminalInputRef?.current?.focus()}

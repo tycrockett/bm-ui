@@ -83,7 +83,7 @@ export const Actions = ({ settings, setSettings }) => {
     }
   };
 
-  useKeyboard({ keydown, options: { useCapture: true } });
+  useKeyboard({ keydown, options: { capture: true } });
 
   return (
     <>

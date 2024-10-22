@@ -862,7 +862,8 @@ export const Git = () => {
                 className={css`
                   box-sizing: border-box;
                   width: calc(100% - 8px);
-                  padding: 8px;
+                  padding: 16px 8px;
+                  padding-bottom: 12px;
                   border-radius: 8px;
                   outline: none;
                   background-color: ${colors.darkIndigo};

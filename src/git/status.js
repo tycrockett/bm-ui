@@ -171,6 +171,7 @@ export const Status = ({
         box-sizing: border-box;
         overflow-y: auto;
         min-height: 50%;
+        height: 100%;
         ${styles.scrollbar}
       `}
     >
@@ -242,7 +243,7 @@ export const Status = ({
               <Div
                 css={`
                   padding: 0;
-                  padding-left: 16px;
+                  padding-left: 8px;
                   margin-left: 12px;
                   border-left: 2px solid ${colors.light};
                 `}
@@ -253,7 +254,7 @@ export const Status = ({
                       css={`
                         ${flex("space-between")}
                         border-radius: 8px;
-                        padding: 2px 0;
+                        padding: 2px 4px;
                         :hover {
                           background-color: rgba(0, 0, 0, 0.5);
                           cursor: pointer;
@@ -378,13 +379,7 @@ export const Status = ({
               >
                 On branch {currentBranch}
               </Text>
-              <Text
-                css={`
-                  border-radius: 8px;
-                `}
-              >
-                nothing to commit, working tree clean.
-              </Text>
+              <Text>nothing to commit, working tree clean.</Text>
             </Div>
             <Text
               bold

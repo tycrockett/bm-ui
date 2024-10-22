@@ -16,6 +16,7 @@ import { logCommits } from "./utils";
 import { cmd } from "../node/node-exports";
 import { StoreContext } from "../context/store";
 import { Collapse } from "../shared/Collapse";
+import { Tooltip } from "../shared/Tooltip";
 
 export const Commits = ({
   currentBranch,
@@ -26,18 +27,26 @@ export const Commits = ({
 }) => {
   const context = useContext(StoreContext);
   const { store } = context;
-
   const getLogs = useCallback(
-    () => logCommits(parentBranch),
-    [parentBranch, pwd]
+    () => logCommits(parentBranch, repo?.defaultBranch),
+    [parentBranch, pwd, repo?.defaultBranch]
   );
   const [logs] = useAsyncValue(getLogs, [
     lastCommand,
     parentBranch,
     currentBranch,
-    pwd,
     store?.mode,
+    pwd,
   ]);
+  console.log(logs);
+
+  const [parentToRemote] = useAsyncValue(async () => {
+    const diff = await cmd(
+      `git rev-list --left-right --count origin/${parentBranch}...${parentBranch}`
+    );
+    return diff.split("\t").map((item) => Number(item));
+  }, [parentBranch, pwd]);
+
   const commits = Object.entries(logs || {});
 
   const [hash, setHash] = useState("all");
@@ -58,14 +67,11 @@ export const Commits = ({
     }
   };
 
-  if (currentBranch === repo?.defaultBranch) {
-    return null;
-  }
   const metaBranch = repo?.branches?.[currentBranch];
 
   return (
     <Collapse
-      isOpen={false}
+      isOpen={true}
       css={`
         ${animation("fadeIn", ".2s ease")}
         ${flex("column")}
@@ -81,14 +87,15 @@ export const Commits = ({
         css={`
           ${flex("space-between")}
           padding: 0 16px;
+          padding-bottom: 16px;
+          cursor: pointer;
         `}
+        onClick={() => setHash(hash === "all" ? "" : "all")}
       >
         <Div
           css={`
             ${flex("left")}
-            p {
-              margin-left: 8px;
-            }
+            gap: 16px;
           `}
         >
           <GitCommit size={16} color="white" weight="bold" />
@@ -109,55 +116,37 @@ export const Commits = ({
               ""
             )}
           </Text>
+          <Tooltip label="Collapse/Expand Files">
+            {hash === "all" ? (
+              <CaretUp color="#777" />
+            ) : (
+              <CaretDown color="#777" />
+            )}
+          </Tooltip>
         </Div>
         <Div
           css={`
             text-align: right;
-          `}
-        >
-          <Text bold>{metaBranch?.parentBranch}</Text>
-        </Div>
-      </Div>
-      <Div
-        css={`
-          ${flex("space-between")}
-          padding: 8px 16px;
-        `}
-      >
-        <Div
-          css={`
-            ${flex("left")}
-            svg {
-              margin-left: 8px;
-            }
-            border-bottom: 1px solid transparent;
-            cursor: pointer;
-            :hover {
-              border-bottom: 1px solid #777;
-            }
+            ${flex("right")}
+            flex-grow: 1;
           `}
         >
           <Text
             css={`
               color: #777;
+              font-size: 0.9em;
+              margin-top: -2px;
+              margin-right: 4px;
             `}
-            onClick={() => setHash(hash === "all" ? "" : "all")}
           >
-            {hash === "all" ? "collapse files" : "expand files"}
+            {parentToRemote?.[0] > 0
+              ? `${parentToRemote?.[0]} commits behind origin `
+              : `Up to date with origin `}
           </Text>
-          {hash === "all" ? (
-            <CaretUp color="#777" />
-          ) : (
-            <CaretDown color="#777" />
-          )}
+          <Text bold>{metaBranch?.parentBranch}</Text>
         </Div>
-
-        {metaBranch?.createdAt ? (
-          <Text>
-            {format(new Date(metaBranch?.createdAt), "MMM d | h:mm a")}
-          </Text>
-        ) : null}
       </Div>
+
       <Div
         css={`
           flex-grow: 1;

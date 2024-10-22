@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { colors } from "./styles";
 import { flex, shadows, useStyles } from "./utils";
 
@@ -71,7 +72,11 @@ export const buttonStyles = {
   `,
 };
 
-export const Button = ({ children, ...rest }) => {
+export const Button = forwardRef(({ children, ...rest }, ref) => {
   const props = useStyles(buttonStyles, rest);
-  return <button {...props}>{children}</button>;
-};
+  return (
+    <button {...props} ref={ref}>
+      {children}
+    </button>
+  );
+});

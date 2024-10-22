@@ -141,24 +141,11 @@ export const addCommitPush = async (des = "", options = {}) => {
 export const update = async (options) => {
   const { flags = "", currentBranch = "", parentBranch = "" } = options;
   try {
-    let branch = parentBranch;
-    if (!flags.includes("-s") && !flags.includes("--self")) {
-      if (currentBranch !== branch) {
-        branch = parentBranch;
-        if (!branch) {
-          console.log(`Can't seem to detect a parent branch.`);
-          return;
-        }
-      }
-    } else {
-      branch = currentBranch;
-    }
-
-    await cmd(`git checkout ${branch}`);
-    await cmd(`git pull origin ${branch}`);
-    if (!flags.includes("-s") && !flags.includes("--self")) {
+    await cmd(`git checkout ${parentBranch}`);
+    await cmd(`git pull origin ${parentBranch}`);
+    if (currentBranch !== parentBranch) {
       await cmd(`git checkout ${currentBranch}`);
-      await cmd(`git merge ${branch}`);
+      await cmd(`git merge ${parentBranch}`);
     }
   } catch (err) {
     throw err;
@@ -250,28 +237,26 @@ export const fetch = async () =>
     });
   });
 
-export const logCommits = async (parentBranch) => {
-  if (parentBranch) {
-    try {
-      const files = await cmd(
-        `git show --name-only --oneline ${parentBranch}..HEAD`
-      );
-      const split = files.split("\n");
-      let key = "";
-      return split.reduce((prev, item) => {
-        if (item.includes(" ")) {
-          key = item;
-        }
-        if (key !== item) {
-          return { ...prev, [key]: [...(prev[key] || []), item] };
-        }
-        return prev;
-      }, {});
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  } else {
+export const logCommits = async (parentBranch, defaultBranch) => {
+  const command =
+    !parentBranch || parentBranch === defaultBranch
+      ? "git log --oneline --name-only --no-merges -15"
+      : `git show --name-only --oneline ${parentBranch}..HEAD`;
+  try {
+    const files = await cmd(command);
+    const split = files.split("\n");
+    let key = "";
+    return split.reduce((prev, item) => {
+      if (item.includes(" ")) {
+        key = item;
+      }
+      if (key !== item) {
+        return { ...prev, [key]: [...(prev[key] || []), item] };
+      }
+      return prev;
+    }, {});
+  } catch (err) {
+    console.log(err);
     return [];
   }
 };
