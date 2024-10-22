@@ -38,7 +38,6 @@ export const Commits = ({
     store?.mode,
     pwd,
   ]);
-  console.log(logs);
 
   const [parentToRemote] = useAsyncValue(async () => {
     const diff = await cmd(
@@ -71,7 +70,7 @@ export const Commits = ({
 
   return (
     <Collapse
-      isOpen={true}
+      isOpen={false}
       css={`
         ${animation("fadeIn", ".2s ease")}
         ${flex("column")}
