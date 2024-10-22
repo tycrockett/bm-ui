@@ -422,11 +422,9 @@ export const Git = () => {
                 width: 40px;
                 height: 40px;
                 box-sizing: border-box;
-                ${tab === "command"
-                  ? `background-color: ${colors.lightIndigo};`
-                  : ""}
+                ${tab === "command" ? `background-color: ${colors.green};` : ""}
                 :hover {
-                  outline: 2px solid ${colors.lightIndigo};
+                  outline: 2px solid ${colors.green};
                   ${shadows.md}
                 }
                 svg {
@@ -455,10 +453,10 @@ export const Git = () => {
                 height: 40px;
                 box-sizing: border-box;
                 ${tab === "terminal"
-                  ? `background-color: ${colors.lightIndigo};`
+                  ? `background-color: ${colors.green};`
                   : ""}
                 :hover {
-                  outline: 2px solid ${colors.lightIndigo};
+                  outline: 2px solid ${colors.green};
                   ${shadows.md}
                 }
                 svg {
@@ -499,11 +497,9 @@ export const Git = () => {
                 width: 40px;
                 height: 40px;
                 box-sizing: border-box;
-                ${tab === "notes"
-                  ? `background-color: ${colors.lightIndigo};`
-                  : ""}
+                ${tab === "notes" ? `background-color: ${colors.green};` : ""}
                 :hover {
-                  outline: 2px solid ${colors.lightIndigo};
+                  outline: 2px solid ${colors.green};
                   ${shadows.md}
                 }
                 svg {
@@ -788,7 +784,7 @@ export const Git = () => {
                         border: none;
                         margin: 8px;
                         :hover {
-                          background: ${colors.lightIndigo};
+                          background: ${colors.green};
                           color: white;
                         }
                       `}

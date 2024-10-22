@@ -35,7 +35,7 @@ export const scrollbar = {
     }
 
     ::-webkit-scrollbar-thumb {
-      background: ${colors.lightIndigo};
+      background: ${colors.green};
       border-radius: 16px;
       visibility: visible;
       height: 3px;

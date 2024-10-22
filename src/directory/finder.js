@@ -107,7 +107,7 @@ export const Finder = () => {
             border: 1px solid ${colors.black};
             width: max-content;
             padding: 8px;
-            background-color: ${colors.lightIndigo};
+            background-color: ${colors.green};
             cursor: pointer;
           `}
           onClick={handleSubmit}
@@ -141,7 +141,7 @@ export const Finder = () => {
               color: white;
               border: 1px solid transparent;
               ${!!search && index == idx
-                ? `background-color: ${colors.lightIndigo};`
+                ? `background-color: ${colors.green};`
                 : ""}
               :hover {
                 background-color: rgba(0, 0, 0, 0.5);

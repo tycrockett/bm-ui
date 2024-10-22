@@ -74,12 +74,12 @@ export const CmdList = ({
                   border: 2px solid transparent;
                   transition: background-color 0.2s ease;
                   :hover {
-                    background-color: ${colors.lightIndigo};
+                    background-color: ${colors.green};
                   }
                   ${idx === index && !!cmd
                     ? `
                       padding: 4px 8px;
-                      background-color: ${colors.lightIndigo};
+                      background-color: ${colors.green};
                     `
                     : ""}
                 `}
@@ -94,7 +94,7 @@ export const CmdList = ({
             css={`
               width: 100%;
               ${list?.length > 1 && cmd.startsWith("/")
-                ? `padding-top: 16px; border-top: 1px solid ${colors.lightIndigo};`
+                ? `padding-top: 16px; border-top: 1px solid ${colors.green};`
                 : ""}
             `}
           >
@@ -113,14 +113,14 @@ export const CmdList = ({
                   css={`
                     padding: 4px 8px;
                     border-radius: 16px;
-                    background-color: ${colors.lightIndigo};
+                    background-color: ${colors.green};
                     margin-right: 16px;
                     cursor: pointer;
                     border: 1px solid transparent;
                     :hover {
                       transition: background-color 0.2s ease, border 0.2s ease;
-                      background-color: ${colors.lightIndigo};
-                      border: 1px solid ${colors.lightIndigo};
+                      background-color: ${colors.green};
+                      border: 1px solid ${colors.green};
                     }
                   `}
                   onClick={handleCmd}
@@ -187,13 +187,13 @@ export const CmdList = ({
                       border: 1px solid transparent;
                       transition: background-color 0.2s ease;
                       ${idx === 0
-                        ? `background-color: ${colors.lightIndigo}; border: 1px solid ${colors.lightIndigo}; font-weight: bold;`
+                        ? `background-color: ${colors.green}; border: 1px solid ${colors.green}; font-weight: bold;`
                         : `background-color: ${colors.darkIndigo};`}
                       border-radius: 30px;
                       margin-right: 8px;
                       cursor: pointer;
                       :hover {
-                        background-color: ${colors.lightIndigo};
+                        background-color: ${colors.green};
                       }
                     `}
                     onClick={() => setCmd(`${list[index]?.command} ${item}`)}

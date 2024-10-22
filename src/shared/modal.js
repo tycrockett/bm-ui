@@ -20,7 +20,7 @@ export const Modal = ({ children, onClose, ...props }) => {
         > div {
           ${shadows.lg}
           border-radius: 8px;
-          background-color: ${colors.lightIndigo};
+          background-color: ${colors.green};
         }
       `}
       onMouseDown={onClose}

@@ -35,7 +35,7 @@ export const buttonStyles = {
     color: white;
     :hover {
     transition: background-color .2s ease;
-      background-color: ${colors.lightIndigo};
+      background-color: ${colors.green};
     }
     svg {
       min-width: 32px;

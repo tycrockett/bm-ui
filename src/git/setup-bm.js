@@ -58,7 +58,7 @@ export const SetupBm = () => {
             padding: 32px;
             width: 500px;
             height: max-content;
-            background-color: ${colors.lightIndigo};
+            background-color: ${colors.green};
             border-radius: 16px;
           `}
         >

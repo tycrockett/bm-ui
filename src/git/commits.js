@@ -106,7 +106,7 @@ export const Commits = ({
                   margin-left: 8px;
                   border-radius: 30px;
                   padding: 2px 10px;
-                  background-color: ${colors.lightIndigo};
+                  background-color: ${colors.green};
                 `}
               >
                 {commits?.length}
@@ -205,7 +205,7 @@ export const Commits = ({
                   ${flex("center")}
                   border-radius: 30px;
                   padding: 4px;
-                  background-color: ${colors.lightIndigo};
+                  background-color: ${colors.green};
                   min-width: 100px;
                 `}
               >
