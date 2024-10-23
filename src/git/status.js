@@ -396,12 +396,17 @@ export const Status = ({
                 css={`
                   border-radius: 8px;
                   font-weight: bold;
+                  span {
+                    font-weight: normal;
+                  }
                 `}
               >
                 On branch {currentBranch}
-                {repo?.defaultBranch === currentBranch
-                  ? " (default branch)"
-                  : ""}
+                {repo?.defaultBranch === currentBranch ? (
+                  <span> (default branch)</span>
+                ) : (
+                  ""
+                )}
               </Text>
               <Text>nothing to commit, working tree clean.</Text>
             </Div>
