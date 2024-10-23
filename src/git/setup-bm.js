@@ -2,7 +2,7 @@ import { GitBranch, ShieldWarning } from "phosphor-react";
 import { useContext, useState } from "react";
 import { StoreContext } from "../context/store";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
-import { flex, shadows } from "../shared/utils";
+import { flex } from "../shared/utils";
 import { useAsyncValue } from "../hooks/use-async-value";
 import { isInGit } from "./utils";
 
