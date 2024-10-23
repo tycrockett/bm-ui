@@ -311,7 +311,9 @@ const defaultCommands = [
               branches: nextBranches,
             },
           });
-        } catch {}
+        } catch (err) {
+          throw err;
+        }
       }
     },
   },
