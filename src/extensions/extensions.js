@@ -322,9 +322,8 @@ const defaultCommands = [
     name: "Clear",
     command: "clear",
     args: "",
-    flags: "-u --undo",
-    description:
-      "Clears branch all uncommitted changes. Adding the -u flag undoes the clear.",
+    flags: "",
+    description: "1. git add .\n2. git stash",
     function: async ({ command, context }) => {
       await clearBranch(command.options);
     },
