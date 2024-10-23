@@ -135,7 +135,7 @@ export const addCommitPush = async (path, des = "", options = {}) => {
   try {
     let addPath = path;
     if (addPath.startsWith("./")) {
-      addPath = addPath.replace("./", "");
+      addPath = addPath.replace("./", "") || ".";
     }
 
     if (des) {
