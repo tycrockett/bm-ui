@@ -159,7 +159,6 @@ export const Status = ({
     cmd(command);
   };
 
-  console.log(settings);
   return (
     <Collapse
       isOpen={false}
