@@ -394,10 +394,10 @@ const defaultCommands = [
   {
     name: "Remove",
     command: "remove",
-    args: "{relativeFilepath}",
+    args: "{relativeFilepath} *{branch}",
     flags: "",
     description:
-      "git checkout {relativeFilepath} from the parent branch\n\n(removes {relativeFilepath} changes in the branch)",
+      "git checkout {branch} -- {relativeFilepath} \n\n*{branch} is optional and is set to {parentBranch} by default.\n\nRemoves all changes to a file.",
     function: async ({ command, context }) => {
       await handleFile(command.args[0], command.args[1], command.options);
     },
