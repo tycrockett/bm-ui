@@ -836,6 +836,7 @@ export const Git = () => {
                 parentBranch={parentBranch}
                 completeMerge={completeMerge}
                 settings={settings}
+                repo={repos?.[settings?.pwd]}
               />
               <Commits
                 currentBranch={branches?.current}

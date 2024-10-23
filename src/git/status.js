@@ -42,6 +42,7 @@ function nestFiles(filePaths) {
 
 export const Status = ({
   settings,
+  repo,
   status,
   currentBranch,
   parentBranch,
@@ -158,6 +159,7 @@ export const Status = ({
     cmd(command);
   };
 
+  console.log(settings);
   return (
     <Collapse
       isOpen={false}
@@ -397,7 +399,7 @@ export const Status = ({
                 `}
               >
                 On branch {currentBranch}
-                {settings?.defaultBranch === currentBranch
+                {repo?.defaultBranch === currentBranch
                   ? " (default branch)"
                   : ""}
               </Text>
