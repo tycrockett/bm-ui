@@ -398,6 +398,7 @@ export const Status = ({
                   font-weight: bold;
                   span {
                     font-weight: normal;
+                    color: ${colors.lightBlue};
                   }
                 `}
               >
