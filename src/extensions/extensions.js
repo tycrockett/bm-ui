@@ -266,6 +266,18 @@ const defaultCommands = [
       });
     },
   },
+
+  {
+    name: "Clear",
+    command: "clear",
+    args: "",
+    flags: "",
+    description: "1. git add .\n2. git stash",
+    function: async ({ command, context }) => {
+      await clearBranch(command.options);
+    },
+  },
+
   {
     name: "Checkout",
     command: "checkout",
@@ -319,16 +331,6 @@ const defaultCommands = [
     },
   },
 
-  {
-    name: "Clear",
-    command: "clear",
-    args: "",
-    flags: "",
-    description: "1. git add .\n2. git stash",
-    function: async ({ command, context }) => {
-      await clearBranch(command.options);
-    },
-  },
   {
     name: "Stash",
     command: "stash",
