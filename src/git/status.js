@@ -408,7 +408,7 @@ export const Status = ({
                   `}
                 >
                   {" "}
-                  (default branch)
+                  {currentBranch} is set to default branch
                 </Text>
               ) : null}
             </Div>
