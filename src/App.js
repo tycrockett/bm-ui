@@ -6,6 +6,8 @@ import {
   Command,
   DotsThreeVertical,
   Gear,
+  Hamburger,
+  List,
   X,
 } from "phosphor-react";
 import { useContext, useEffect, useState } from "react";
@@ -28,7 +30,7 @@ import { Shortkey } from "./Shortkey";
 
 const header = `
   padding: 8px 16px;
-  margin-top: 32px;
+  margin-top: 16px;
 `;
 
 const App = () => {
@@ -228,23 +230,156 @@ const App = () => {
         overflow: auto;
       `}
     >
+      <Div
+        css={`
+          ${flex("space-between")}
+          padding: 16px;
+          padding-left: 24px;
+          margin-bottom: -8px;
+          background-color: ${colors.darkIndigo};
+        `}
+      >
+        <Text h2>
+          {mode === "finder"
+            ? "Finder"
+            : mode === "git"
+            ? "Git Command"
+            : mode === "settings"
+            ? "Settings"
+            : mode === "extensions"
+            ? "Extensions"
+            : mode === "logs"
+            ? "Logs"
+            : null}
+        </Text>
+        <Div
+          css={`
+            position: relative;
+          `}
+          ref={settingsRef}
+        >
+          <Button icon onClick={() => setDropdown(dropdown ? "" : "settings")}>
+            <List weight="bold" />
+          </Button>
+
+          {dropdown === "settings" ? (
+            <Div
+              css={`
+                position: absolute;
+                top: calc(100% + 8px);
+                right: 0;
+                width: 250px;
+                background-color: ${colors.darkIndigo};
+                z-index: 1000;
+                border-radius: 8px;
+                overflow: hidden;
+                padding: 8px 0;
+                cursor: pointer;
+                ${shadows.lg}
+              `}
+              onClick={() => setDropdown("")}
+            >
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("git")}
+              >
+                <Text>Git Command</Text>
+                <Shortkey type="navigate-git" />
+              </Div>
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("finder")}
+              >
+                <Text>Finder</Text>
+                <Shortkey type="navigate-finder" />
+              </Div>
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("logs")}
+              >
+                <Text>Logs</Text>
+                <Shortkey type="navigate-logs" />
+              </Div>
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("extensions")}
+              >
+                <Text>Extensions</Text>
+                <Shortkey type="navigate-extensions" />
+              </Div>
+
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("settings")}
+              >
+                <Text>Settings</Text>
+                <Shortkey type="navigate-settings" />
+              </Div>
+              <Div
+                css={`
+                  ${flex("space-between")}
+                  padding: 8px 16px;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.5);
+                  }
+                `}
+                onClick={() => setMode("settings")}
+              >
+                <Text>Create Bookmark</Text>
+                <Shortkey type="create-bookmark" />
+              </Div>
+            </Div>
+          ) : null}
+        </Div>
+      </Div>
       <Div css={header}>
         <Div
           css={`
             ${flex("left")}
           `}
         >
-          <Button
-            icon
-            disabled={settings?.pwd === "~"}
-            onClick={goBack}
-            css={`
-              margin-right: 8px;
-              padding: 16px;
-            `}
-          >
-            <ArrowLeft weight="bold" />
-          </Button>
+          <Tooltip label="Move up a directory">
+            <Button
+              icon
+              onClick={settings?.pwd === "~" ? null : goBack}
+              css={`
+                margin-right: 8px;
+                padding: 16px;
+              `}
+            >
+              <ArrowLeft weight="bold" />
+            </Button>
+          </Tooltip>
           <Div
             css={`
               position: relative;
@@ -449,122 +584,8 @@ const App = () => {
               <ArrowSquareOut weight="bold" />
             </Button>
           </Tooltip>
-
-          <Div
-            css={`
-              position: relative;
-            `}
-            ref={settingsRef}
-          >
-            <Button
-              icon
-              onClick={() => setDropdown(dropdown ? "" : "settings")}
-            >
-              <DotsThreeVertical weight="bold" />
-            </Button>
-
-            {dropdown === "settings" ? (
-              <Div
-                css={`
-                  position: absolute;
-                  top: calc(100% + 8px);
-                  right: 0;
-                  width: 250px;
-                  background-color: ${colors.darkIndigo};
-                  z-index: 1000;
-                  border-radius: 8px;
-                  overflow: hidden;
-                  padding: 8px 0;
-                  cursor: pointer;
-                  ${shadows.lg}
-                `}
-                onClick={() => setDropdown("")}
-              >
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("git")}
-                >
-                  <Text>Git Command</Text>
-                  <Shortkey type="navigate-git" />
-                </Div>
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("finder")}
-                >
-                  <Text>Finder</Text>
-                  <Shortkey type="navigate-finder" />
-                </Div>
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("logs")}
-                >
-                  <Text>Logs</Text>
-                  <Shortkey type="navigate-logs" />
-                </Div>
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("extensions")}
-                >
-                  <Text>Extensions</Text>
-                  <Shortkey type="navigate-extensions" />
-                </Div>
-
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("settings")}
-                >
-                  <Text>Settings</Text>
-                  <Shortkey type="navigate-settings" />
-                </Div>
-                <Div
-                  css={`
-                    ${flex("space-between")}
-                    padding: 8px 16px;
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.5);
-                    }
-                  `}
-                  onClick={() => setMode("settings")}
-                >
-                  <Text>Create Bookmark</Text>
-                  <Shortkey type="create-bookmark" />
-                </Div>
-              </Div>
-            ) : null}
-          </Div>
         </Div>
       </Div>
-
       <Div>
         {mode === "finder" ? (
           <Finder />

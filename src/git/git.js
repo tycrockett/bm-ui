@@ -540,28 +540,6 @@ export const Git = () => {
           }}
         >
           <Div
-            css={`
-              width: 32px;
-              height: 24px;
-              ${flex("center")}
-              background-color: ${branches?.hasRemote
-                ? colors.lightGreen
-                : colors.red};
-              padding: 8px;
-              padding-left: 16px;
-              border-radius: 30px;
-              border-top-right-radius: 0;
-              border-bottom-right-radius: 0;
-              cursor: pointer;
-            `}
-          >
-            {branches.hasRemote ? (
-              <CloudCheck size={24} color="white" weight="bold" />
-            ) : (
-              <CloudSlash size={24} color="white" weight="bold" />
-            )}
-          </Div>
-          <Div
             flex="left"
             css={`
               min-width: 100px;
@@ -570,13 +548,35 @@ export const Git = () => {
               padding-top: 12px;
               padding-bottom: 4px;
               border-radius: 30px;
-              border-top-left-radius: 0;
-              border-bottom-left-radius: 0;
+              border-top-right-radius: 0;
+              border-bottom-right-radius: 0;
               background-color: ${colors.darkIndigo};
               cursor: pointer;
             `}
           >
             <Text bold>{branches?.current}</Text>
+          </Div>
+          <Div
+            css={`
+              width: 32px;
+              height: 24px;
+              ${flex("center")}
+              background-color: ${branches?.hasRemote
+                ? colors.lightGreen
+                : colors.red};
+              padding: 8px;
+              padding-right: 16px;
+              border-radius: 30px;
+              border-top-left-radius: 0;
+              border-bottom-left-radius: 0;
+              cursor: pointer;
+            `}
+          >
+            {branches.hasRemote ? (
+              <CloudCheck size={24} color="white" weight="bold" />
+            ) : (
+              <CloudSlash size={24} color="white" weight="bold" />
+            )}
           </Div>
           {branchOptions ? (
             <Div

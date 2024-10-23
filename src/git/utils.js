@@ -2,6 +2,14 @@ import { toast } from "react-toastify";
 import { cmd } from "../node/node-exports";
 const { spawn } = window.require("child_process");
 
+export const isInGit = async () => {
+  try {
+    return await cmd(`git rev-parse --is-inside-work-tree`);
+  } catch {
+    return false;
+  }
+};
+
 export const checkoutBranch = async (branch, options = {}) => {
   const { flags = "" } = options;
   try {

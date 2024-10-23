@@ -31,7 +31,6 @@ export const Extensions = () => {
         padding: 16px;
       `}
     >
-      <Text h2>Extensions</Text>
       <Input
         placeholder="Search"
         css={`
