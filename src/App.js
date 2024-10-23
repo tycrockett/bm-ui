@@ -41,7 +41,7 @@ const App = () => {
   } = context;
   const setMode = (mode) => set("mode", mode);
 
-  const { ports = {}, action } = store;
+  const { ports = {}, logs = [] } = store;
 
   const basePath = store?.settings?.pwd?.replace("~", store?.settings?.base);
 
@@ -258,9 +258,34 @@ const App = () => {
           `}
           ref={settingsRef}
         >
-          <Button icon onClick={() => setDropdown(dropdown ? "" : "settings")}>
-            <List weight="bold" />
-          </Button>
+          <Div
+            css={`
+              position: relative;
+              ${logs?.length > 0
+                ? `
+                ::after {
+                  content: "${logs?.length}";
+                  position: absolute;
+                  top: -8px;
+                  right: -8px;
+                  border-radius: 30px;
+                  padding: 4px 8px;
+                  background-color: ${colors.green};
+                  color: white;
+                  font-weight: bold;
+                }
+                
+              `
+                : ""}
+            `}
+          >
+            <Button
+              icon
+              onClick={() => setDropdown(dropdown ? "" : "settings")}
+            >
+              <List weight="bold" />
+            </Button>
+          </Div>
 
           {dropdown === "settings" ? (
             <Div

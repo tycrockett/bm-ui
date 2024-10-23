@@ -131,11 +131,16 @@ export const push = async (options) => {
   }
 };
 
-export const addCommitPush = async (des = "", options = {}) => {
+export const addCommitPush = async (path, des = "", options = {}) => {
   try {
+    let addPath = path;
+    if (addPath.startsWith("./")) {
+      addPath = addPath.replace("./", "");
+    }
+
     if (des) {
       const description = des.replace(/"'/g, "");
-      await cmd(`git add .`);
+      await cmd(`git add ${addPath}`);
       await cmd(`git commit -m "${description}"`);
       await push({ ...options, flags: "--disable-set-upstream" });
     } else {

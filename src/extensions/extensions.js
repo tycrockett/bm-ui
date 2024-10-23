@@ -224,15 +224,14 @@ const defaultCommands = [
   {
     name: "Add + Commit + Push",
     command: ".",
-    args: "{description}",
+    args: "{path} {commitMessage}",
     flags: "",
-    description:
-      "1. Adds all unstaged files \n2. Commits all files with a {description} message \n3. Pushes everything if a remote branch is detected.",
+    description: `1. git add {path}\n2. git commit -m {commitMessage} \n3. git push, if a remote branch is detected.\n\n". {commitMessage}" or "./path/to/file {commitMessage}"`,
     function: async ({ command, context }) => {
       const description = command.args
         .filter((v) => !v.startsWith("-"))
         .join(" ");
-      await addCommitPush(description, command.options);
+      await addCommitPush(command.value, description, command.options);
     },
   },
   {

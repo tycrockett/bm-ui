@@ -194,6 +194,7 @@ export const Git = () => {
     };
 
     const command = {
+      value,
       args,
       options,
       filteredBranchList: checkoutList,
@@ -234,7 +235,7 @@ export const Git = () => {
     try {
       setLoading(true);
       const description = `Merge branch '${parentBranch}' into '${branches.current}'`;
-      await addCommitPush(description);
+      await addCommitPush(".", description);
       refreshGit();
       methods.set("lastCommand", `complete-merge-${new Date().toISOString()}`);
     } catch (err) {
@@ -282,7 +283,8 @@ export const Git = () => {
     const filtered = commands.filter(
       (item) =>
         item?.name?.toLowerCase().includes(lowerCase) ||
-        item?.command?.toLowerCase().includes(lowerCase)
+        item?.command?.toLowerCase().includes(lowerCase) ||
+        (item?.command === "." && lowerCase?.startsWith("./"))
     );
 
     return filtered.sort((a, b) => {
@@ -375,7 +377,7 @@ export const Git = () => {
       } else if (captured === "+Space") {
         if (!cmd.startsWith("/") && !cmd.includes(" ")) {
           const command = list[index]?.command;
-          if (command) {
+          if (command && !cmd.startsWith("./")) {
             setCmd(command);
           }
         }
