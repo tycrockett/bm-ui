@@ -408,8 +408,8 @@ export const Status = ({
                     padding-top: 8px;
                   `}
                 >
-                  {" "}
-                  {currentBranch} is set to the default branch
+                  <strong>{currentBranch}</strong> is set to the{" "}
+                  <strong>default branch</strong>
                 </Text>
               ) : null}
             </Div>
