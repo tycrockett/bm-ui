@@ -482,7 +482,7 @@ const App = () => {
                   </Div>
                 ) : null}
                 {Object.entries(settings?.bookmarks || {}).map(
-                  ([key, value]) => (
+                  ([key, value], idx) => (
                     <Div
                       css={`
                         padding: 8px 16px;
@@ -492,6 +492,11 @@ const App = () => {
                         }
                         :not(:hover) {
                           button {
+                            display: none;
+                          }
+                        }
+                        :hover {
+                          .shortkey {
                             display: none;
                           }
                         }
@@ -506,6 +511,10 @@ const App = () => {
                           ${flex("right")}
                         `}
                       >
+                        <Shortkey
+                          type={`meta+${idx + 1}`}
+                          className="shortkey"
+                        />
                         <Button
                           icon
                           xs

@@ -25,7 +25,7 @@ const mapping = {
   PageDown: "⇟",
 };
 
-export const Shortkey = ({ type }) => {
+export const Shortkey = ({ type, css: cssString = "", className = "" }) => {
   const { store } = useContext(StoreContext);
   const { actions } = store;
 
@@ -34,12 +34,14 @@ export const Shortkey = ({ type }) => {
     ...actions,
   };
 
-  const shortkey = commands?.[type]?.shortkey || "";
+  const shortkey = commands?.[type]?.shortkey || type;
 
   return (
     <Text
+      className={className}
       css={`
         color: ${colors.lightBlue};
+        ${cssString}
       `}
     >
       {shortkey
