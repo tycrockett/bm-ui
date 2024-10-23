@@ -48,7 +48,7 @@ export const Commits = ({
 
   const commits = Object.entries(logs || {});
 
-  const [hash, setHash] = useState("all");
+  const [hash, setHash] = useState("");
 
   const deleteFile = (file) => {
     try {

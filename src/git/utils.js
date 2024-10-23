@@ -13,14 +13,7 @@ export const isInGit = async () => {
 export const checkoutBranch = async (branch, options = {}) => {
   const { flags = "" } = options;
   try {
-    const isStashing = flags.includes("-s") || flags.includes("--stash");
-    if (isStashing) {
-      await cmd(`git stash`);
-    }
     await cmd(`git checkout ${branch}`);
-    if (isStashing) {
-      await cmd(`git stash apply`);
-    }
   } catch (err) {
     if (
       err

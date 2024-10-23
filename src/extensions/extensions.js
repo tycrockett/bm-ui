@@ -235,6 +235,7 @@ const defaultCommands = [
       await addCommitPush(command.value, description, command.options);
     },
   },
+
   {
     name: "New",
     command: "new",
@@ -282,8 +283,8 @@ const defaultCommands = [
     name: "Checkout",
     command: "checkout",
     args: "{branch}",
-    flags: "-s --stash",
-    description: "Checkout a branch.",
+    flags: "",
+    description: "git checkout {branch}.",
     function: async ({ command }) => {
       await checkoutBranch(command.filteredBranchList?.[0], command.options);
       fetch();
@@ -343,6 +344,7 @@ const defaultCommands = [
       await stash(command.options);
     },
   },
+
   {
     name: "Apply",
     command: "apply",
@@ -353,6 +355,7 @@ const defaultCommands = [
       await context?.methods?.executeCommand("git stash apply");
     },
   },
+
   {
     name: "Rename",
     command: "rename",
@@ -376,6 +379,7 @@ const defaultCommands = [
       context.methods.setRepos(next);
     },
   },
+
   {
     name: "Fetch",
     command: "fetch",
@@ -386,6 +390,7 @@ const defaultCommands = [
       await fetch();
     },
   },
+
   {
     name: "Pop",
     command: "pop",
@@ -396,6 +401,7 @@ const defaultCommands = [
       await context?.methods?.executeCommand("git reset HEAD~");
     },
   },
+
   {
     name: "Remove",
     command: "remove",
@@ -407,6 +413,7 @@ const defaultCommands = [
       await handleFile(command.args[0], command.args[1], command.options);
     },
   },
+
   {
     name: "Restore",
     command: "restore",
@@ -431,91 +438,31 @@ const defaultCommands = [
       });
     },
   },
+
   {
     name: "Parent",
     command: "parent",
     args: "{branchName}",
-    flags: "--point",
-    description: "--point: Points current branch's parent to {branchName}",
-    function: async ({ command, context }) => {
-      if (command.options.flags.includes("--point")) {
-        context.methods.setRepos({
-          ...context.store?.repos,
-          [context.store?.settings?.pwd]: {
-            ...context.store?.repos?.[context.store?.settings?.pwd],
-            branches: {
-              ...(context.store?.repos?.[context.store?.settings?.pwd]
-                ?.branches || {}),
-              [command.options.currentBranch]: {
-                ...(context.store?.repos?.[context.store?.settings?.pwd]
-                  ?.branches?.[command.options.currentBranch] || {}),
-                parentBranch: command.args[0],
-              },
-            },
-          },
-        });
-      }
-    },
-  },
-  {
-    name: "Note",
-    command: "note",
-    args: '"{note}"',
     flags: "",
-    description: "Adds a quick-note to the current branch.",
+    description: "Points current branch's parent to {branchName}",
     function: async ({ command, context }) => {
-      const branchName = command.options?.currentBranch;
-      const branches =
-        context.store?.repos?.[context.store?.settings?.pwd]?.branches || {};
-      const matches = command?.options?.executingCommand.match('"(.*)"');
-      if (matches?.length) {
-        const note = matches[1];
-        context.methods.setRepos({
-          ...context.store?.repos,
-          [context.store?.settings?.pwd]: {
-            ...context.store?.repos?.[context.store?.settings?.pwd],
-            branches: {
-              ...branches,
-              [branchName]: {
-                ...(branches?.[branchName] || {}),
-                notes: [...(branches?.[branchName]?.notes || []), note],
-              },
+      context.methods.setRepos({
+        ...context.store?.repos,
+        [context.store?.settings?.pwd]: {
+          ...context.store?.repos?.[context.store?.settings?.pwd],
+          branches: {
+            ...(context.store?.repos?.[context.store?.settings?.pwd]
+              ?.branches || {}),
+            [command.options.currentBranch]: {
+              ...(context.store?.repos?.[context.store?.settings?.pwd]
+                ?.branches?.[command.options.currentBranch] || {}),
+              parentBranch: command.args[0],
             },
           },
-        });
-      }
+        },
+      });
     },
   },
-  {
-    name: "list",
-    command: "list",
-    args: "{commit hash}",
-    flags: "--files",
-    description: "Lists items in the logs.",
-    function: async ({ command, context }) => {
-      const [hash] = command?.args;
-      if (command?.options?.flags?.includes("--files")) {
-        const data = await context?.methods?.executeCommand(
-          `git diff-tree --no-commit-id --name-only ${hash} -r`
-        );
-
-        context?.methods?.set("logs", [
-          {
-            timestamp: new Date().toISOString(),
-            pwd: context?.store?.settings?.pwd,
-            type: "git-list",
-            title: "List Files",
-            message: data?.toString(),
-            data: command,
-          },
-          ...context?.store?.logs,
-        ]);
-        context?.methods?.set("mode", "logs");
-      }
-    },
-  },
-
-  // git diff-tree --no-commit-id --name-only bd61ad98 -r
 ];
 
 export const defaultExtensions = [
