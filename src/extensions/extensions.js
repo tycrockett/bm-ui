@@ -410,7 +410,21 @@ const defaultCommands = [
     flags: "",
     description: "Restores a recently deleted {branch}",
     function: async ({ command, context }) => {
-      await restoreBranch(command);
+      const data = await restoreBranch(command);
+      context.methods.setRepos({
+        ...context.store?.repos,
+        [context.store?.settings?.pwd]: {
+          ...context.store?.repos?.[context.store?.settings?.pwd],
+          branches: {
+            ...(context.store?.repos?.[context.store?.settings?.pwd]
+              ?.branches || {}),
+            [data?.branch]: {
+              parentBranch: data?.parentBranch,
+              createdAt: new Date().toISOString(),
+            },
+          },
+        },
+      });
     },
   },
   {

@@ -288,10 +288,15 @@ export const restoreBranch = async (command) => {
   try {
     const reflog = await cmd(`git reflog`);
     const list = reflog.split("\n");
-    const checkValue = `checkout: moving from ${command?.args[0]} to ${command?.options?.parentBranch}`;
+    const branch = command?.args[0];
+    const checkValue = `checkout: moving from ${branch} to`;
     console.log(checkValue);
     const commit = list.find((item) => item.includes(checkValue));
     console.log(commit);
+    const first = commit.split(" ")[0];
+    const parent = commit.split(" ").at(-1);
+    await cmd(`git checkout -b ${branch} ${first}`);
+    return { branch, parent };
   } catch {}
 };
 
