@@ -1,8 +1,10 @@
-import { GitBranch } from "phosphor-react";
+import { GitBranch, ShieldWarning } from "phosphor-react";
 import { useContext, useState } from "react";
 import { StoreContext } from "../context/store";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex, shadows } from "../shared/utils";
+import { useAsyncValue } from "../hooks/use-async-value";
+import { isInGit } from "./utils";
 
 export const SetupBm = () => {
   const {
@@ -21,37 +23,66 @@ export const SetupBm = () => {
     setDefaultBranch("main");
   };
 
+  const [value] = useAsyncValue(async () => {
+    const data = await isInGit();
+    return Boolean(data);
+  }, [settings?.pwd]);
+
   return (
     <>
-      <Div
-        css={`
-          margin: auto;
-          margin-top: 5vh;
-          border-radius: 16px;
-          padding: 32px 64px;
-          background-color: rgba(0, 0, 0, 0.2);
-        `}
-      >
+      {value ? (
         <Div
           css={`
-            ${flex("space-between")}
+            margin: auto;
+            margin-top: 5vh;
+            border-radius: 16px;
+            padding: 32px;
+            background-color: rgba(0, 0, 0, 0.2);
+            width: calc(100% - 64px);
+          `}
+        >
+          <Div
+            css={`
+              ${flex("left")}
+              svg {
+                min-width: 48px;
+                padding: 0;
+                margin: 0;
+                margin-right: 16px;
+              }
+            `}
+          >
+            <GitBranch size={48} weight="bold" color="white" />
+            <Text h3>Detected git repository</Text>
+          </Div>
+          <Div
+            css={`
+              ${flex("right")}
+              margin-top: 16px;
+            `}
+          >
+            <Button onClick={() => setModal("init")}>Initialize</Button>
+          </Div>
+        </Div>
+      ) : (
+        <Div
+          css={`
+            ${flex("left")}
+            margin: auto;
+            margin-top: 5vh;
+            border-radius: 16px;
+            padding: 32px;
+            background-color: rgba(0, 0, 0, 0.2);
+            width: calc(100% - 64px);
             svg {
-              min-width: 48px;
-              padding: 0;
-              margin: 0;
-            }
-            p {
-              margin: 0 8px;
+              margin-right: 16px;
             }
           `}
         >
-          <GitBranch size={48} weight="bold" color="white" />
-          <Text h3>
-            Detected git repository, would you like to initialize BM?
-          </Text>
-          <Button onClick={() => setModal("init")}>Initialize</Button>
+          <ShieldWarning size={48} weight="bold" color="white" />
+          <Text h3>No Git Repository was detected.</Text>
         </Div>
-      </Div>
+      )}
       {modal === "init" && (
         <Modal
           css={`

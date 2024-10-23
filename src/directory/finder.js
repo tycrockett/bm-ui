@@ -119,7 +119,7 @@ export const Finder = () => {
         css={`
           width: 100%;
           margin: 0 auto;
-          max-height: calc(100vh - 200px);
+          max-height: calc(100vh - 250px);
           overflow-y: auto;
           background-color: ${colors.darkIndigo};
           border-radius: 8px;
