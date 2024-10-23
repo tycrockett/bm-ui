@@ -512,7 +512,7 @@ const App = () => {
                         `}
                       >
                         <Shortkey
-                          type={`meta+${idx + 1}`}
+                          value={`meta+Digit${idx + 1}`}
                           className="shortkey"
                         />
                         <Button

@@ -5,9 +5,9 @@ import { StoreContext } from "./context/store";
 
 const mapping = {
   meta: "⌘",
-  ctrl: "Ctrl",
-  shift: "Shift",
-  alt: "Alt",
+  ctrl: "⌃",
+  shift: "⇧",
+  alt: "⌥",
   Enter: "↵",
   ArrowUp: "↑",
   ArrowDown: "↓",
@@ -25,7 +25,12 @@ const mapping = {
   PageDown: "⇟",
 };
 
-export const Shortkey = ({ type, css: cssString = "", className = "" }) => {
+export const Shortkey = ({
+  type,
+  value = "",
+  css: cssString = "",
+  className = "",
+}) => {
   const { store } = useContext(StoreContext);
   const { actions } = store;
 
@@ -34,7 +39,15 @@ export const Shortkey = ({ type, css: cssString = "", className = "" }) => {
     ...actions,
   };
 
-  const shortkey = commands?.[type]?.shortkey || type;
+  const shortkey = commands?.[type]?.shortkey || value;
+  const formattedKey = shortkey
+    ?.split("+")
+    ?.map((item) =>
+      item in mapping
+        ? mapping[item]
+        : item?.replace("Key", "").replace("Digit", "")
+    );
+  const displayKey = formattedKey?.join("");
 
   return (
     <Text
@@ -44,11 +57,7 @@ export const Shortkey = ({ type, css: cssString = "", className = "" }) => {
         ${cssString}
       `}
     >
-      {shortkey
-        ?.split("+")
-        ?.map((item) =>
-          item in mapping ? mapping[item] : item?.replace("Key", "")
-        )}
+      {displayKey}
     </Text>
   );
 };

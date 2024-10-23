@@ -6,13 +6,14 @@ import {
   TrashSimple,
   X,
 } from "phosphor-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, colors, Div, Input, Modal, Text } from "../shared";
 import { flex, styles } from "../shared/utils";
 import uuid4 from "uuid4";
 import { useKeyboard } from "../hooks/use-keyboard";
 import { Select } from "../shared/select";
 import { isEqual } from "lodash";
+import { Shortkey } from "../Shortkey";
 
 const splice = (array, idx, deleteCount, ...items) => {
   let next = [...array];
@@ -29,6 +30,7 @@ export const Actions = ({ settings, setSettings }) => {
   const [actionKey, setActionKey] = useState("");
   const [action, setAction] = useState(null);
   const [focus, setFocus] = useState(false);
+  const shortkeyRef = useRef(null);
 
   const closeAction = () => {
     setActionKey("");
@@ -109,7 +111,7 @@ export const Actions = ({ settings, setSettings }) => {
       {Object.entries(actions)?.map(([key, item]) => (
         <Div
           css={`
-            padding: 2px 16px;
+            padding: 8px 16px;
             margin: 0 -16px;
             ${styles.hover}
           `}
@@ -138,17 +140,7 @@ export const Actions = ({ settings, setSettings }) => {
             >
               <Text>{item.name}</Text>
             </Div>
-
-            <Text
-              css={`
-                color: ${colors.lightBlue};
-                background-color: rgba(0, 0, 0, 0.2);
-                padding: 4px 8px;
-                border-radius: 16px;
-              `}
-            >
-              {item.shortkey}
-            </Text>
+            <Shortkey value={item.shortkey} />
           </Div>
         </Div>
       ))}
@@ -197,15 +189,34 @@ export const Actions = ({ settings, setSettings }) => {
             <Text h3 bold>
               Shortkey
             </Text>
-            <Input
+            <Div
               css={`
+                ${flex("center")}
+                border: 1px solid ${colors.darkIndigo};
+                border-radius: 8px;
+                background-color: ${colors.darkIndigo};
                 width: 50%;
-                ${focus ? `outline: 2px solid ${colors.lightBlue};` : ""}
+                padding: 8px 8px;
+                :focus-within {
+                  outline: 2px solid ${colors.lightBlue};
+                }
+                cursor: pointer;
               `}
-              value={action?.shortkey || ""}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
-            />
+              onClick={() => shortkeyRef?.current?.focus()}
+            >
+              <Input
+                ref={shortkeyRef}
+                css={`
+                  width: 0;
+                  height: 0;
+                  padding: 0;
+                `}
+                value={action?.shortkey || ""}
+                onFocus={() => setFocus(true)}
+                onBlur={() => setFocus(false)}
+              />
+              <Shortkey value={action?.shortkey} />
+            </Div>
           </Div>
 
           <Div
