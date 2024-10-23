@@ -405,10 +405,11 @@ export const Status = ({
                 <Text
                   css={`
                     color: ${colors.lightBlue};
+                    padding-top: 8px;
                   `}
                 >
                   {" "}
-                  {currentBranch} is set to default branch
+                  {currentBranch} is set to the default branch
                 </Text>
               ) : null}
             </Div>
