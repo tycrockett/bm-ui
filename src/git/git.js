@@ -356,6 +356,7 @@ export const Git = () => {
     },
   });
 
+  //
   const handleCheckout = async (branch) => {
     try {
       await checkoutBranch(branch);

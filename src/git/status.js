@@ -1,4 +1,4 @@
-import { colors, Div, Text } from "../shared";
+import { Button, colors, Div, Text } from "../shared";
 import { animation, flex, styles } from "../shared/utils";
 import {
   FileX,
@@ -18,6 +18,7 @@ import { useAsyncValue } from "../hooks/use-async-value";
 import { cmd } from "../node/node-exports";
 import { useEffect, useMemo, useState } from "react";
 import { Collapse } from "../shared/Collapse";
+import { Tooltip } from "../shared/Tooltip";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -77,7 +78,6 @@ export const Status = ({
     }
   };
 
-  // const files = useMemo(() => {
   const untracked = status?.untracked?.filter(
     (item) => Number(status?.fileCount?.[item]) > 0
   );
@@ -91,8 +91,6 @@ export const Status = ({
       Number(status?.files?.[item]?.deletes) > 0 ||
       Number(status?.files?.[item]?.adds) > 0
   );
-
-  // });
 
   const fileStatus = useMemo(() => {
     const untracked =
@@ -227,6 +225,7 @@ export const Status = ({
             <Div
               css={`
                 margin-bottom: 16px;
+                position: relative;
               `}
             >
               <Div
@@ -235,10 +234,30 @@ export const Status = ({
                     margin-right: 8px;
                   }
                   margin-bottom: 8px;
+                  cursor: default;
+                  :not(:hover) {
+                    .full {
+                      display: none;
+                    }
+                  }
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.3);
+                    cursor: pointer;
+                    .short {
+                      display: none;
+                    }
+                  }
                 `}
+                onClick={() => navigator.clipboard.writeText(pathname)}
               >
                 <Folder size={24} color="#fbfbbc" weight="fill" />
-                <Text bold>.../{pathname.split("/").at(-1)}</Text>
+
+                <Text bold className="short">
+                  .../{pathname.split("/").at(-1)}
+                </Text>
+                <Text bold className="full">
+                  {pathname}
+                </Text>
               </Div>
               <Div
                 css={`
