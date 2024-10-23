@@ -397,6 +397,9 @@ export const Status = ({
                 `}
               >
                 On branch {currentBranch}
+                {settings?.defaultBranch === currentBranch
+                  ? " (default branch)"
+                  : ""}
               </Text>
               <Text>nothing to commit, working tree clean.</Text>
             </Div>
