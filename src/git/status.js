@@ -401,6 +401,16 @@ export const Status = ({
                 On branch {currentBranch}
               </Text>
               <Text>nothing to commit, working tree clean.</Text>
+              {repo?.defaultBranch === currentBranch ? (
+                <Text
+                  css={`
+                    color: ${colors.lightBlue};
+                  `}
+                >
+                  {" "}
+                  (default branch)
+                </Text>
+              ) : null}
             </Div>
             <Text
               bold
@@ -412,16 +422,6 @@ export const Status = ({
               {refreshedAt ? format(new Date(refreshedAt), "h:mm.ss a") : ""}
             </Text>
 
-            {repo?.defaultBranch === currentBranch ? (
-              <Text
-                css={`
-                  color: ${colors.lightBlue};
-                `}
-              >
-                {" "}
-                (default branch)
-              </Text>
-            ) : null}
             {/* <Button onClick={refresh}>Refresh</Button> */}
           </Div>
         </Div>
