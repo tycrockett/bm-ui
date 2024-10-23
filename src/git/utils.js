@@ -284,6 +284,17 @@ export const handleFile = async (filepath, branch = "", options) => {
   }
 };
 
+export const restoreBranch = async (command) => {
+  try {
+    const reflog = await cmd(`git reflog`);
+    const list = reflog.split("\n");
+    const checkValue = `checkout: moving from ${command?.args[0]} to ${command?.options?.parentBranch}`;
+    console.log(checkValue);
+    const commit = list.find((item) => item.includes(checkValue));
+    console.log(commit);
+  } catch {}
+};
+
 export const renameBranch = async (branchName, options) => {
   const { flags = "" } = options;
   try {

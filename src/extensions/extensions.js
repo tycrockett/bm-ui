@@ -12,6 +12,7 @@ import {
   pruneLocalBranches,
   push,
   renameBranch,
+  restoreBranch,
   stash,
   update,
 } from "../git/utils";
@@ -400,6 +401,16 @@ const defaultCommands = [
       "git checkout {branch} -- {relativeFilepath} \n\n*{branch} is optional and is set to {parentBranch} by default.\n\nRemoves all changes to a file.",
     function: async ({ command, context }) => {
       await handleFile(command.args[0], command.args[1], command.options);
+    },
+  },
+  {
+    name: "Restore",
+    command: "restore",
+    args: "{branch}",
+    flags: "",
+    description: "Restores a recently deleted {branch}",
+    function: async ({ command, context }) => {
+      await restoreBranch(command);
     },
   },
   {

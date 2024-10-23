@@ -284,7 +284,7 @@ export const TerminalCommand = () => {
           css={`
             width: calc(100% - 32px);
             background: ${colors.darkIndigo};
-            height: calc(100% - 180px);
+            height: calc(100% - 200px);
             overflow-y: auto;
             ${scrollbar.style}
             padding: 16px;
