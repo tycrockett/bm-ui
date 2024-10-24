@@ -856,6 +856,7 @@ export const Git = () => {
                 border-radius: 8px;
                 box-sizing: border-box;
                 margin-top: 8px;
+                ${animation("fadeIn", ".2s ease")}
               `}
             >
               <textarea

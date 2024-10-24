@@ -1,6 +1,6 @@
 import { Button, colors, Div, Text } from "../shared";
 import { Input } from "../shared";
-import { flex, shadows } from "../shared/utils";
+import { animation, flex, shadows } from "../shared/utils";
 import { css } from "@emotion/css";
 
 import Ansi from "ansi-to-react";
@@ -95,6 +95,7 @@ export const TerminalCommand = () => {
   return (
     <Div
       css={`
+        ${animation("fadeIn", ".2s ease")}
         width: 100%;
       `}
     >
