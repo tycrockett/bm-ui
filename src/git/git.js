@@ -194,6 +194,7 @@ export const Git = () => {
     };
 
     const command = {
+      raw: executingCommand,
       value,
       args,
       options,
