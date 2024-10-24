@@ -480,7 +480,7 @@ export const defaultActions = {
     ],
   },
   "open-internal-terminal": {
-    name: "Open Terminal",
+    name: "Open Internal Terminal",
     shortkey: "meta+KeyT",
     list: [
       {
