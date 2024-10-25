@@ -27,6 +27,14 @@ export const Extensions = () => {
 
   const [extension, setExtension] = useState(null);
 
+  const handleCmd = (cmd) => {
+    if (cmd?.executionType === "command") {
+      setExtension(cmd);
+    } else if (cmd?.executionType === "click") {
+      cmd?.function?.({ context });
+    }
+  };
+
   return (
     <Div
       css={`
@@ -63,9 +71,18 @@ export const Extensions = () => {
                   cursor: pointer;
                 }
               `}
-              onClick={() => setExtension(cmd)}
+              onClick={() => handleCmd(cmd)}
             >
               <Text bold>{cmd?.name}</Text>
+              <Text
+                css={`
+                  padding-top: 4px;
+                  font-size: 0.9em;
+                  color: ${colors.lightBlue};
+                `}
+              >
+                {cmd?.description}
+              </Text>
             </Div>
           )
         )}
@@ -470,34 +487,22 @@ const defaultCommands = [
 
 export const defaultExtensions = [
   {
-    id: "open-local-url",
-    name: "Open local url",
-    description: "",
-
-    executionType: "form",
-    formInputs: [
-      {
-        accessorKey: "domain",
-        label: "Domain",
-        type: "text",
-        defaultValue: "http://localhost:3000",
-        validator: (value) => {
-          try {
-            new URL(value);
-            return { isValid: true };
-          } catch (err) {
-            return { isValid: false, message: "Error parsing url" };
-          }
-        },
-        isRequired: true,
-      },
-    ],
-
-    function: async ({ form, context }) => {
+    id: `auto-open-localhost`,
+    name: "Auto open localhost",
+    description:
+      "Open copied url and format it into a localhost url. Uses first detected port.",
+    executionType: "click",
+    hideExtension: false,
+    function: async ({ context }) => {
+      const path = context?.store?.settings?.pwd?.replace(
+        "~",
+        context?.store?.settings?.base
+      );
+      const port = context?.store?.ports?.[path]?.[0];
       try {
         const text = await context.methods.clipboard.readText();
         const url = new URL(text);
-        const nextUrl = `${form?.domain}${url?.pathname}`;
+        const nextUrl = `http://localhost${port?.port}${url?.pathname}`;
         context.methods.executeCommand(`open "${nextUrl}"`);
       } catch {}
     },
