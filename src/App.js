@@ -3,10 +3,6 @@ import {
   ArrowSquareOut,
   BookmarkSimple,
   CaretDown,
-  Command,
-  DotsThreeVertical,
-  Gear,
-  Hamburger,
   List,
   X,
 } from "phosphor-react";

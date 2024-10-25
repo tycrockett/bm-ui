@@ -8,7 +8,9 @@ import { useTerminal } from "../terminal/useTerminal";
 // "open -n -b "com.microsoft.VSCode" --args "$PWD""
 
 const initialState = {
-  settings: {},
+  settings: {
+    pwd: "~",
+  },
 };
 
 const reducer = (state, action) => {
@@ -104,7 +106,7 @@ export const StoreProvider = (props) => {
       const cacheKey = `${base}/bm-cache`;
       const cachePath = `${cacheKey}/settings.json`;
       setCachePath(cachePath);
-      let data = read(cachePath);
+      let data = read(cachePath, { pwd: "~" });
       data = { ...data, base, pwd: data.pwd || "~", cacheKey };
       setStore("settings", { ...data });
       const path = data.pwd.replace("~", base);
