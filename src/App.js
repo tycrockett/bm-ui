@@ -277,7 +277,11 @@ const App = () => {
           padding: 16px;
           padding-left: 24px;
           margin-bottom: -8px;
-          background-color: ${colors.darkIndigo};
+          background: linear-gradient(
+            100deg,
+            ${colors.darkIndigo},
+            ${colors.dark}
+          );
           gap: 24px;
         `}
       >
