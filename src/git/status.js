@@ -407,7 +407,7 @@ export const Status = ({
                     padding-top: 8px;
                   `}
                 >
-                  <strong>{currentBranch}</strong> is set to the{" "}
+                  <strong>{currentBranch}</strong> is set as the{" "}
                   <strong>default branch</strong>
                 </Text>
               ) : (
@@ -417,7 +417,7 @@ export const Status = ({
                     padding-top: 8px;
                   `}
                 >
-                  <strong>{parentBranch}</strong> is set to the{" "}
+                  <strong>{parentBranch}</strong> is set as the{" "}
                   <strong>parent branch</strong>
                 </Text>
               )}
