@@ -410,7 +410,17 @@ export const Status = ({
                   <strong>{currentBranch}</strong> is set to the{" "}
                   <strong>default branch</strong>
                 </Text>
-              ) : null}
+              ) : (
+                <Text
+                  css={`
+                    color: ${colors.lightBlue};
+                    padding-top: 8px;
+                  `}
+                >
+                  <strong>{parentBranch}</strong> is set to the{" "}
+                  <strong>parent branch</strong>
+                </Text>
+              )}
             </Div>
             <Text
               bold

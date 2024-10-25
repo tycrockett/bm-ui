@@ -36,7 +36,8 @@
     "test": "rescripts test",
     "eject": "rescripts eject",
     "dev": "concurrently -k \"BROWSER=none PORT=3030 npm start\" \"npm:electron\"",
-    "electron": "wait-on tcp:3030 && electron ."
+    "electron": "wait-on tcp:3030 && electron .",
+    "dist": "react-scripts build && electron-builder"
   },
   "eslintConfig": {
     "extends": [
@@ -60,6 +61,7 @@
     "@rescripts/cli": "^0.0.16",
     "concurrently": "^7.4.0",
     "electron": "^20.2.0",
+    "electron-builder": "^25.1.8",
     "electron-is-dev": "^2.0.0",
     "wait-on": "^6.0.1"
   }

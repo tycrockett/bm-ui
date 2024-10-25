@@ -109,19 +109,42 @@ export const Git = () => {
   const [notes, setNotes] = useStateSync(repo?.notes || "");
 
   const blurNotes = () => {
-    context.methods.setRepos({
-      ...context.store?.repos,
-      [context.store?.settings?.pwd]: {
-        ...context.store?.repos?.[context.store?.settings?.pwd],
-        branches: {
-          ...branches,
-          [branches?.current]: {
-            ...(branches?.[branches?.current] || {}),
-            notes,
+    if (notes) {
+      const repoBranches =
+        context.store?.repos?.[context.store?.settings?.pwd]?.branches || {};
+      context.methods.setRepos({
+        ...context.store?.repos,
+        [context.store?.settings?.pwd]: {
+          ...context.store?.repos?.[context.store?.settings?.pwd],
+          branches: {
+            ...repoBranches,
+            [branches?.current]: {
+              ...(repoBranches?.[branches?.current] || {}),
+              notes,
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      const repoBranches =
+        context.store?.repos?.[context.store?.settings?.pwd]?.branches || {};
+      delete repoBranches?.[branches?.current]?.notes;
+      const check = Object.keys(
+        repoBranches?.[branches?.current] || {}
+      )?.length;
+      if (!check) {
+        delete repoBranches?.[branches?.current];
+      }
+      context.methods.setRepos({
+        ...context.store?.repos,
+        [context.store?.settings?.pwd]: {
+          ...context.store?.repos?.[context.store?.settings?.pwd],
+          branches: {
+            ...repoBranches,
+          },
+        },
+      });
+    }
   };
 
   const parentBranch =
