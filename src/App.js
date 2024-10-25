@@ -3,7 +3,14 @@ import {
   ArrowSquareOut,
   BookmarkSimple,
   CaretDown,
+  File,
+  Folder,
+  Gear,
+  GitBranch,
   List,
+  Note,
+  Plug,
+  Terminal,
   X,
 } from "phosphor-react";
 import { useContext, useEffect, useState } from "react";
@@ -224,6 +231,38 @@ const App = () => {
     updateMode();
   };
 
+  const modeStyle = (current) => `
+    ${flex("center")}
+    position: relative;
+    svg {
+      z-index: 1;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      ${
+        mode === current
+          ? `color: ${colors.darkIndigo};`
+          : `color: ${colors.light};`
+      }
+      :hover {
+        outline: 2px solid ${colors.lightBlue};
+        outline-offset: 6px;
+        border-radius: 50%;
+      }
+    }
+    border-radius: 50%;
+    ::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
+      ${mode === current ? `background-color: ${colors.lightBlue};` : ""}
+    }
+  `;
+
   return (
     <Div
       css={`
@@ -239,9 +278,10 @@ const App = () => {
           padding-left: 24px;
           margin-bottom: -8px;
           background-color: ${colors.darkIndigo};
+          gap: 24px;
         `}
       >
-        <Text h2>
+        <Text bold>
           {mode === "finder"
             ? "Finder"
             : mode === "git"
@@ -256,137 +296,41 @@ const App = () => {
         </Text>
         <Div
           css={`
-            position: relative;
+            ${flex(`right`)}
+            gap: 24px;
           `}
-          ref={settingsRef}
         >
-          <Div
-            css={`
-              position: relative;
-              ${logs?.length > 0
-                ? `
-                ::after {
-                  content: "${logs?.length}";
-                  position: absolute;
-                  top: -8px;
-                  right: -8px;
-                  border-radius: 30px;
-                  padding: 4px 8px;
-                  background-color: ${colors.green};
-                  color: white;
-                  font-weight: bold;
-                }
-                
-              `
-                : ""}
-            `}
-          >
-            <Button
-              icon
-              onClick={() => setDropdown(dropdown ? "" : "settings")}
-            >
-              <List weight="bold" />
-            </Button>
-          </Div>
-
-          {dropdown === "settings" ? (
-            <Div
-              css={`
-                position: absolute;
-                top: calc(100% + 8px);
-                right: 0;
-                width: 250px;
-                background-color: ${colors.darkIndigo};
-                z-index: 1000;
-                border-radius: 8px;
-                overflow: hidden;
-                padding: 8px 0;
-                cursor: pointer;
-                ${shadows.lg}
-              `}
-              onClick={() => setDropdown("")}
-            >
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("git")}
-              >
-                <Text>Git Command</Text>
-                <Shortkey type="navigate-git" />
-              </Div>
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("finder")}
-              >
-                <Text>Finder</Text>
-                <Shortkey type="navigate-finder" />
-              </Div>
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("logs")}
-              >
-                <Text>Logs</Text>
-                <Shortkey type="navigate-logs" />
-              </Div>
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("extensions")}
-              >
-                <Text>Extensions</Text>
-                <Shortkey type="navigate-extensions" />
-              </Div>
-
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("settings")}
-              >
-                <Text>Settings</Text>
-                <Shortkey type="navigate-settings" />
-              </Div>
-              <Div
-                css={`
-                  ${flex("space-between")}
-                  padding: 8px 16px;
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.5);
-                  }
-                `}
-                onClick={() => setMode("settings")}
-              >
-                <Text>Create Bookmark</Text>
-                <Shortkey type="create-bookmark" />
-              </Div>
+          <Tooltip label="Git Command" shortkey="navigate-git">
+            <Div css={modeStyle("git")} onClick={() => setMode("git")}>
+              <GitBranch size={24} weight="fill" />
             </Div>
-          ) : null}
+          </Tooltip>
+          <Tooltip label="Finder" shortkey="navigate-finder">
+            <Div css={modeStyle("finder")} onClick={() => setMode("finder")}>
+              <Folder size={24} weight="fill" />
+            </Div>
+          </Tooltip>
+          <Tooltip label="Logs" shortkey="navigate-logs">
+            <Div css={modeStyle("logs")} onClick={() => setMode("logs")}>
+              <Note size={24} weight="fill" />
+            </Div>
+          </Tooltip>
+          <Tooltip label="Extensions" shortkey="navigate-extensions">
+            <Div
+              css={modeStyle("extensions")}
+              onClick={() => setMode("extensions")}
+            >
+              <Plug size={24} weight="fill" />
+            </Div>
+          </Tooltip>
+          <Tooltip label="Settings" shortkey="navigate-settings">
+            <Div
+              css={modeStyle("settings")}
+              onClick={() => setMode("settings")}
+            >
+              <Gear size={24} weight="fill" />
+            </Div>
+          </Tooltip>
         </Div>
       </Div>
       <Div css={header}>
