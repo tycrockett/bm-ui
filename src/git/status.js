@@ -19,7 +19,6 @@ import { cmd } from "../node/node-exports";
 import { useEffect, useMemo, useState } from "react";
 import { Collapse } from "../shared/Collapse";
 import { Tooltip } from "../shared/Tooltip";
-import { css } from "@emotion/css";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -408,14 +407,8 @@ export const Status = ({
                     padding-top: 8px;
                   `}
                 >
-                  <strong
-                    className={css`
-                      color: white;
-                    `}
-                  >
-                    {currentBranch}
-                  </strong>{" "}
-                  is set as the <strong>default branch</strong>
+                  <strong>{currentBranch}</strong> is set as the{" "}
+                  <strong>default branch</strong>
                 </Text>
               ) : (
                 <Text
@@ -424,14 +417,8 @@ export const Status = ({
                     padding-top: 8px;
                   `}
                 >
-                  <strong
-                    className={css`
-                      color: white;
-                    `}
-                  >
-                    {parentBranch}
-                  </strong>{" "}
-                  is set as the <strong>parent branch</strong>
+                  <strong>{parentBranch}</strong> is set as the{" "}
+                  <strong>parent branch</strong>
                 </Text>
               )}
             </Div>
