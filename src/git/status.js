@@ -387,7 +387,7 @@ export const Status = ({
               }
             `}
           >
-            <Tree size={80} color={colors.lightGreen} />
+            <Tree size={80} color={colors.green} />
             <Div
               css={`
                 flex-grow: 1;
