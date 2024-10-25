@@ -1,5 +1,6 @@
 import {
   NavigationArrow,
+  Plug,
   Plus,
   PlusCircle,
   Terminal,
@@ -14,6 +15,7 @@ import { useKeyboard } from "../hooks/use-keyboard";
 import { Select } from "../shared/select";
 import { isEqual } from "lodash";
 import { Shortkey } from "../Shortkey";
+import { defaultExtensions } from "../extensions/extensions";
 
 const splice = (array, idx, deleteCount, ...items) => {
   let next = [...array];
@@ -132,6 +134,8 @@ export const Actions = ({ settings, setSettings }) => {
               <PlusCircle />
             ) : item?.list?.[0]?.type === "execute-command" ? (
               <Terminal />
+            ) : item?.list?.[0]?.type === "extension" ? (
+              <Plug />
             ) : null}
             <Div
               css={`
@@ -196,6 +200,7 @@ export const Actions = ({ settings, setSettings }) => {
                 border-radius: 8px;
                 background-color: ${colors.darkIndigo};
                 width: 50%;
+                min-height: 16px;
                 padding: 8px 8px;
                 :focus-within {
                   outline: 2px solid ${colors.lightBlue};
@@ -288,6 +293,7 @@ export const Actions = ({ settings, setSettings }) => {
                         <option value="execute-command">Execute Command</option>
                         <option value="navigate">Navigate</option>
                         <option value="create">Create</option>
+                        <option value="extension">Extension</option>
                       </Select>
                     </Div>
                     {item?.type === "execute-command" ? (
@@ -350,6 +356,30 @@ export const Actions = ({ settings, setSettings }) => {
                         {Object.values(create)?.map((value) => (
                           <option value={value}>{value}</option>
                         ))}
+                      </Select>
+                    ) : item?.type === "extension" ? (
+                      <Select
+                        value={item?.payload}
+                        onChange={(e) =>
+                          setAction({
+                            ...action,
+                            list: splice(action?.list, idx, 1, {
+                              ...item,
+                              payload: e.target.value,
+                            }),
+                          })
+                        }
+                        css={`
+                          width: 100%;
+                          margin-top: 8px;
+                        `}
+                      >
+                        <option value="">N/A</option>
+                        {Object.values(defaultExtensions)
+                          ?.filter((item) => item?.executionType === "click")
+                          ?.map((item) => (
+                            <option value={item?.id}>{item?.name}</option>
+                          ))}
                       </Select>
                     ) : null}
                   </Div>

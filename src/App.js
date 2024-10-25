@@ -186,6 +186,12 @@ const App = () => {
         createBookmark();
       }
     },
+    extension: (payload) => {
+      const extension = defaultExtensions?.find((item) => item?.id === payload);
+      if (extension) {
+        extension?.function({ context });
+      }
+    },
   });
 
   const keydown = (captured, event) => {
