@@ -242,9 +242,13 @@ export const fetch = async () =>
     });
   });
 
-export const logCommits = async (parentBranch, defaultBranch) => {
+export const logCommits = async ({
+  currentBranch,
+  parentBranch,
+  defaultBranch,
+}) => {
   const command =
-    !parentBranch || parentBranch === defaultBranch
+    !parentBranch || currentBranch === defaultBranch
       ? "git log --oneline --name-only --no-merges -15"
       : `git show --name-only --oneline ${parentBranch}..HEAD`;
   try {

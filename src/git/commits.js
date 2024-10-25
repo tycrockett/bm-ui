@@ -28,8 +28,13 @@ export const Commits = ({
   const context = useContext(StoreContext);
   const { store } = context;
   const getLogs = useCallback(
-    () => logCommits(parentBranch, repo?.defaultBranch),
-    [parentBranch, pwd, repo?.defaultBranch]
+    () =>
+      logCommits({
+        currentBranch,
+        parentBranch,
+        defaultBranch: repo?.defaultBranch,
+      }),
+    [currentBranch, parentBranch, pwd, repo?.defaultBranch]
   );
   const [logs] = useAsyncValue(getLogs, [
     lastCommand,
