@@ -6,13 +6,14 @@ const { spawn } = require("child_process");
 // const { pid } = require("process");
 
 let childProcesses = {};
+let openDevTools = null;
 
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 650,
-    height: 800,
-    title: "BM GUI",
+    width: 600,
+    height: 1000,
+    frame: false,
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
@@ -30,11 +31,17 @@ function createWindow() {
 
   // Open the DevTools.
   if (isDev) {
-    win.webContents.openDevTools({ mode: "detach" });
+    openDevTools = () => win.webContents.openDevTools({ mode: "detach" });
   }
 }
 
 let processes = {};
+
+ipcMain.on("open-dev-tools", (event, pid) => {
+  if (isDev) {
+    openDevTools?.();
+  }
+});
 
 ipcMain.on("kill", (event, pid) => {
   console.log(pid);

@@ -19,6 +19,7 @@ import { cmd } from "../node/node-exports";
 import { useEffect, useMemo, useState } from "react";
 import { Collapse } from "../shared/Collapse";
 import { Tooltip } from "../shared/Tooltip";
+import { scrollbar } from "../shared/styles";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -168,277 +169,283 @@ export const Status = ({
         margin-bottom: 16px;
         width: 100%;
         box-sizing: border-box;
-        overflow-y: auto;
-        min-height: 50%;
-        height: 100%;
         ${styles.scrollbar}
       `}
     >
-      {hasStatus ? (
-        <Div
-          css={`
-            border-radius: 8px;
-            background-color: ${colors.darkIndigo};
-            padding: 16px;
-          `}
-        >
+      <Div
+        css={`
+          overflow-y: auto;
+          min-height: 50%;
+          height: 100%;
+          ${scrollbar.style}
+        `}
+      >
+        {hasStatus ? (
           <Div
             css={`
-              ${flex("space-between")}
+              border-radius: 8px;
+              background-color: ${colors.darkIndigo};
+              padding: 16px;
             `}
           >
             <Div
               css={`
-                ${flex("left")}
-                margin-bottom: 8px;
-                p {
-                  margin-left: 16px;
-                }
-                svg {
-                  ${hasStatus ? shake : ""}
-                }
+                ${flex("space-between")}
               `}
             >
-              <GitPullRequest
-                size={24}
-                color={colors.lightBlue}
-                weight="fill"
-              />
-              <Text bold>Status</Text>
+              <Div
+                css={`
+                  ${flex("left")}
+                  margin-bottom: 8px;
+                  p {
+                    margin-left: 16px;
+                  }
+                  svg {
+                    ${hasStatus ? shake : ""}
+                  }
+                `}
+              >
+                <GitPullRequest
+                  size={24}
+                  color={colors.lightBlue}
+                  weight="fill"
+                />
+                <Text bold>Status</Text>
+              </Div>
+              <Text
+                h4
+                bold
+                css={`
+                  margin-bottom: 8px;
+                  color: ${colors.light};
+                `}
+              >
+                {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
+              </Text>
             </Div>
             <Text
-              h4
-              bold
-              css={`
-                margin-bottom: 8px;
-                color: ${colors.light};
-              `}
-            >
-              {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
-            </Text>
-          </Div>
-          <Text
-            css={`
-              margin-bottom: 16px;
-            `}
-          >
-            {shortStatus}
-          </Text>
-
-          {fileStatus?.map(([pathname, files]) => (
-            <Div
               css={`
                 margin-bottom: 16px;
-                position: relative;
               `}
             >
-              <Div
-                css={`
-                  ${flex("left")} svg {
-                    margin-right: 8px;
-                  }
-                  margin-bottom: 8px;
-                  cursor: default;
-                  :not(:hover) {
-                    .full {
-                      display: none;
-                    }
-                  }
-                  :hover {
-                    background-color: rgba(0, 0, 0, 0.3);
-                    cursor: pointer;
-                    .short {
-                      display: none;
-                    }
-                  }
-                `}
-                onClick={() => navigator.clipboard.writeText(pathname)}
-              >
-                <Folder size={24} color="#fbfbbc" weight="fill" />
-
-                <Text bold className="short">
-                  .../{pathname.split("/").at(-1)}
-                </Text>
-                <Text bold className="full">
-                  {pathname}
-                </Text>
-              </Div>
-              <Div
-                css={`
-                  padding: 0;
-                  padding-left: 8px;
-                  margin-left: 12px;
-                  border-left: 2px solid ${colors.light};
-                `}
-              >
-                {files?.map((file) => {
-                  return (
-                    <Div
-                      css={`
-                        ${flex("space-between")}
-                        border-radius: 8px;
-                        padding: 2px 4px;
-                        :hover {
-                          background-color: rgba(0, 0, 0, 0.5);
-                          cursor: pointer;
-                        }
-                      `}
-                      key={file.filename}
-                      onClick={() => openFile(file.pathname)}
-                    >
-                      <Div
-                        css={`
-                          ${flex("left")}
-                          svg {
-                            margin-right: 8px;
-                          }
-                        `}
-                      >
-                        {file.type === "untracked" ? (
-                          <FilePlus
-                            size={24}
-                            color={colors.lightBlue}
-                            weight="fill"
-                          />
-                        ) : file.type === "deleted" ? (
-                          <FileX size={24} color={colors.red} weight="fill" />
-                        ) : file.type === "modified" ? (
-                          <FileArrowUp
-                            size={24}
-                            color={colors.green}
-                            weight="fill"
-                          />
-                        ) : (
-                          <Question
-                            size={24}
-                            color={colors.lightBlue}
-                            weight="fill"
-                          />
-                        )}
-                        <Text>{file.filename}</Text>
-                      </Div>
-                      <Div
-                        css={`
-                          ${flex("right")}
-                          svg {
-                            margin-left: 8px;
-                          }
-                          p {
-                            text-align: right;
-                            min-width: 50px;
-                            font-weight: bold;
-                          }
-                        `}
-                      >
-                        {file.type === "untracked" ? null : (
-                          <>
-                            {file.adds >= 0 ? (
-                              <>
-                                <Text>{file.adds}</Text>
-                                <PlusCircle
-                                  size={24}
-                                  color={colors.green}
-                                  weight="fill"
-                                />
-                              </>
-                            ) : null}
-                            {file.deletes ? (
-                              <>
-                                <Text>{file.deletes}</Text>
-                                <MinusCircle
-                                  size={24}
-                                  color={colors.red}
-                                  weight="fill"
-                                />
-                              </>
-                            ) : null}
-                          </>
-                        )}
-                      </Div>
-                    </Div>
-                  );
-                })}
-              </Div>
-            </Div>
-          ))}
-        </Div>
-      ) : (
-        <Div
-          css={`
-            margin: 8px 0;
-          `}
-        >
-          <Div
-            css={`
-              ${flex("left start")}
-              margin: auto;
-              width: 100%;
-              height: 150px;
-              border-radius: 16px;
-              background-color: ${colors.darkIndigo};
-              padding: 32px;
-              box-sizing: border-box;
-              user-select: none;
-              :hover {
-                cursor: default;
-              }
-              svg {
-                ${shake}
-              }
-            `}
-          >
-            <Tree size={80} color={colors.green} />
-            <Div
-              css={`
-                flex-grow: 1;
-                margin: 16px;
-              `}
-            >
-              <Text
-                css={`
-                  border-radius: 8px;
-                  font-weight: bold;
-                `}
-              >
-                On branch {currentBranch}
-              </Text>
-              <Text>nothing to commit, working tree clean.</Text>
-              {repo?.defaultBranch === currentBranch ? (
-                <Text
-                  css={`
-                    color: ${colors.lightBlue};
-                    padding-top: 8px;
-                  `}
-                >
-                  <strong>{currentBranch}</strong> is set as the{" "}
-                  <strong>default branch</strong>
-                </Text>
-              ) : (
-                <Text
-                  css={`
-                    color: ${colors.lightBlue};
-                    padding-top: 8px;
-                  `}
-                >
-                  <strong>{parentBranch}</strong> is set as the{" "}
-                  <strong>parent branch</strong>
-                </Text>
-              )}
-            </Div>
-            <Text
-              bold
-              css={`
-                color: ${colors.light};
-                margin: 16px 0;
-              `}
-            >
-              {refreshedAt ? format(new Date(refreshedAt), "h:mm.ss a") : ""}
+              {shortStatus}
             </Text>
 
-            {/* <Button onClick={refresh}>Refresh</Button> */}
+            {fileStatus?.map(([pathname, files]) => (
+              <Div
+                css={`
+                  margin-bottom: 16px;
+                  position: relative;
+                `}
+              >
+                <Div
+                  css={`
+                    ${flex("left")} svg {
+                      margin-right: 8px;
+                    }
+                    margin-bottom: 8px;
+                    cursor: default;
+                    :not(:hover) {
+                      .full {
+                        display: none;
+                      }
+                    }
+                    :hover {
+                      background-color: rgba(0, 0, 0, 0.3);
+                      cursor: pointer;
+                      .short {
+                        display: none;
+                      }
+                    }
+                  `}
+                  onClick={() => navigator.clipboard.writeText(pathname)}
+                >
+                  <Folder size={24} color="#fbfbbc" weight="fill" />
+
+                  <Text bold className="short">
+                    .../{pathname.split("/").at(-1)}
+                  </Text>
+                  <Text bold className="full">
+                    {pathname}
+                  </Text>
+                </Div>
+                <Div
+                  css={`
+                    padding: 0;
+                    padding-left: 8px;
+                    margin-left: 12px;
+                    border-left: 2px solid ${colors.light};
+                  `}
+                >
+                  {files?.map((file) => {
+                    return (
+                      <Div
+                        css={`
+                          ${flex("space-between")}
+                          border-radius: 8px;
+                          padding: 2px 4px;
+                          :hover {
+                            background-color: rgba(0, 0, 0, 0.5);
+                            cursor: pointer;
+                          }
+                        `}
+                        key={file.filename}
+                        onClick={() => openFile(file.pathname)}
+                      >
+                        <Div
+                          css={`
+                            ${flex("left")}
+                            svg {
+                              margin-right: 8px;
+                            }
+                          `}
+                        >
+                          {file.type === "untracked" ? (
+                            <FilePlus
+                              size={24}
+                              color={colors.lightBlue}
+                              weight="fill"
+                            />
+                          ) : file.type === "deleted" ? (
+                            <FileX size={24} color={colors.red} weight="fill" />
+                          ) : file.type === "modified" ? (
+                            <FileArrowUp
+                              size={24}
+                              color={colors.green}
+                              weight="fill"
+                            />
+                          ) : (
+                            <Question
+                              size={24}
+                              color={colors.lightBlue}
+                              weight="fill"
+                            />
+                          )}
+                          <Text>{file.filename}</Text>
+                        </Div>
+                        <Div
+                          css={`
+                            ${flex("right")}
+                            svg {
+                              margin-left: 8px;
+                            }
+                            p {
+                              text-align: right;
+                              min-width: 50px;
+                              font-weight: bold;
+                            }
+                          `}
+                        >
+                          {file.type === "untracked" ? null : (
+                            <>
+                              {file.adds >= 0 ? (
+                                <>
+                                  <Text>{file.adds}</Text>
+                                  <PlusCircle
+                                    size={24}
+                                    color={colors.green}
+                                    weight="fill"
+                                  />
+                                </>
+                              ) : null}
+                              {file.deletes ? (
+                                <>
+                                  <Text>{file.deletes}</Text>
+                                  <MinusCircle
+                                    size={24}
+                                    color={colors.red}
+                                    weight="fill"
+                                  />
+                                </>
+                              ) : null}
+                            </>
+                          )}
+                        </Div>
+                      </Div>
+                    );
+                  })}
+                </Div>
+              </Div>
+            ))}
           </Div>
-        </Div>
-      )}
+        ) : (
+          <Div
+            css={`
+              margin: 8px 0;
+            `}
+          >
+            <Div
+              css={`
+                ${flex("left start")}
+                margin: auto;
+                width: 100%;
+                height: 150px;
+                border-radius: 16px;
+                background-color: ${colors.darkIndigo};
+                padding: 32px;
+                box-sizing: border-box;
+                user-select: none;
+                :hover {
+                  cursor: default;
+                }
+                svg {
+                  ${shake}
+                }
+              `}
+            >
+              <Tree size={80} color={colors.green} />
+              <Div
+                css={`
+                  flex-grow: 1;
+                  margin: 16px;
+                `}
+              >
+                <Text
+                  css={`
+                    border-radius: 8px;
+                    font-weight: bold;
+                  `}
+                >
+                  On branch {currentBranch}
+                </Text>
+                <Text>nothing to commit, working tree clean.</Text>
+                {repo?.defaultBranch === currentBranch ? (
+                  <Text
+                    css={`
+                      color: ${colors.lightBlue};
+                      padding-top: 8px;
+                    `}
+                  >
+                    <strong>{currentBranch}</strong> is set as the{" "}
+                    <strong>default branch</strong>
+                  </Text>
+                ) : (
+                  <Text
+                    css={`
+                      color: ${colors.lightBlue};
+                      padding-top: 8px;
+                    `}
+                  >
+                    <strong>{parentBranch}</strong> is set as the{" "}
+                    <strong>parent branch</strong>
+                  </Text>
+                )}
+              </Div>
+              <Text
+                bold
+                css={`
+                  color: ${colors.light};
+                  margin: 16px 0;
+                `}
+              >
+                {refreshedAt ? format(new Date(refreshedAt), "h:mm.ss a") : ""}
+              </Text>
+
+              {/* <Button onClick={refresh}>Refresh</Button> */}
+            </Div>
+          </Div>
+        )}
+      </Div>
     </Collapse>
   );
 };

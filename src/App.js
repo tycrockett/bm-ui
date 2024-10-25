@@ -30,6 +30,8 @@ import { useInterval } from "./hooks/useInterval";
 import { Tooltip } from "./shared/Tooltip";
 import { useActions } from "./hooks/useActions";
 import { Shortkey } from "./Shortkey";
+import { useProcesses } from "./terminal/useProcesses";
+import { ipcRenderer } from "electron";
 
 const header = `
   padding: 8px 16px;
@@ -182,6 +184,8 @@ const App = () => {
           cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
         } else if (to === "") {
         }
+      } else if (payload?.startsWith("internal")) {
+        ipcRenderer.send("open-dev-tools");
       }
     },
     create: (payload) => {
@@ -273,6 +277,7 @@ const App = () => {
     >
       <Div
         css={`
+          -webkit-app-region: drag;
           ${flex("space-between")}
           padding: 16px;
           padding-left: 24px;

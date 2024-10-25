@@ -17,6 +17,7 @@ import { cmd } from "../node/node-exports";
 import { StoreContext } from "../context/store";
 import { Collapse } from "../shared/Collapse";
 import { Tooltip } from "../shared/Tooltip";
+import { scrollbar } from "../shared/styles";
 
 export const Commits = ({
   currentBranch,
@@ -157,7 +158,7 @@ export const Commits = ({
           transition: height 0.5s ease;
           overflow-y: auto;
           overflow-x: hidden;
-          ${styles.scrollbar}
+          ${scrollbar.style}
           max-width: 100%;
         `}
       >

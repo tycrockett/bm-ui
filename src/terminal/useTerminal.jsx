@@ -198,7 +198,7 @@ export const useTerminal = (props) => {
       delete feeds.current.list[store.settings.pwd][feeds.current.selected];
       feeds.current.selected = "";
     } else {
-      processes.spawn({ command, pwd: store?.settings?.pwd });
+      processes.spawn("spawn", { command, pwd: store?.settings?.pwd });
     }
   };
 

@@ -5,8 +5,8 @@ export const useProcesses = (props) => {
   const methods = useRef();
   methods.current = props;
 
-  const spawn = (data) => {
-    ipcRenderer.send("spawn", data);
+  const spawn = (type, data) => {
+    ipcRenderer.send(type, data);
   };
 
   const kill = (pid) => {

@@ -442,6 +442,8 @@ const navigate = {
 
   externalGithub: "external.github",
   externalVSCode: "external.vscode",
+
+  internalDevTools: "internal.devtools",
 };
 
 const create = {
@@ -566,6 +568,16 @@ export const defaultActions = {
       {
         type: "execute-command",
         payload: "open -a terminal .",
+      },
+    ],
+  },
+  "open-dev-tools": {
+    name: "Open Dev Tools",
+    shortkey: "+F12",
+    list: [
+      {
+        type: "navigate",
+        payload: navigate.internalDevTools,
       },
     ],
   },
