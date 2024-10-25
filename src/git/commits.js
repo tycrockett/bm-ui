@@ -102,7 +102,7 @@ export const Commits = ({
             gap: 16px;
           `}
         >
-          <GitCommit size={16} color="white" weight="bold" />
+          <GitCommit size={24} color={colors.lightBlue} weight="bold" />
           <Text bold>
             Commits{" "}
             {commits?.length ? (
@@ -111,7 +111,7 @@ export const Commits = ({
                   margin-left: 8px;
                   border-radius: 30px;
                   padding: 2px 10px;
-                  background-color: ${colors.green};
+                  background-color: ${colors.dark};
                 `}
               >
                 {commits?.length}
@@ -198,7 +198,11 @@ export const Commits = ({
                   bold
                   css={`
                     min-width: max-content;
+                    color: ${colors.lightBlue};
                   `}
+                  onClick={() =>
+                    navigator.clipboard.writeText(key.split(" ")[0])
+                  }
                 >
                   {key.split(" ")[0]}
                 </Text>
@@ -210,7 +214,7 @@ export const Commits = ({
                   ${flex("center")}
                   border-radius: 30px;
                   padding: 4px;
-                  background-color: ${colors.green};
+                  background-color: ${colors.dark};
                   min-width: 100px;
                 `}
               >

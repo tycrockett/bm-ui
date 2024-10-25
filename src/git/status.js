@@ -199,16 +199,19 @@ export const Status = ({
                 }
               `}
             >
-              <GitPullRequest size={24} color="white" weight="fill" />
-              <Text bold css={``}>
-                Status
-              </Text>
+              <GitPullRequest
+                size={24}
+                color={colors.lightBlue}
+                weight="fill"
+              />
+              <Text bold>Status</Text>
             </Div>
             <Text
               h4
               bold
               css={`
                 margin-bottom: 8px;
+                color: ${colors.light};
               `}
             >
               {refreshedAt ? format(new Date(refreshedAt), "h:mm a") : ""}
@@ -384,7 +387,7 @@ export const Status = ({
               }
             `}
           >
-            <Tree size={80} color={colors.light} />
+            <Tree size={80} color={colors.lightBlue} />
             <Div
               css={`
                 flex-grow: 1;
