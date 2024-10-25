@@ -224,144 +224,143 @@ export const Status = ({
           >
             {shortStatus}
           </Text>
-          <Collapse isOpen={fileStatus?.length}>
-            {fileStatus?.map(([pathname, files]) => (
+
+          {fileStatus?.map(([pathname, files]) => (
+            <Div
+              css={`
+                margin-bottom: 16px;
+                position: relative;
+              `}
+            >
               <Div
                 css={`
-                  margin-bottom: 16px;
-                  position: relative;
+                  ${flex("left")} svg {
+                    margin-right: 8px;
+                  }
+                  margin-bottom: 8px;
+                  cursor: default;
+                  :not(:hover) {
+                    .full {
+                      display: none;
+                    }
+                  }
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.3);
+                    cursor: pointer;
+                    .short {
+                      display: none;
+                    }
+                  }
+                `}
+                onClick={() => navigator.clipboard.writeText(pathname)}
+              >
+                <Folder size={24} color="#fbfbbc" weight="fill" />
+
+                <Text bold className="short">
+                  .../{pathname.split("/").at(-1)}
+                </Text>
+                <Text bold className="full">
+                  {pathname}
+                </Text>
+              </Div>
+              <Div
+                css={`
+                  padding: 0;
+                  padding-left: 8px;
+                  margin-left: 12px;
+                  border-left: 2px solid ${colors.light};
                 `}
               >
-                <Div
-                  css={`
-                    ${flex("left")} svg {
-                      margin-right: 8px;
-                    }
-                    margin-bottom: 8px;
-                    cursor: default;
-                    :not(:hover) {
-                      .full {
-                        display: none;
-                      }
-                    }
-                    :hover {
-                      background-color: rgba(0, 0, 0, 0.3);
-                      cursor: pointer;
-                      .short {
-                        display: none;
-                      }
-                    }
-                  `}
-                  onClick={() => navigator.clipboard.writeText(pathname)}
-                >
-                  <Folder size={24} color="#fbfbbc" weight="fill" />
-
-                  <Text bold className="short">
-                    .../{pathname.split("/").at(-1)}
-                  </Text>
-                  <Text bold className="full">
-                    {pathname}
-                  </Text>
-                </Div>
-                <Div
-                  css={`
-                    padding: 0;
-                    padding-left: 8px;
-                    margin-left: 12px;
-                    border-left: 2px solid ${colors.light};
-                  `}
-                >
-                  {files?.map((file) => {
-                    return (
+                {files?.map((file) => {
+                  return (
+                    <Div
+                      css={`
+                        ${flex("space-between")}
+                        border-radius: 8px;
+                        padding: 2px 4px;
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.5);
+                          cursor: pointer;
+                        }
+                      `}
+                      key={file.filename}
+                      onClick={() => openFile(file.pathname)}
+                    >
                       <Div
                         css={`
-                          ${flex("space-between")}
-                          border-radius: 8px;
-                          padding: 2px 4px;
-                          :hover {
-                            background-color: rgba(0, 0, 0, 0.5);
-                            cursor: pointer;
+                          ${flex("left")}
+                          svg {
+                            margin-right: 8px;
                           }
                         `}
-                        key={file.filename}
-                        onClick={() => openFile(file.pathname)}
                       >
-                        <Div
-                          css={`
-                            ${flex("left")}
-                            svg {
-                              margin-right: 8px;
-                            }
-                          `}
-                        >
-                          {file.type === "untracked" ? (
-                            <FilePlus
-                              size={24}
-                              color={colors.lightBlue}
-                              weight="fill"
-                            />
-                          ) : file.type === "deleted" ? (
-                            <FileX size={24} color={colors.red} weight="fill" />
-                          ) : file.type === "modified" ? (
-                            <FileArrowUp
-                              size={24}
-                              color={colors.green}
-                              weight="fill"
-                            />
-                          ) : (
-                            <Question
-                              size={24}
-                              color={colors.lightBlue}
-                              weight="fill"
-                            />
-                          )}
-                          <Text>{file.filename}</Text>
-                        </Div>
-                        <Div
-                          css={`
-                            ${flex("right")}
-                            svg {
-                              margin-left: 8px;
-                            }
-                            p {
-                              text-align: right;
-                              min-width: 50px;
-                              font-weight: bold;
-                            }
-                          `}
-                        >
-                          {file.type === "untracked" ? null : (
-                            <>
-                              {file.adds >= 0 ? (
-                                <>
-                                  <Text>{file.adds}</Text>
-                                  <PlusCircle
-                                    size={24}
-                                    color={colors.green}
-                                    weight="fill"
-                                  />
-                                </>
-                              ) : null}
-                              {file.deletes ? (
-                                <>
-                                  <Text>{file.deletes}</Text>
-                                  <MinusCircle
-                                    size={24}
-                                    color={colors.red}
-                                    weight="fill"
-                                  />
-                                </>
-                              ) : null}
-                            </>
-                          )}
-                        </Div>
+                        {file.type === "untracked" ? (
+                          <FilePlus
+                            size={24}
+                            color={colors.lightBlue}
+                            weight="fill"
+                          />
+                        ) : file.type === "deleted" ? (
+                          <FileX size={24} color={colors.red} weight="fill" />
+                        ) : file.type === "modified" ? (
+                          <FileArrowUp
+                            size={24}
+                            color={colors.green}
+                            weight="fill"
+                          />
+                        ) : (
+                          <Question
+                            size={24}
+                            color={colors.lightBlue}
+                            weight="fill"
+                          />
+                        )}
+                        <Text>{file.filename}</Text>
                       </Div>
-                    );
-                  })}
-                </Div>
+                      <Div
+                        css={`
+                          ${flex("right")}
+                          svg {
+                            margin-left: 8px;
+                          }
+                          p {
+                            text-align: right;
+                            min-width: 50px;
+                            font-weight: bold;
+                          }
+                        `}
+                      >
+                        {file.type === "untracked" ? null : (
+                          <>
+                            {file.adds >= 0 ? (
+                              <>
+                                <Text>{file.adds}</Text>
+                                <PlusCircle
+                                  size={24}
+                                  color={colors.green}
+                                  weight="fill"
+                                />
+                              </>
+                            ) : null}
+                            {file.deletes ? (
+                              <>
+                                <Text>{file.deletes}</Text>
+                                <MinusCircle
+                                  size={24}
+                                  color={colors.red}
+                                  weight="fill"
+                                />
+                              </>
+                            ) : null}
+                          </>
+                        )}
+                      </Div>
+                    </Div>
+                  );
+                })}
               </Div>
-            ))}
-          </Collapse>
+            </Div>
+          ))}
         </Div>
       ) : (
         <Div

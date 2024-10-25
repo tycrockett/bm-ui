@@ -221,48 +221,48 @@ export const Commits = ({
                 {item?.length} File{item?.length !== 1 ? "s" : ""}
               </Text>
             </Div>
-            {hash === key || hash === "all"
-              ? logs[key]?.map((file) =>
-                  file ? (
+            <Collapse isOpen={hash === key || hash === "all"}>
+              {logs[key]?.map((file) =>
+                file ? (
+                  <Div
+                    css={css`
+                      padding: 8px 16px;
+                      height: 24px;
+                      padding-left: 64px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      cursor: default;
+                      :hover {
+                        background-color: rgba(0, 0, 0, 0.3);
+                      }
+                      :not(:hover) {
+                        .actions {
+                          display: none;
+                        }
+                      }
+                    `}
+                  >
+                    <Text>{file}</Text>
                     <Div
+                      className="actions"
                       css={css`
-                        padding: 8px 16px;
-                        height: 24px;
-                        padding-left: 64px;
                         display: flex;
+                        justify-content: right;
                         align-items: center;
-                        justify-content: space-between;
-                        cursor: default;
-                        :hover {
-                          background-color: rgba(0, 0, 0, 0.3);
-                        }
-                        :not(:hover) {
-                          .actions {
-                            display: none;
-                          }
-                        }
                       `}
                     >
-                      <Text>{file}</Text>
-                      <Div
-                        className="actions"
-                        css={css`
-                          display: flex;
-                          justify-content: right;
-                          align-items: center;
-                        `}
-                      >
-                        <Button icon sm onClick={() => deleteFile(file)}>
-                          <Trash />
-                        </Button>
-                        <Button icon sm onClick={() => copyFile(file)}>
-                          <CopySimple />
-                        </Button>
-                      </Div>
+                      <Button icon sm onClick={() => deleteFile(file)}>
+                        <Trash />
+                      </Button>
+                      <Button icon sm onClick={() => copyFile(file)}>
+                        <CopySimple />
+                      </Button>
                     </Div>
-                  ) : null
-                )
-              : null}
+                  </Div>
+                ) : null
+              )}
+            </Collapse>
           </Div>
         ))}
       </Div>
