@@ -1,5 +1,4 @@
 import { css } from "@emotion/css";
-import { format } from "date-fns";
 import {
   CaretDown,
   CaretUp,

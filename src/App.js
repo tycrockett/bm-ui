@@ -20,7 +20,7 @@ import { Git } from "./git/git";
 import { useKeyboard } from "./hooks/use-keyboard";
 import { Settings } from "./settings/settings";
 import { Div, Text, Button, colors } from "./shared";
-import { flex, shadows } from "./shared/utils";
+import { animation, flex, shadows } from "./shared/utils";
 import { cmd } from "./node/node-exports";
 import { defaultActions } from "./settings/actions";
 import { defaultExtensions, Extensions } from "./extensions/extensions";
@@ -32,6 +32,7 @@ import { useActions } from "./hooks/useActions";
 import { Shortkey } from "./Shortkey";
 import { useProcesses } from "./terminal/useProcesses";
 import { ipcRenderer } from "electron";
+import { useAnimation } from "./hooks/use-animation";
 
 const header = `
   padding: 8px 16px;
@@ -64,15 +65,25 @@ const App = () => {
 
   const [displayPorts, setDisplayPorts] = useState(false);
 
-  const killMainPID = async (pid) => {
-    await process.kill(pid);
-    set("lastCommand", `kill-pid-${new Date().toISOString()}`);
-  };
-
   const { settings, mode = "finder" } = store;
   const actions = {
     ...defaultActions,
     ...(settings?.actions || {}),
+  };
+
+  const animateShake = {
+    animation: animation("shake", ".5s ease"),
+    timing: 500,
+  };
+
+  const callAttentionBookmark = !(settings?.pwd in (settings?.bookmarks || {}));
+  const { animation: shake } = useAnimation(animateShake, [
+    callAttentionBookmark,
+  ]);
+
+  const killMainPID = async (pid) => {
+    await process.kill(pid);
+    set("lastCommand", `kill-pid-${new Date().toISOString()}`);
   };
 
   const splitDir = settings?.pwd?.split("/");
@@ -427,6 +438,11 @@ const App = () => {
                     <Div
                       css={`
                         ${flex("right")}
+                        background-color: ${colors.dark};
+                        border-radius: 8px;
+                        padding: 8px;
+                        margin: -8px;
+                        ${shake}
                       `}
                     >
                       <Text>
