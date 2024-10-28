@@ -34,23 +34,40 @@ export const CmdList = ({
       `}
     >
       {cmd.startsWith("/") ? (
-        <Div
-          css={`
-            padding-bottom: 8px;
-            margin-bottom: 16px;
-            width: calc(100% - 16px);
-            ${flex("left")}
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 8px;
-            border-radius: 8px;
-            gap: 8px;
-          `}
-        >
-          <Info color={colors.lightBlue} weight="bold" size={24} />
-          <Text>
-            Tab through commands or type them out to read more about them.
-          </Text>
-        </Div>
+        <>
+          <Div
+            css={`
+              padding-bottom: 8px;
+              margin-bottom: 16px;
+              width: calc(100% - 16px);
+              ${flex("left")}
+              background-color: rgba(255, 255, 255, 0.15);
+              padding: 8px;
+              border-radius: 8px;
+              gap: 8px;
+            `}
+          >
+            <Info color={colors.lightBlue} weight="bold" size={24} />
+            <Text>Space autocompletes the command.</Text>
+          </Div>
+          <Div
+            css={`
+              padding-bottom: 8px;
+              margin-bottom: 16px;
+              width: calc(100% - 16px);
+              ${flex("left")}
+              background-color: rgba(255, 255, 255, 0.15);
+              padding: 8px;
+              border-radius: 8px;
+              gap: 8px;
+            `}
+          >
+            <Info color={colors.lightBlue} weight="bold" size={24} />
+            <Text>
+              Tab to navigate or type out commands to read more about them.
+            </Text>
+          </Div>
+        </>
       ) : null}
       <Div
         css={`

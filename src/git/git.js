@@ -311,7 +311,7 @@ export const Git = () => {
         (item?.command === "." && lowerCase?.startsWith("./"))
     );
 
-    return filtered.sort((a, b) => {
+    const filteredAndSorted = filtered.sort((a, b) => {
       const aCommand = a?.command?.toLowerCase();
       const bCommand = b?.command?.toLowerCase();
       const acIdx = aCommand.indexOf(lowerCase);
@@ -331,6 +331,10 @@ export const Git = () => {
       }
       return -1;
     });
+    if (inputCmd.includes(" ")) {
+      return [filteredAndSorted[0]];
+    }
+    return filteredAndSorted;
   }, [cmd]);
 
   const handleRemote = async () => {
