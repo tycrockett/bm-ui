@@ -43,6 +43,7 @@ const App = () => {
   const context = useContext(StoreContext);
   const {
     store,
+    terminal,
     methods: { set, setSettings, directory },
   } = context;
   const setMode = (mode) => set("mode", mode);
@@ -516,17 +517,23 @@ const App = () => {
                 border-radius: 16px;
                 background-color: ${colors.darkIndigo};
                 padding: 8px;
-                padding-right: 12px;
+                padding-right: 8px;
                 margin-right: 8px;
 
                 cursor: pointer;
               `}
               onClick={() => setDisplayPorts(true)}
             >
-              <Tooltip label="Active Ports">
+              <Tooltip
+                label={`Active Ports ${
+                  ports?.[basePath]?.length
+                    ? `(${ports?.[basePath]?.length})`
+                    : ""
+                }`}
+              >
                 <Div
                   css={`
-                    ${flex("right")}
+                    ${flex("center")}
                   `}
                 >
                   <Div
@@ -535,11 +542,9 @@ const App = () => {
                       width: 6px;
                       height: 6px;
                       background-color: ${colors.lightGreen};
-                      margin-right: 8px;
                       border: 3px solid ${colors.green};
                     `}
                   />
-                  <Text bold>{ports?.[basePath]?.length}</Text>
                 </Div>
               </Tooltip>
               {displayPorts ? (
@@ -548,7 +553,7 @@ const App = () => {
                     position: absolute;
                     top: calc(100% + 8px);
                     right: 0;
-                    width: 300px;
+                    width: 400px;
                     background-color: ${colors.darkIndigo};
                     border-radius: 8px;
                     z-index: 100000;
@@ -569,7 +574,9 @@ const App = () => {
                       `}
                       onClick={() => killMainPID(port.pid)}
                     >
-                      <Text>{port.pid}</Text>
+                      <Text>
+                        {terminal?.children?.[port.pid]?.command || port?.pid}
+                      </Text>
                       <Text bold>{port.port}</Text>
                     </Div>
                   ))}
