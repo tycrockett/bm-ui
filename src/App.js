@@ -132,8 +132,10 @@ const App = () => {
   useInterval(updatePort, 5000);
 
   useEffect(() => {
-    updatePort();
-  }, [settings?.base, store.lastCommand]);
+    if (settings?.base) {
+      updatePort();
+    }
+  }, [settings?.base]);
 
   useEffect(() => {
     const extensions = defaultExtensions;
