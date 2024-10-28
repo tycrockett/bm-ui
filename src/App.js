@@ -133,7 +133,7 @@ const App = () => {
 
   useEffect(() => {
     updatePort();
-  }, [store.lastCommand]);
+  }, [settings?.base, store.lastCommand]);
 
   useEffect(() => {
     const extensions = defaultExtensions;

@@ -5,10 +5,6 @@ export function useInterval(callback, delay) {
 
   savedCallback.current = callback;
 
-  useEffect(() => {
-    savedCallback.current();
-  }, []);
-
   // Set up the interval.
   useEffect(() => {
     // Don't schedule if no delay is specified.
