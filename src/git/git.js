@@ -57,7 +57,8 @@ export const Git = () => {
       logs = [],
       lastCommand = "",
       terminal = {},
-      action,
+      commandHistory = [],
+      commandHistoryIndex = null,
     },
     methods,
   } = context;
@@ -224,6 +225,9 @@ export const Git = () => {
       filteredBranchList: checkoutList,
       branches: branches.list,
     };
+
+    methods.set("commandHistory", [executingCommand, ...commandHistory]);
+    methods.set("commandHistoryIndex", null);
 
     try {
       if (executingCommand.startsWith("command")) {
@@ -393,6 +397,7 @@ export const Git = () => {
   };
 
   const keydown = async (captured, event) => {
+    console.log(captured);
     if (tab === "command") {
       if (captured === "+Tab") {
         event.preventDefault();
@@ -410,11 +415,26 @@ export const Git = () => {
             setCmd(command);
           }
         }
+      } else if (captured === "+ArrowUp") {
+        ref?.current?.focus();
+        let index = commandHistoryIndex + 1;
+        if (index > commandHistory.length) {
+          index = null;
+        }
+        methods.set("commandHistoryIndex", index);
       } else if (!captured.includes("meta")) {
         ref?.current?.focus();
       }
     }
   };
+
+  useEffect(() => {
+    if (commandHistoryIndex !== null && commandHistory?.length) {
+      setCmd(commandHistory[commandHistoryIndex - 1]);
+    } else if (commandHistoryIndex === null) {
+      setCmd("");
+    }
+  }, [commandHistoryIndex]);
 
   useKeyboard({ keydown });
   const box = positionRef?.current?.getBoundingClientRect();
