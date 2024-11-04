@@ -161,110 +161,127 @@ export const Commits = ({
           max-width: 100%;
         `}
       >
-        {commits?.map(([key, item]) => (
-          <Div>
-            <Div
-              css={`
-                ${animation("fadeIn", ".2s ease")}
-                ${flex("space-between")}
-                border-top: 1px solid ${colors.dark};
-                padding: 8px 16px;
-                transition: background-color 0.2s ease;
-                cursor: pointer;
-                :hover {
-                  background-color: rgba(0, 0, 0, 0.3);
-                }
-              `}
-              onClick={() => setHash(hash === key ? "" : key)}
-            >
+        {commits?.length ? (
+          commits?.map(([key, item]) => (
+            <Div>
               <Div
                 css={`
+                  ${animation("fadeIn", ".2s ease")}
                   ${flex("space-between")}
-                  flex-grow: 1;
-                  margin-right: 16px;
-                `}
-              >
-                <Text
-                  bold
-                  css={`
-                    flex-grow: 1;
-                    overflow: hidden;
-                    white-space: wrap;
-                  `}
-                >
-                  {key.split(" ").slice(1).join(" ")}
-                </Text>
-                <Text
-                  bold
-                  css={`
-                    min-width: max-content;
-                    color: ${colors.lightBlue};
-                  `}
-                  onClick={() =>
-                    navigator.clipboard.writeText(key.split(" ")[0])
+                border-top: 1px solid ${colors.dark};
+                  padding: 8px 16px;
+                  transition: background-color 0.2s ease;
+                  cursor: pointer;
+                  :hover {
+                    background-color: rgba(0, 0, 0, 0.3);
                   }
-                >
-                  {key.split(" ")[0]}
-                </Text>
-              </Div>
-
-              <Text
-                bold
-                css={`
-                  ${flex("center")}
-                  border-radius: 30px;
-                  padding: 4px;
-                  background-color: ${colors.dark};
-                  min-width: 100px;
                 `}
+                onClick={() => setHash(hash === key ? "" : key)}
               >
-                {item?.length} File{item?.length !== 1 ? "s" : ""}
-              </Text>
-            </Div>
-            <Collapse isOpen={hash === key || hash === "all"}>
-              {logs[key]?.map((file) =>
-                file ? (
-                  <Div
-                    css={css`
-                      padding: 8px 16px;
-                      height: 24px;
-                      padding-left: 64px;
-                      display: flex;
-                      align-items: center;
-                      justify-content: space-between;
-                      cursor: default;
-                      :hover {
-                        background-color: rgba(0, 0, 0, 0.3);
-                      }
-                      :not(:hover) {
-                        .actions {
-                          display: none;
-                        }
-                      }
+                <Div
+                  css={`
+                    ${flex("space-between")}
+                    flex-grow: 1;
+                    margin-right: 16px;
+                  `}
+                >
+                  <Text
+                    bold
+                    css={`
+                      flex-grow: 1;
+                      overflow: hidden;
+                      white-space: wrap;
                     `}
                   >
-                    <Text>{file}</Text>
+                    {key.split(" ").slice(1).join(" ")}
+                  </Text>
+                  <Text
+                    bold
+                    css={`
+                      min-width: max-content;
+                      color: ${colors.lightBlue};
+                    `}
+                    onClick={() =>
+                      navigator.clipboard.writeText(key.split(" ")[0])
+                    }
+                  >
+                    {key.split(" ")[0]}
+                  </Text>
+                </Div>
+
+                <Text
+                  bold
+                  css={`
+                    ${flex("center")}
+                    border-radius: 30px;
+                    padding: 4px;
+                    background-color: ${colors.dark};
+                    min-width: 100px;
+                  `}
+                >
+                  {item?.length} File{item?.length !== 1 ? "s" : ""}
+                </Text>
+              </Div>
+              <Collapse isOpen={hash === key || hash === "all"}>
+                {logs[key]?.map((file) =>
+                  file ? (
                     <Div
-                      className="actions"
                       css={css`
+                        padding: 8px 16px;
+                        height: 24px;
+                        padding-left: 64px;
                         display: flex;
-                        justify-content: right;
                         align-items: center;
+                        justify-content: space-between;
+                        cursor: default;
+                        :hover {
+                          background-color: rgba(0, 0, 0, 0.3);
+                        }
+                        :not(:hover) {
+                          .actions {
+                            display: none;
+                          }
+                        }
                       `}
                     >
-                      <Button icon sm onClick={() => deleteFile(file)}>
-                        <Trash />
-                      </Button>
-                      <Button icon sm onClick={() => copyFile(file)}>
-                        <CopySimple />
-                      </Button>
+                      <Text>{file}</Text>
+                      <Div
+                        className="actions"
+                        css={css`
+                          display: flex;
+                          justify-content: right;
+                          align-items: center;
+                        `}
+                      >
+                        <Button icon sm onClick={() => deleteFile(file)}>
+                          <Trash />
+                        </Button>
+                        <Button icon sm onClick={() => copyFile(file)}>
+                          <CopySimple />
+                        </Button>
+                      </Div>
                     </Div>
-                  </Div>
-                ) : null
-              )}
-            </Collapse>
+                  ) : null
+                )}
+              </Collapse>
+            </Div>
+          ))
+        ) : (
+          <Div
+            css={`
+              margin: 0 16px;
+              font-weight: bold;
+            `}
+          >
+            <Text
+              css={`
+                color: ${colors.light};
+              `}
+            >
+              No commits found.
+            </Text>
           </Div>
-        ))}
+        )}
       </Div>
     </Collapse>
   );
