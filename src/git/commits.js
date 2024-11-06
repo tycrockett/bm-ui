@@ -49,7 +49,7 @@ export const Commits = ({
       `git rev-list --left-right --count origin/${parentBranch}...${parentBranch}`
     );
     return diff.split("\t").map((item) => Number(item));
-  }, [parentBranch, pwd]);
+  }, [parentBranch, pwd, lastCommand]);
 
   const commits = Object.entries(logs || {});
 
