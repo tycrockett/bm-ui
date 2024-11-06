@@ -48,7 +48,7 @@ export const CmdList = ({
             `}
           >
             <Info color={colors.lightBlue} weight="bold" size={24} />
-            <Text>Space autocompletes the command.</Text>
+            <Text>Space to autocomplete the command.</Text>
           </Div>
           <Div
             css={`
