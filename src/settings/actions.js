@@ -28,6 +28,7 @@ export const Actions = ({ settings, setSettings }) => {
     ...defaultActions,
     ...(settings?.actions || {}),
   };
+  console.log(actions);
 
   const [actionKey, setActionKey] = useState("");
   const [action, setAction] = useState(null);
@@ -451,6 +452,36 @@ const create = {
 };
 
 export const defaultActions = {
+  "auto-open-localhost": {
+    name: "Open localhost",
+    shortkey: "meta+KeyK",
+    list: [
+      {
+        type: "extension",
+        payload: "auto-open-localhost",
+      },
+    ],
+  },
+  "open-terminal": {
+    name: "Open External Terminal",
+    shortkey: "meta+shift+KeyT",
+    list: [
+      {
+        type: "execute-command",
+        payload: "open -a terminal .",
+      },
+    ],
+  },
+  "create-bookmark": {
+    name: "Create bookmark",
+    shortkey: "meta+Equal",
+    list: [
+      {
+        type: "create",
+        payload: create.bookmark,
+      },
+    ],
+  },
   "navigate-finder": {
     name: "View Finder",
     shortkey: "meta+KeyF",
@@ -548,26 +579,6 @@ export const defaultActions = {
       {
         type: "navigate",
         payload: navigate?.externalVSCode,
-      },
-    ],
-  },
-  "create-bookmark": {
-    name: "Create bookmark",
-    shortkey: "meta+Equal",
-    list: [
-      {
-        type: "create",
-        payload: create.bookmark,
-      },
-    ],
-  },
-  "open-terminal": {
-    name: "Open External Terminal",
-    shortkey: "meta+shift+KeyT",
-    list: [
-      {
-        type: "execute-command",
-        payload: "open -a terminal .",
       },
     ],
   },
