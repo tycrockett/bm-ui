@@ -584,7 +584,7 @@ const App = () => {
               ) : null}
             </Div>
           ) : null}
-          <Tooltip label="Open directory" shortkey="open-vscode">
+          <Tooltip label="Open" shortkey="open-vscode">
             <Button
               icon
               disabled={settings?.pwd === "~"}
