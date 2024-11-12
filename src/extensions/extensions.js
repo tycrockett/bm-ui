@@ -247,7 +247,7 @@ const defaultCommands = [
     flags: "",
     description: `1. git add {path}\n2. git commit -m {commitMessage} \n3. git push, if a remote branch is detected.\n\n". {commitMessage}" or "./path/to/file {commitMessage}"`,
     function: async ({ command, context }) => {
-      const matches = [...(command?.raw?.match(/'([^"]*)'/g) || [])];
+      const matches = [...(command?.raw?.match(/"([^"]*)"/g) || [])];
       if (matches?.length !== 1) {
         return toast.error("Invalid commit message");
       }
