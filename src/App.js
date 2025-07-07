@@ -195,7 +195,7 @@ const App = () => {
       } else if (payload?.startsWith("external")) {
         const to = payload.split(".")?.[1] || "";
         if (to === "vscode") {
-          cmd(`open -n -b "com.microsoft.VSCode" --args "$PWD"`);
+          cmd("cursor $PWD");
         } else if (to === "") {
         }
       } else if (payload?.startsWith("internal")) {
@@ -239,7 +239,7 @@ const App = () => {
 
   const openBookmark = (pwd) => {
     const path = pwd?.replace("~", store?.settings?.base);
-    cmd(`open -n -b "com.microsoft.VSCode" --args "${path}"`);
+    cmd(`cursor ${path}`);
   };
 
   useKeyboard({ keydown });
@@ -591,9 +591,7 @@ const App = () => {
               css={`
                 padding: 16px;
               `}
-              onClick={() =>
-                cmd('open -n -b "com.microsoft.VSCode" --args "$PWD"')
-              }
+              onClick={() => cmd("cursor $PWD")}
             >
               <ArrowSquareOut weight="bold" />
             </Button>

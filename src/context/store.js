@@ -5,8 +5,6 @@ import { useTerminalActions } from "./use-terminal-actions";
 import { merge } from "lodash";
 import { useTerminal } from "../terminal/useTerminal";
 
-// "open -n -b "com.microsoft.VSCode" --args "$PWD""
-
 const initialState = {
   settings: {
     pwd: "~",

@@ -78,10 +78,13 @@ export const deleteBranch = async (options = {}) => {
   }
 };
 
-export const stash = async (options = {}) => {
+export const stash = async (args, options = {}) => {
   const { flags = "" } = options;
   try {
-    if (flags.includes("-a") || flags.includes("--apply")) {
+    if (args.length) {
+      const path = args[0];
+      await cmd(`git stash push --include-untracked ${path}`);
+    } else if (flags.includes("-a") || flags.includes("--apply")) {
       await cmd("git stash apply");
     } else {
       await cmd("git stash");
@@ -247,14 +250,17 @@ export const logCommits = async ({
   parentBranch,
   defaultBranch,
 }) => {
+  console.log(1);
   const command =
     !parentBranch || currentBranch === defaultBranch
       ? "git log --oneline --name-only --no-merges -15"
       : `git show --name-only --oneline ${parentBranch}..HEAD`;
   try {
+    console.log(2);
     const files = await cmd(command);
     const split = files.split("\n");
     let key = "";
+    console.log(3);
     return split.reduce((prev, item) => {
       if (item.includes(" ")) {
         key = item;

@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Collapse } from "../shared/Collapse";
 import { Tooltip } from "../shared/Tooltip";
 import { scrollbar } from "../shared/styles";
+import { stash } from "./utils";
 
 const dedupe = (arr) => [...new Set(arr)];
 
@@ -156,7 +157,7 @@ export const Status = ({
 
   const openFile = (file) => {
     const path = settings?.pwd?.replace("~", settings?.base);
-    const command = `open -n -b "com.microsoft.VSCode" --args -g "${path}/${file}"`;
+    const command = `cursor "${path}/${file}"`;
     cmd(command);
   };
 
@@ -291,6 +292,11 @@ export const Status = ({
                         `}
                         key={file.filename}
                         onClick={() => openFile(file.pathname)}
+                        onContextMenu={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          stash([file.pathname]);
+                        }}
                       >
                         <Div
                           css={`

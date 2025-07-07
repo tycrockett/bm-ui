@@ -9,6 +9,7 @@ import {
   deleteBranch,
   fetch,
   handleFile,
+  moveFilesFromCommit,
   pruneLocalBranches,
   push,
   renameBranch,
@@ -357,11 +358,11 @@ const defaultCommands = [
   {
     name: "Stash",
     command: "stash",
-    args: "",
+    args: "{file}",
     flags: "-a --apply",
-    description: "git stash",
+    description: "git stash. Optionally, stash a file.",
     function: async ({ command, context }) => {
-      await stash(command.options);
+      await stash(command.args, command.options);
     },
   },
 
@@ -414,9 +415,10 @@ const defaultCommands = [
   {
     name: "Pop",
     command: "pop",
-    args: "",
+    args: "{relativeFilepath}",
     flags: "",
-    description: "Undo most recent commit",
+    description:
+      "Undo most recent commit. {relativeFilepath} is optional but will remove a file from the commit",
     function: async ({ command, context }) => {
       await context?.methods?.executeCommand("git reset HEAD~");
     },
